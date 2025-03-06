@@ -1,0 +1,20 @@
+[gd_scene load_steps=4 format=3 uid="uid://ririv7e6tmwp"]
+
+[ext_resource type="Script" uid="uid://d5h3hc38qpa7" path="res://_script/terrain/world/static/Tree.cs" id="1_fvdkc"]
+[ext_resource type="PackedScene" uid="uid://b0sj15u6ew86o" path="res://_models/trees/Lowpoly_tree_sample.fbx.glb" id="2_axsp1"]
+
+[sub_resource type="CylinderShape3D" id="CylinderShape3D_ieu8c"]
+height = 4.016
+radius = 1.306
+
+[node name="Tree2" type="Node3D"]
+script = ExtResource("1_fvdkc")
+
+[node name="RigidBody3D" type="RigidBody3D" parent="."]
+freeze = true
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="RigidBody3D"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.33774, 0)
+shape = SubResource("CylinderShape3D_ieu8c")
+
+[node name="Lowpoly_tree_sample_fbx" parent="RigidBody3D" instance=ExtResource("2_axsp1")]

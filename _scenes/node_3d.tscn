@@ -1,0 +1,47 @@
+[gd_scene load_steps=9 format=3 uid="uid://cbrmd426xyisj"]
+
+[ext_resource type="PackedScene" uid="uid://bw42mox3u02yq" path="res://_scenes/main_character.tscn" id="1_tbkan"]
+[ext_resource type="Script" uid="uid://dav7mfvtja61m" path="res://_script/terrain/TerrainManager.cs" id="2_km6q5"]
+
+[sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_1ln0e"]
+
+[sub_resource type="Sky" id="Sky_sqpy2"]
+sky_material = SubResource("ProceduralSkyMaterial_1ln0e")
+
+[sub_resource type="Environment" id="Environment_673ij"]
+background_mode = 2
+sky = SubResource("Sky_sqpy2")
+ambient_light_source = 3
+ambient_light_color = Color(0.188235, 0.2, 0.290196, 1)
+
+[sub_resource type="PhysicsMaterial" id="PhysicsMaterial_23t8k"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_8idyo"]
+size = Vector3(2, 0.1, 2)
+
+[sub_resource type="PlaneMesh" id="PlaneMesh_virbw"]
+
+[node name="World" type="Node3D"]
+
+[node name="GameManager" type="Node" parent="."]
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource("Environment_673ij")
+
+[node name="PlayingCharacter" parent="." instance=ExtResource("1_tbkan")]
+
+[node name="StaticBody3D" type="StaticBody3D" parent="."]
+transform = Transform3D(2.095, 0, 0, 0, 2.095, 0, 0, 0, 2.095, 0, -2.78725, 0)
+physics_material_override = SubResource("PhysicsMaterial_23t8k")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="StaticBody3D"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.0523541, 0)
+shape = SubResource("BoxShape3D_8idyo")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="StaticBody3D/CollisionShape3D"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.0523541, 0)
+mesh = SubResource("PlaneMesh_virbw")
+skeleton = NodePath("../../..")
+
+[node name="TerrainManager" type="Node" parent="."]
+script = ExtResource("2_km6q5")

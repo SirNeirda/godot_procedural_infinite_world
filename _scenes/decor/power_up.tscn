@@ -1,0 +1,44 @@
+[gd_scene load_steps=5 format=3 uid="uid://bmprho4q308ir"]
+
+[ext_resource type="Script" uid="uid://bu0wdk60p7nuy" path="res://_script/gameplay/PowerUp.cs" id="1_5u75h"]
+
+[sub_resource type="SphereShape3D" id="SphereShape3D_7p7in"]
+radius = 0.1
+
+[sub_resource type="SphereMesh" id="SphereMesh_lvdfn"]
+radius = 0.1
+height = 0.2
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_47efx"]
+albedo_color = Color(0.945189, 0.0221066, 0.373902, 1)
+metallic = 0.13
+roughness = 0.34
+emission_enabled = true
+emission = Color(1, 0.305148, 0.451096, 1)
+emission_energy_multiplier = 5.41
+
+[node name="PowerUp" type="Node3D" node_paths=PackedStringArray("collider")]
+transform = Transform3D(2.095, 0, 0, 0, 2.095, 0, 0, 0, 2.095, 0, 7.28011, 0)
+script = ExtResource("1_5u75h")
+collider = NodePath("Area3D/CollisionShape3D")
+
+[node name="Area3D" type="Area3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.418678, 0)
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Area3D"]
+transform = Transform3D(2, 0, 0, 0, 2, 0, 0, 0, 2, 0, 0, 0)
+shape = SubResource("SphereShape3D_7p7in")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Area3D/CollisionShape3D"]
+mesh = SubResource("SphereMesh_lvdfn")
+skeleton = NodePath("../../..")
+surface_material_override/0 = SubResource("StandardMaterial3D_47efx")
+
+[node name="OmniLight3D" type="OmniLight3D" parent="."]
+transform = Transform3D(0.477327, 0, 0, 0, 0.477327, 0, 0, 0, 0.477327, 0, 1.10801, 0)
+light_color = Color(0.898014, 0.630767, 0.737439, 1)
+light_energy = 5.133
+light_volumetric_fog_energy = 5.599
+
+[connection signal="area_entered" from="Area3D" to="." method="_on_area_3d_area_entered"]
+[connection signal="body_entered" from="Area3D" to="." method="_on_area_3d_body_entered"]
