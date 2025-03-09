@@ -5,7 +5,7 @@ This project also includes a simple playable demo with a character, showcasing t
 
 ![Alt Text](./images/introgif.gif)
 
-#h2 Demo Project
+## H2 Demo Project
 In the demo, you can play a simple character in third person view. Obstacles are generated and randomized throughout the infinite map. Mindless mobs spawn randomly around the player and move toward him. Try to run away as far away as possible from the starting point, but if you let the mobs get too close, the distance counter resets.
 This is a simple starter demo to showcase the project, but can be extended to support any actual gameplay.
 How to Play
@@ -22,7 +22,7 @@ Mobs are constantly spawned around the player.
 Mobs are cleaned-up when they get too far.
 Doing any sort of action will consume stamina, shown in the upper right bar. Once you're out of stamina, you can only walk. 
 
-#h2 Key Features
+## H2 Key Features
 - Terrain generation, by default using Godot's Simplex Perlin Noise, but fully extensible and allowing any type of blend or crazy stuff.
 - Terrain LOD. Adjustable draw distance.
 - The mesh is generated around the player and cleaned depending on distance.
@@ -30,10 +30,11 @@ Doing any sort of action will consume stamina, shown in the upper right bar. Onc
 - Physics enabled playable character and items.
 - Works surprisingly well on Android
   
-#h2 Incomplete features
-- There are a selection of shaders to go along the terrain, which are largely incomplete. With the mesh coordinates, it is possible to blend textures according to elevation/orientation, or any other variable supported in Godot.
+## H2 Incomplete features
+- There are a selection of shaders to go along the terrain, which are largely incomplete/not working. With the mesh coordinates, it is possible to blend textures according to elevation/orientation, or any other variable supported in Godot.
 - Water spawns at elevation 0, but it's a simple mesh with no logic. Although terrain objects will not spawn under elevation zero, the character and mobs will not drown or swim.
 - For now there isn't any kind of variable exposed to customize generation, all must be done through code.
 - The project is somewhat over-engineered with some overkill functions and classes.
+- Works on Android, but there is no logic for touch movement
 
 If you like this project, need help or have cool ideas, join our [Discord](https://discord.gg/JhnQwUpFBm)! 
