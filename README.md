@@ -1,9 +1,11 @@
 # Godot Procedural World Generation Demo Project
 
-Full Godot C# project for procedural infinite landmass generation, with random items or obstacles spreading throughout the map, with physics enabled. The base mesh generation logic is based on Sebastian Lague's Procedural Landmass Generation, optimized and customized to work in Godot 4.4 and lower.
-This project also includes a simple playable demo with a character, showcasing the features. Also includes some helper functions not present in Godot's default engine, such as in-world gizmos and text for easy debugging.
-
 ![Alt Text](./images/screenshot_2.jpg)
+
+Run away from Evil Godots forever. 
+
+Full Godot C# project for procedural infinite terrain generation, with random items or obstacles spreading throughout the map, with physics enabled. 
+Mesh generation logic based on Sebastian Lague's Procedural Landmass Generation, optimized and customized to work in Godot 4.4 and lower. Works on PC and Android. Other platforms still untested, but probably work as well.
 
 ## Demo Project
 In the demo, you can play a simple character in third person view. Obstacles are generated and randomized throughout the infinite map. Mindless mobs spawn randomly around the player and move toward him. Try to run away as far away as possible from the starting point, but if you let the mobs get too close, the distance counter resets.
@@ -22,6 +24,9 @@ Mobs are constantly spawned around the player.
 Mobs are cleaned-up when they get too far.
 Doing any sort of action will consume stamina, shown in the upper right bar. Once you're out of stamina, you can only walk. 
 
+Full Godot C# project for procedural infinite terrain generation, with random items or obstacles spreading throughout the map, with physics enabled. 
+Mesh generation logic based on Sebastian Lague's Procedural Landmass Generation, optimized and customized to work in Godot 4.4 and lower. Works on PC and Android. Other platforms still untested, but probably work as well.
+
 ## Key Features
 - Terrain generation, by default using Godot's Simplex Perlin Noise, but fully extensible and allowing any type of blend or crazy stuff.
 - Terrain LOD. Adjustable draw distance.
@@ -32,6 +37,7 @@ Doing any sort of action will consume stamina, shown in the upper right bar. Onc
   
 ## Incomplete features
 - There are a selection of shaders to go along the terrain, which are largely incomplete/not working. With the mesh coordinates, it is possible to blend textures according to elevation/orientation, or any other variable supported in Godot.
+- There is the base code logic to create and save chunk files (FileWriter.cs), making it potentially possible to save chunks data on disk or transfer them to a remote server. This would allow persitent terrain deformation, but still untested.
 - Water spawns at elevation 0, but it's a simple mesh with no logic. Although terrain objects will not spawn under elevation zero, the character and mobs will not drown or swim.
 - For now there isn't any kind of variable exposed to customize generation, all must be done through code.
 - The project is somewhat over-engineered with some overkill functions and classes.
