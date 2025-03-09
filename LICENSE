@@ -19,3 +19,12 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
+
+Credits:
+
+The Godot character model is by CaptainRipley
+https://captainripley.itch.io/godot-3d-robot-character
+The tree model comes from:
+https://3dmodels.org/fr/free/low-poly-tree/
+The original code I based this project on comes from 
+https://github.com/SebLague/Procedural-Landmass-Generation
