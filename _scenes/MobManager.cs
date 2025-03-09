@@ -24,12 +24,15 @@ public partial class MobManager : Node
 
 	bool GenerationActive = false;
 
+	PackedScene Mob = ResourceLoader.Load<PackedScene>("res://_scenes/mob.tscn");
+
 	
 
 	public List<CharacterMob> Mobs = new List<CharacterMob>();
 	public override void _Ready()
 	{
 		//SpawnMob(SpawnsPerTime);
+		Mob = ResourceLoader.Load<PackedScene>("res://_scenes/mob.tscn");
 	}
 
 	public override void _Process(double delta)
@@ -83,7 +86,6 @@ public partial class MobManager : Node
 		// Generate a random distance between minDistance and maxDistance
 		float distance = (float)(random.NextDouble() * (10 - 50) + 10);
 
-		// Calculate the offset using polar coordinates
 		float offsetX = distance * (float)Math.Cos(angle);
 		float offsetZ = distance * (float)Math.Sin(angle);
 
@@ -111,11 +113,11 @@ public partial class MobManager : Node
 
 		}
 		GD.Print("Spawning mob: " + number);
-		PackedScene Mob = ResourceLoader.Load<PackedScene>("res://_scenes/mob.tscn");
+		//PackedScene Mob = ResourceLoader.Load<PackedScene>("res://_scenes/mob.tscn");
             
 		CharacterMob node = Mob.Instantiate() as CharacterMob;
 		node.Position = GetSpawnLocation();
-		AddChild(node);
+		CallDeferred("add_child", node);//AddChild(node);
 		Mobs.Add(node);
 		node.Name = "Ennemy " + Mobs.Count;
 		for (int i = 1; i < number; i++)

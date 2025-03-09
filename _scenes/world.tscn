@@ -1,14 +1,12 @@
-[gd_scene load_steps=21 format=3 uid="uid://dorvgphrel13u"]
+[gd_scene load_steps=18 format=3 uid="uid://dorvgphrel13u"]
 
 [ext_resource type="PackedScene" uid="uid://bw42mox3u02yq" path="res://_scenes/main_character.tscn" id="1_ciup7"]
 [ext_resource type="Material" uid="uid://wq3811s3nwm7" path="res://materials/sky.tres" id="1_f50i4"]
 [ext_resource type="Script" uid="uid://dav7mfvtja61m" path="res://_script/terrain/TerrainManager.cs" id="2_hui18"]
 [ext_resource type="Texture2D" uid="uid://dvprrws80mh2u" path="res://materials/start.png" id="3_ike5v"]
 [ext_resource type="Script" uid="uid://tk8lkgbaluti" path="res://_script/terrain/TerrainDetailsManager.cs" id="3_x21qi"]
-[ext_resource type="Texture2D" uid="uid://lunuvyo62vsa" path="res://materials/textures/Grass_1_colourOpacity.png" id="4_luoph"]
-[ext_resource type="Texture2D" uid="uid://bfjr6o1faw61k" path="res://materials/textures/Grass_1__Normal.png" id="5_ike5v"]
+[ext_resource type="Material" uid="uid://cskxpml7do2lq" path="res://materials/base_terrain.tres" id="5_u8evv"]
 [ext_resource type="Script" uid="uid://h5w4bya8uxkc" path="res://_scenes/MobManager.cs" id="6_5h46a"]
-[ext_resource type="Texture2D" uid="uid://dph0ib2xplb4c" path="res://materials/textures/Grass_1_MetallicSmoothness.png" id="6_hvdyj"]
 [ext_resource type="Texture2D" uid="uid://bwaewakix3di8" path="res://materials/textures/platformbase_Platform_1_top_flat-material_Normal.png" id="6_th4oj"]
 [ext_resource type="PackedScene" uid="uid://dydlmuscctvv2" path="res://_scenes/powerups/power_up.tscn" id="8_u7we2"]
 
@@ -46,16 +44,6 @@ size = Vector3(2, 0.1, 2)
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_hvdyj"]
 albedo_texture = ExtResource("3_ike5v")
 roughness_texture = ExtResource("3_ike5v")
-
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_osuqp"]
-albedo_texture = ExtResource("4_luoph")
-roughness_texture = ExtResource("6_hvdyj")
-normal_enabled = true
-normal_scale = 0.35
-normal_texture = ExtResource("5_ike5v")
-rim_enabled = true
-rim_texture = ExtResource("6_hvdyj")
-uv1_scale = Vector3(4, 4, 4)
 
 [sub_resource type="PlaneMesh" id="PlaneMesh_dnkau"]
 size = Vector2(1000, 1000)
@@ -96,7 +84,7 @@ surface_material_override/0 = SubResource("StandardMaterial3D_hvdyj")
 [node name="TerrainManager" type="Node" parent="."]
 script = ExtResource("2_hui18")
 SaveTerrainToLocalDisk = false
-TerrainMaterial = SubResource("StandardMaterial3D_osuqp")
+TerrainMaterial = ExtResource("5_u8evv")
 
 [node name="TerrainDetailsManager" type="Node" parent="TerrainManager"]
 script = ExtResource("3_x21qi")
@@ -112,9 +100,10 @@ light_bake_mode = 0
 shadow_enabled = true
 shadow_bias = 0.0
 shadow_transmittance_bias = -7.283
-shadow_opacity = 0.98
-shadow_blur = 0.375
-directional_shadow_mode = 0
+shadow_opacity = 0.87
+shadow_blur = 0.938
+directional_shadow_blend_splits = true
+directional_shadow_fade_start = 0.73
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.0218635, 0)

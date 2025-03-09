@@ -1,9 +1,10 @@
-[gd_scene load_steps=7 format=3 uid="uid://bf04of4xrt142"]
+[gd_scene load_steps=9 format=3 uid="uid://bf04of4xrt142"]
 
 [ext_resource type="Script" uid="uid://bg7jhdjqxgqbk" path="res://_script/GameManager.cs" id="1_jovvh"]
 [ext_resource type="Script" uid="uid://epcqve8dqtnd" path="res://_script/SoftwareManager.cs" id="2_gqgyk"]
 [ext_resource type="Script" uid="uid://ccilq7mlhnfyg" path="res://_script/ui/GlobalUIManager.cs" id="3_7t23k"]
 [ext_resource type="Script" uid="uid://bp76k8vnf3pn" path="res://_scenes/ScreenSpaceMainUI.cs" id="4_3e8h3"]
+[ext_resource type="Script" uid="uid://df2k2g3a8ktxw" path="res://_scenes/ButtonMobile.cs" id="6_ce27d"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_lavtb"]
 bg_color = Color(0.6, 0.6, 0.6, 0.0627451)
@@ -15,6 +16,9 @@ content_margin_right = 9.0
 content_margin_bottom = 8.0
 bg_color = Color(0.150357, 0.162971, 0.21575, 0.741176)
 
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_ce27d"]
+bg_color = Color(1, 0.341498, 0.317505, 0.635294)
+
 [node name="Main" type="Node"]
 
 [node name="GameManager" type="Node" parent="."]
@@ -23,8 +27,9 @@ script = ExtResource("1_jovvh")
 [node name="SoftwareManager" type="Node" parent="."]
 script = ExtResource("2_gqgyk")
 
-[node name="UI" type="Node" parent="."]
+[node name="UI" type="Node" parent="." node_paths=PackedStringArray("MobileUI")]
 script = ExtResource("3_7t23k")
+MobileUI = NodePath("Control")
 
 [node name="ScreenSpaceUI" type="Control" parent="UI" node_paths=PackedStringArray("Distance", "ActionBar", "Record")]
 layout_mode = 3
@@ -114,3 +119,110 @@ size_flags_horizontal = 4
 size_flags_vertical = 4
 value = 100.0
 show_percentage = false
+
+[node name="Control" type="Control" parent="UI"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="PanelContainer2" type="PanelContainer" parent="UI/Control"]
+layout_mode = 1
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -556.0
+offset_top = -475.0
+offset_right = -56.0
+offset_bottom = -75.0
+grow_horizontal = 0
+grow_vertical = 0
+
+[node name="VBoxContainer" type="VBoxContainer" parent="UI/Control/PanelContainer2"]
+layout_mode = 2
+
+[node name="Button3" type="Button" parent="UI/Control/PanelContainer2/VBoxContainer"]
+custom_minimum_size = Vector2(70, 50)
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_styles/pressed = SubResource("StyleBoxFlat_ce27d")
+text = "FLY"
+script = ExtResource("6_ce27d")
+ActionName = "fly"
+
+[node name="Button5" type="Button" parent="UI/Control/PanelContainer2/VBoxContainer"]
+custom_minimum_size = Vector2(70, 50)
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_styles/pressed = SubResource("StyleBoxFlat_ce27d")
+text = "TOSS STUFF"
+script = ExtResource("6_ce27d")
+ActionName = "attack"
+
+[node name="Button4" type="Button" parent="UI/Control/PanelContainer2/VBoxContainer"]
+custom_minimum_size = Vector2(70, 50)
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_styles/pressed = SubResource("StyleBoxFlat_ce27d")
+text = "JUMP"
+script = ExtResource("6_ce27d")
+ActionName = "jump"
+
+[node name="PanelContainer" type="PanelContainer" parent="UI/Control"]
+visible = false
+layout_mode = 0
+offset_left = 108.0
+offset_top = 351.0
+offset_right = 148.0
+offset_bottom = 391.0
+
+[node name="VBoxContainer" type="VBoxContainer" parent="UI/Control/PanelContainer"]
+layout_mode = 2
+
+[node name="Button" type="Button" parent="UI/Control/PanelContainer/VBoxContainer"]
+custom_minimum_size = Vector2(70, 50)
+layout_mode = 2
+theme_override_styles/pressed = SubResource("StyleBoxFlat_ce27d")
+toggle_mode = true
+text = "FORWARD RUN"
+script = ExtResource("6_ce27d")
+ActionName = "run"
+
+[node name="Button2" type="Button" parent="UI/Control/PanelContainer/VBoxContainer"]
+custom_minimum_size = Vector2(70, 50)
+layout_mode = 2
+theme_override_styles/pressed = SubResource("StyleBoxFlat_ce27d")
+text = "FORWARD WALK"
+script = ExtResource("6_ce27d")
+ActionName = "ui_up"
+
+[node name="HBoxContainer" type="HBoxContainer" parent="UI/Control/PanelContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="Button2" type="Button" parent="UI/Control/PanelContainer/VBoxContainer/HBoxContainer"]
+custom_minimum_size = Vector2(80, 50)
+layout_mode = 2
+theme_override_styles/pressed = SubResource("StyleBoxFlat_ce27d")
+text = "STARBOARD"
+script = ExtResource("6_ce27d")
+ActionName = "ui_left"
+
+[node name="Button3" type="Button" parent="UI/Control/PanelContainer/VBoxContainer/HBoxContainer"]
+custom_minimum_size = Vector2(50, 50)
+layout_mode = 2
+theme_override_styles/pressed = SubResource("StyleBoxFlat_ce27d")
+text = "DOWN"
+script = ExtResource("6_ce27d")
+ActionName = "ui_down"
+
+[node name="Button4" type="Button" parent="UI/Control/PanelContainer/VBoxContainer/HBoxContainer"]
+custom_minimum_size = Vector2(100, 50)
+layout_mode = 2
+theme_override_styles/pressed = SubResource("StyleBoxFlat_ce27d")
+text = "PORT"
+script = ExtResource("6_ce27d")
+ActionName = "ui_right"
