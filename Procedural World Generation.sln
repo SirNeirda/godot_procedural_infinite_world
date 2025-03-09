@@ -1,6 +1,6 @@
 ﻿Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2012
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sableboite Tuto", "Sableboite Tuto.csproj", "{14455C8A-BB6A-4B4C-B676-CB2DB01EF34E}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Procedural World Generation", "Procedural World Generation.csproj", "{14455C8A-BB6A-4B4C-B676-CB2DB01EF34E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
