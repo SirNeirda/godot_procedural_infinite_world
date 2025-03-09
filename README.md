@@ -3,7 +3,7 @@
 Full Godot C# project for procedural infinite landmass generation, with random items or obstacles spreading throughout the map, with physics enabled. The base mesh generation logic is based on Sebastian Lague's Procedural Landmass Generation, optimized and customized to work in Godot 4.4 and lower.
 This project also includes a simple playable demo with a character, showcasing the features. Also includes some helper functions not present in Godot's default engine, such as in-world gizmos and text for easy debugging.
 
-![Alt Text](./images/introgif.gif)
+![Alt Text](./images/screenshot_2.jpg)
 
 ## H2 Demo Project
 In the demo, you can play a simple character in third person view. Obstacles are generated and randomized throughout the infinite map. Mindless mobs spawn randomly around the player and move toward him. Try to run away as far away as possible from the starting point, but if you let the mobs get too close, the distance counter resets.
