@@ -126,6 +126,8 @@ public partial class MainCharacter : CharacterBody3D
 	float cam_rot_x=0;
 	float cam_rot_y=0;
 
+	[Export] public TouchInputManager touchInputManager;
+
 
 
 	
@@ -390,6 +392,11 @@ public partial class MainCharacter : CharacterBody3D
 
 	protected void UpdateCamera(float deltaFloat)
 		{
+			#if GODOT_ANDROID
+			//if (touchInputManager == null) {GD.Print("wtf"); return;}
+			CameraRotationAxis.X = touchInputManager.CameraRotationAxis.X;
+			CameraRotationAxis.Y= touchInputManager.CameraRotationAxis.Y;
+			#endif
 			float targetFov = 75;
 			float fovLerpTime = 0.5f; // adjust this value to control the speed of the FOV change
 
@@ -470,6 +477,7 @@ public partial class MainCharacter : CharacterBody3D
 			{
 				CurrentInput.SetFly();
 			}
+			#if GODOT_WINDOWS 
 			
 			if (keyEvent is InputEventMouseButton _mouseButton)
 			{
@@ -496,6 +504,25 @@ public partial class MainCharacter : CharacterBody3D
 
 				}
 			}
+			#endif 
+			#if GODOT_ANDROID 
+			if (Input.IsActionPressed("attack"))
+			{
+				CurrentInput.SetAttack();
+					
+					//Toss a crate
+					Animator.Set("parameters/conditions/tossing", true);
+					RigidBody3D newCube = Cube.Instantiate() as RigidBody3D;
+					GetTree().Root.AddChild(newCube);
+					Vector3 forwardDirection = GlobalTransform.Basis.Z;
+
+					newCube.Position = GlobalTransform.Origin + (forwardDirection*2)+Vector3.Up;
+
+					Vector3 velocityDirection = (forwardDirection*2 + Vector3.Up).Normalized();
+        			newCube.LinearVelocity = velocityDirection * 10;
+			}
+			#endif 
+			#if GODOT_WINDOWS 
 			if (keyEvent is InputEventJoypadMotion joypadMotionEvent)
 				{
 					// Get the joystick axis values
@@ -514,11 +541,13 @@ public partial class MainCharacter : CharacterBody3D
 					}
 					//GD.Print(axis + joypadMotionEvent.AxisValue.ToString());
 				}
+				
 			if (keyEvent is InputEventMouseMotion motion)
 			{
 				cam_rot_x = Mathf.Clamp((cam_rot_x +(-motion.Relative.Y * mouse_speed)), -25,60);
 				cam_rot_y += -motion.Relative.X * mouse_speed;
 			}
+			#endif 
 			if (Input.IsActionPressed("run"))
 			{
 				CurrentInput.SetRun();

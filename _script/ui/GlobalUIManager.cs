@@ -11,6 +11,8 @@ namespace Bouncerock.UI
 
     public enum UIEventType { Close, Open}
 
+   
+
     public struct BouncerockUIEvent
     {
         public UIModule Module;
@@ -40,6 +42,7 @@ namespace Bouncerock.UI
        // public TestUI _testUI;
         
         public List<UIModule> AvailableUIModules;
+         [Export] public Control MobileUI;
        // public Dictionary<string, UIModule> AvailableUIModules = new Dictionary<string, UIModule>();
 
         [Export]
@@ -47,11 +50,14 @@ namespace Bouncerock.UI
 
         public bool MovementBlocked = false;
 
-        public void Initialize()
+        public override void _Ready()
         {
             Instance = this;
-
-            StartModules();
+            MobileUI.Visible = false;
+            #if GODOT_ANDROID
+			MobileUI.Visible = true;
+			#endif
+            //StartModules();
         }
 
         protected void StartModules()

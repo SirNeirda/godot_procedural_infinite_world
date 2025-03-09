@@ -81,9 +81,9 @@ namespace Bouncerock
 					}
 			#endif
 			#if GODOT_ANDROID
-						persistentpath = Application.persistentDataPath;
+						/*persistentpath = Application.persistentDataPath;
 						documentspath = persistentpath
-							+ "/Docs";
+							+ "/Docs";*/
 			#endif
 		}
 

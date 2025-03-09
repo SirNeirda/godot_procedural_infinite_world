@@ -29,7 +29,7 @@ public partial class CharacterMob : CharacterBody3D
 	float mouse_speed = 0.05f;
 
 	[Export]
-	public float WalkingSpeed = 4;
+	public float WalkingSpeed = 6;
 	[Export]
 	public float WalkToRunSpeedIncrease = 1;
 	[Export]

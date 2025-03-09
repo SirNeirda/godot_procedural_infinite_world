@@ -17,11 +17,11 @@ namespace Bouncerock.Events
 	}
 	public static class BouncerockEventManager
 	{
-		private static Dictionary<Type, List<BouncerockEventListenerBase>> _subscribersList;
+		private static Dictionary<Type, List<BouncerockEventListenerBase>> _subbersList;
 
 		static BouncerockEventManager()
 		{
-			_subscribersList = new Dictionary<Type, List<BouncerockEventListenerBase>>();
+			_subbersList = new Dictionary<Type, List<BouncerockEventListenerBase>>();
 		}
 
 	
@@ -29,22 +29,22 @@ namespace Bouncerock.Events
 		{
 			Type eventType = typeof(BouncerockEvent);
 
-			if (!_subscribersList.ContainsKey(eventType))
-				_subscribersList[eventType] = new List<BouncerockEventListenerBase>();
+			if (!_subbersList.ContainsKey(eventType))
+				_subbersList[eventType] = new List<BouncerockEventListenerBase>();
 
 			if (!SubscriptionExists(eventType, listener))
-				_subscribersList[eventType].Add(listener);
+				_subbersList[eventType].Add(listener);
 		}
 
 		public static void RemoveListener<BouncerockEvent>(BouncerockEventListener<BouncerockEvent> listener) where BouncerockEvent : struct
 		{
 			Type eventType = typeof(BouncerockEvent);
 
-			if (!_subscribersList.ContainsKey(eventType))
+			if (!_subbersList.ContainsKey(eventType))
 			{
 			}
 
-			List<BouncerockEventListenerBase> subscriberList = _subscribersList[eventType];
+			List<BouncerockEventListenerBase> subscriberList = _subbersList[eventType];
 			bool listenerFound;
 			listenerFound = false;
 
@@ -61,7 +61,7 @@ namespace Bouncerock.Events
 					listenerFound = true;
 
 					if (subscriberList.Count == 0)
-						_subscribersList.Remove(eventType);
+						_subbersList.Remove(eventType);
 
 					return;
 				}
@@ -71,7 +71,7 @@ namespace Bouncerock.Events
 		public static void TriggerEvent<BouncerockEvent>(BouncerockEvent newEvent) where BouncerockEvent : struct
 		{
 			List<BouncerockEventListenerBase> list;
-			if (!_subscribersList.TryGetValue(typeof(BouncerockEvent), out list))
+			if (!_subbersList.TryGetValue(typeof(BouncerockEvent), out list))
 
 				return;
 
@@ -85,7 +85,7 @@ namespace Bouncerock.Events
 		{
 			List<BouncerockEventListenerBase> receivers;
 
-			if (!_subscribersList.TryGetValue(type, out receivers)) return false;
+			if (!_subbersList.TryGetValue(type, out receivers)) return false;
 
 			bool exists = false;
 
