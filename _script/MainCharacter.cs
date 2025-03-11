@@ -3,6 +3,7 @@ using System;
 using Bouncerock;
 using Bouncerock.Terrain;
 using Bouncerock.UI;
+using System.Collections.Generic;
 
 public partial class MainCharacter : CharacterBody3D
 {
@@ -32,6 +33,8 @@ public partial class MainCharacter : CharacterBody3D
 	//Vector3 Direction = Vector3.Zero;
 
 	Vector3 CameraRotationAxis = Vector3.Zero;
+
+	List<RigidBody3D> Crates = new List<RigidBody3D>();
 	
 
 	float mouse_speed = 0.05f;
@@ -57,7 +60,9 @@ public partial class MainCharacter : CharacterBody3D
 
 	public enum CharacterPowers {Crates, RotoPunch, Jetpack}
 
-	public CharacterPowers CurrentPower = CharacterPowers.RotoPunch;
+	public CharacterPowers CurrentPower = CharacterPowers.Crates;
+
+	float upkeepTimer=0;
 
 	public class CharacterInput
 	{
@@ -178,14 +183,20 @@ public partial class MainCharacter : CharacterBody3D
 			UpdateHelpers(deltaFloat);
 			//UpdateInput(deltaFloat);
 			UpdateAnimations();
-		} 
+			upkeepTimer = upkeepTimer-(float)delta;
+			if (upkeepTimer < 0)
+			{
+				CratesUpkeep();
+				upkeepTimer = 1;
+			}
+		}
 
 	protected void UpdateAction(float deltaFloat)
 	{
 		CharacterActions previousAction = CurrentAction;
 		if (CurrentInput.IsRunning() && CurrentInput.Direction != Vector3.Zero && Action >0)
 		{
-			if (IsOnFloor() || timeOffGround <0.5f)
+			if (IsOnFloor() || timeOffGround <1f)
 			{
 				CurrentAction = CharacterActions.Running; 
 				timeOffGround =0;
@@ -194,6 +205,7 @@ public partial class MainCharacter : CharacterBody3D
 			}
 			if (!IsOnFloor())
 			{
+				GD.Print("off ground " + timeOffGround);
 				timeOffGround +=deltaFloat;
 			}
 		
@@ -204,9 +216,9 @@ public partial class MainCharacter : CharacterBody3D
 			if (CurrentInput.IsFlying() && Action >0) {CurrentAction = CharacterActions.Flying; return;}
 			CurrentAction = CharacterActions.Falling; return;
 		}
-		if (CurrentInput.IsAttacking() && Action >20)
+		if (CurrentInput.IsAttacking() && Action >5)
 		{
-			Action = Mathf.Clamp(Action - 20, 0, 100);
+			Action = Mathf.Clamp(Action - 5, 0, 100);
 			LaunchAttack();
 			if (previousAction == CharacterActions.Attacking)
 			{
@@ -221,6 +233,8 @@ public partial class MainCharacter : CharacterBody3D
 		}
 		Action = Mathf.Clamp(Action + deltaFloat*3,0,100);
 		CurrentAction = CharacterActions.Idle;
+
+		
 	}
 
 	void LaunchAttack()
@@ -231,6 +245,8 @@ public partial class MainCharacter : CharacterBody3D
 			RigidBody3D newCube = Cube.Instantiate() as RigidBody3D;
 			GetTree().Root.AddChild(newCube);
 			Vector3 forwardDirection = GlobalTransform.Basis.Z;
+
+			Crates.Add(newCube);
 
 			newCube.Position = GlobalTransform.Origin + (forwardDirection*2)+Vector3.Up;
 
@@ -245,6 +261,28 @@ public partial class MainCharacter : CharacterBody3D
 				CurrentInput.EndAttack();
 			}
 
+	}
+
+	public void CratesUpkeep()
+	{
+		 foreach (RigidBody3D crate in Crates.ToArray()) // Iterate over a copy of the list
+		{
+			if (Position.DistanceTo(crate.Position) > 200)
+			{
+				DespawnCrate(crate, 1);
+			}
+		}
+	}
+
+	async void DespawnCrate(RigidBody3D crate, float delay = -1)
+	{
+		Crates.Remove(crate);
+        if (delay > 0)
+        {
+            await ToSignal(GetTree().CreateTimer(delay), "timeout");
+        }
+        crate.QueueFree();
+		
 	}
 
 	/*public override void _Input(InputEvent keyEvent)
@@ -386,6 +424,12 @@ public partial class MainCharacter : CharacterBody3D
 			velocity.Z = Mathf.MoveToward(Velocity.Z, 0, speed);
 		}
 
+		if (Position.Y < -100)
+		{
+			Position = new Vector3(Position.X, 50, Position.Z);
+			Action = 100;
+		}
+
 		Velocity = velocity;
 		MoveAndSlide();
 	}
@@ -443,6 +487,9 @@ public partial class MainCharacter : CharacterBody3D
 				//Mathf.RadToDeg(GetFloorAngle()) + " Pos: X: " + string.Format("{0:0. #}", Position.X) + " Y: " + string.Format("{0:0. #}", Position.Y) + " Z: " + string.Format("{0:0. #}", Position.Z) ;
 				//GD.Print(TerrainGenerator.Instance.CameraInChunk());
 				PopupInfo.SetText(text);
+				#if GODOT_ANDROID
+				PopupInfo.SetSize(50);
+				#endif
 				PopupInfo.Position = CameraPivot.Position+ Vector3.Down*0.7f;
 				//GD.Print("Position " + PopupInfo.Position);
 			}
@@ -492,15 +539,16 @@ public partial class MainCharacter : CharacterBody3D
 					CurrentInput.SetAttack();
 					
 					//Toss a crate
-					Animator.Set("parameters/conditions/tossing", true);
+					/*Animator.Set("parameters/conditions/tossing", true);
 					RigidBody3D newCube = Cube.Instantiate() as RigidBody3D;
 					GetTree().Root.AddChild(newCube);
+					Crates.Add(newCube);
 					Vector3 forwardDirection = GlobalTransform.Basis.Z;
 
 					newCube.Position = GlobalTransform.Origin + (forwardDirection*2)+Vector3.Up;
 
 					Vector3 velocityDirection = (forwardDirection*2 + Vector3.Up).Normalized();
-        			newCube.LinearVelocity = velocityDirection * 10;
+        			newCube.LinearVelocity = velocityDirection * 10;*/
 
 				}
 			}

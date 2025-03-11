@@ -246,7 +246,7 @@ public partial class CharacterMob : CharacterBody3D
 			if (PopupInfo == null)
 			{
 				PopupInfo = Debug.SetTextHelper(text, CameraPivot.Position, CameraPivot);
-				PopupInfo.MaxViewDistance = 1000;
+				PopupInfo.MaxViewDistance = 30;
 			}
 			if (PopupInfo != null)
 			{

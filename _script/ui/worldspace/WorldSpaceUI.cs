@@ -43,4 +43,9 @@ public partial class WorldSpaceUI : Node3D
 	{
 		GetNode<Label>("Control/Label").Text = text;
 	}
+
+	public void SetSize(int size)
+	{
+		GetNode<Label>("Control/Label").AddThemeFontSizeOverride("font_size", size);
+	}
 }
