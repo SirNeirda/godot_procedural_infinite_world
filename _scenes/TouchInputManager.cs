@@ -10,7 +10,7 @@ public partial class TouchInputManager : Node
     private int cameraTouchIndex = -1;   
 
     private Vector2 movementStartPos = Vector2.Zero;
-    private Vector2 cameraStartPos = Vector2.Zero;
+    //private Vector2 cameraStartPos = Vector2.Zero;
     private bool isDraggingMovement = false;
     private bool isDraggingCamera = false;
 
@@ -69,7 +69,7 @@ public partial class TouchInputManager : Node
             {
 
                 cameraTouchIndex = index;
-                cameraStartPos = position;
+                lastCameraTouchPos = position;
                 isDraggingCamera = true;
             }
         }
@@ -90,7 +90,7 @@ public partial class TouchInputManager : Node
         if (index == cameraTouchIndex) // Only stop camera control if this was the camera touch
         {
             CameraRotationAxis = Vector2.Zero;
-           // lastCameraTouchPos = Vector2.Zero;
+            //lastCameraTouchPos = Vector2.Zero;
             cameraTouchIndex = -1;
             isDraggingCamera = false;
         }
@@ -113,17 +113,16 @@ public partial class TouchInputManager : Node
         }
         else if (index == cameraTouchIndex && isDraggingCamera) 
         {
-            if (isFirstCameraTouch)
+            /*if (isFirstCameraTouch)
             {
-                lastCameraTouchPos = position;
                 isFirstCameraTouch = false;
-            }
+            }*/
 
             Vector2 delta = position - lastCameraTouchPos; 
             float cameraSensitivity = 0.05f; 
-
-            CameraRotationAxis = new Vector2(delta.X * cameraSensitivity, delta.Y * cameraSensitivity);
-
+            GD.Print("axis" + CameraRotationAxis);
+            CameraRotationAxis = new Vector2(-delta.X * cameraSensitivity, -delta.Y * cameraSensitivity);
+            //lastCameraRotationAxis = CameraRotationAxis;
             lastCameraTouchPos = position; 
         }
             
@@ -132,10 +131,10 @@ public partial class TouchInputManager : Node
 
     private void OnTouchRelease(int index)
 {
-    if (index == cameraTouchIndex)
+   /* if (index == cameraTouchIndex)
     {
         isFirstCameraTouch = true; 
-    }
+    }*/
 }
 
     private string GetMoveDirection(Vector2 delta)
