@@ -1,5 +1,4 @@
-# Infinite Runner
-## A Godot Procedural World Generation Demo Project
+# Infinite Runner - A Godot Procedural World Generation Demo Project
 
 ![Alt Text](./images/screenshot_2.jpg)
 
