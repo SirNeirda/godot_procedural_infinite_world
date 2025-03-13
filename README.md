@@ -4,6 +4,8 @@
 
 Run away from Evil Godots forever. 
 
+Playable executables here, available on Windows, Android and Linux: https://bouncerocksoftware.itch.io/infinite-runner
+
 Full Godot C# project for procedural infinite terrain generation, with random items or obstacles spreading throughout the map, with physics enabled. 
 Mesh generation logic based on Sebastian Lague's Procedural Landmass Generation, optimized and customized to work in Godot 4.4 and lower. Works on PC and Android. Other platforms still untested, but probably work as well.
 
