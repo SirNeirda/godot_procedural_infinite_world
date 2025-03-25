@@ -1,10 +1,12 @@
-[gd_scene load_steps=9 format=3 uid="uid://bf04of4xrt142"]
+[gd_scene load_steps=14 format=3 uid="uid://bf04of4xrt142"]
 
 [ext_resource type="Script" uid="uid://bg7jhdjqxgqbk" path="res://_script/GameManager.cs" id="1_jovvh"]
 [ext_resource type="Script" uid="uid://epcqve8dqtnd" path="res://_script/SoftwareManager.cs" id="2_gqgyk"]
 [ext_resource type="Script" uid="uid://ccilq7mlhnfyg" path="res://_script/ui/GlobalUIManager.cs" id="3_7t23k"]
 [ext_resource type="Script" uid="uid://bp76k8vnf3pn" path="res://_scenes/ScreenSpaceMainUI.cs" id="4_3e8h3"]
+[ext_resource type="Shader" uid="uid://chnahpefqhrhb" path="res://materials/shaders/chroma.gdshader" id="5_ce27d"]
 [ext_resource type="Script" uid="uid://df2k2g3a8ktxw" path="res://_scenes/ButtonMobile.cs" id="6_ce27d"]
+[ext_resource type="Shader" uid="uid://b1x6scjuekwl4" path="res://materials/shaders/sharpen.gdshader" id="6_urak4"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_lavtb"]
 bg_color = Color(0.6, 0.6, 0.6, 0.0627451)
@@ -15,6 +17,23 @@ content_margin_top = 8.0
 content_margin_right = 9.0
 content_margin_bottom = 8.0
 bg_color = Color(0.150357, 0.162971, 0.21575, 0.741176)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_urak4"]
+bg_color = Color(0.6, 0.6, 0.6, 0)
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_hi6yo"]
+shader = ExtResource("5_ce27d")
+shader_parameter/strength = 0.067
+shader_parameter/center = Vector2(0.5, 0.5)
+shader_parameter/radius = 0.336
+shader_parameter/aberration = 0.357
+shader_parameter/width = 0.0
+shader_parameter/feather = 1.0
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_owtmn"]
+shader = ExtResource("6_urak4")
+shader_parameter/blur_sharp = -0.9
+shader_parameter/pixel = 1.0
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_ce27d"]
 bg_color = Color(1, 0.341498, 0.317505, 0.635294)
@@ -119,6 +138,25 @@ size_flags_horizontal = 4
 size_flags_vertical = 4
 value = 100.0
 show_percentage = false
+
+[node name="PanelContainer4" type="PanelContainer" parent="UI/ScreenSpaceUI"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_urak4")
+
+[node name="ColorRect" type="ColorRect" parent="UI/ScreenSpaceUI/PanelContainer4"]
+visible = false
+material = SubResource("ShaderMaterial_hi6yo")
+layout_mode = 2
+
+[node name="ColorRect2" type="ColorRect" parent="UI/ScreenSpaceUI/PanelContainer4"]
+material = SubResource("ShaderMaterial_owtmn")
+layout_mode = 2
 
 [node name="Control" type="Control" parent="UI"]
 layout_mode = 3
