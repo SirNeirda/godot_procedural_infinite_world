@@ -159,17 +159,8 @@ public partial class MainCharacter : CharacterBody3D
 
 	public override void _PhysicsProcess(double delta)
 		{
-			
-			/*float angleBoost = 1;
-			if (IsOnFloor()) {angleBoost = Mathf.InverseLerp(0,50, Mathf.RadToDeg(GetFloorAngle()) * 2); }
-			
-			Velocity = new Vector3(Direction.X * (speed+angleBoost), Direction.Y * gravity, Direction.Z * (speed+angleBoost) );
-			//Velocity -= gravityResistance;
-			Velocity = Velocity.Rotated(Vector3.Up, Mathf.DegToRad(RotationDegrees.Y));
-			//Velocity = Velocity* (float)delta * 60;
-			Animator.Set("parameters/IdleWalkRun/blend_position", Direction.Z);
-
-			MoveAndSlide();*/
+			float deltaFloat = (float)delta;
+			UpdateMovement(deltaFloat);
 		} 
 
 
@@ -178,7 +169,7 @@ public partial class MainCharacter : CharacterBody3D
 			float deltaFloat = (float)delta;
 			//GD.Print(RaycastDown.IsColliding());
 			UpdateAction(deltaFloat);
-			UpdateMovement(deltaFloat);
+			//UpdateMovement(deltaFloat);
 			UpdateCamera(deltaFloat);
 			UpdateHelpers(deltaFloat);
 			//UpdateInput(deltaFloat);
@@ -190,6 +181,7 @@ public partial class MainCharacter : CharacterBody3D
 				upkeepTimer = 1;
 			}
 		}
+
 
 	protected void UpdateAction(float deltaFloat)
 	{
