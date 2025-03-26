@@ -43,7 +43,7 @@ public partial class MobManager : Node
 			if (!GenerationActive)
 			{
 				Vector3 charPos = GameManager.Instance.GetMainCharacterPosition();
-				float distance = charPos.DistanceTo(Vector3.Zero);
+				float distance = charPos.DistanceTo(new Vector3(0,13,37));//the current default spawn position
 				if (distance >10)
 				{
 					GenerationActive = true;
