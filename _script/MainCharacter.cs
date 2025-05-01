@@ -45,9 +45,12 @@ public partial class MainCharacter : CharacterBody3D
 	public float WalkToRunSpeedIncrease = 1;
 	[Export]
 	public float RunningSpeed = 20;
+
+	public float SpeedMultiplier= 1;
 	
 	[Export]
 	public float JumpVelocity = 5;
+	public float JumpVelocityMultiplier = 1;
 	/*[Export]
 	float MaxSpeed = 4;*/
 	float speed = 1;
@@ -197,7 +200,7 @@ public partial class MainCharacter : CharacterBody3D
 			}
 			if (!IsOnFloor())
 			{
-				GD.Print("off ground " + timeOffGround);
+				//GD.Print("off ground " + timeOffGround);
 				timeOffGround +=deltaFloat;
 			}
 		
@@ -373,7 +376,7 @@ public partial class MainCharacter : CharacterBody3D
 		// Handle Jump.
 		if (CurrentAction == CharacterActions.Jumping && IsOnFloor())
 		{
-			velocity.Y = JumpVelocity;
+			velocity.Y = JumpVelocity* JumpVelocityMultiplier;
 		}
 
 		// Get the input direction and handle the movement/deceleration.
@@ -385,6 +388,7 @@ public partial class MainCharacter : CharacterBody3D
 			if (Action >0)
 			{
 				speed = CurrentAction == CharacterActions.Running?RunningSpeed:WalkingSpeed;
+				speed = speed*SpeedMultiplier;
 			}
 		}
 		if (!IsOnFloor())

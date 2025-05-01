@@ -39,9 +39,10 @@ namespace Bouncerock.Terrain
 				pass1.HorizontalScale = 200;
 
 				TerrainPass pass2 = new TerrainPass();
-				pass2.VerticalScale = 1000;
+				pass2.VerticalScale = 1700;
 				pass2.HorizontalScale = 70;
 				pass2.Octaves = 3;
+				pass2.Contrast = 3;
 
 				TerrainPass pass3 = new TerrainPass();
 				pass2.VerticalScale = 100;
@@ -55,16 +56,59 @@ namespace Bouncerock.Terrain
 				NaturalObjects = new List<NaturalObject>();
 				NaturalObject newObj = new NaturalObject();
 				newObj.ObjectName = "tree_2";
-				newObj.Concentration = 7;
+				newObj.Concentration = 3;
+				newObj.RandomizeTiltAngle = 5;
+				newObj.RandomizeYRotation = true;
+				newObj.MinSize = 0.8f;
+				newObj.MaxSize = 1.2f;
+
+				NaturalObjects = new List<NaturalObject>();
+				NaturalObject tree = new NaturalObject();
+				tree.ObjectName = "tree_3";
+				tree.Concentration = 2f;
+				tree.RandomizeTiltAngle = 5;
+				tree.RandomizeYRotation = true;
+				tree.MinSize = 0.8f;
+				tree.MaxSize = 1.2f;
+
+
+				NaturalObject newObjbush = new NaturalObject();
+				newObjbush.ObjectName = "bush_berries";
+				newObjbush.Concentration = 3;
+				newObjbush.MinSize = 0.8f;
+				newObjbush.MaxSize = 1.3f;
+
 				NaturalObject newObj2 = new NaturalObject();
 				newObj2.ObjectName = "wall";
-				newObj2.Concentration = 2;
+				newObj2.Concentration = 1;
+
+				NaturalObject newObj3 = new NaturalObject();
+				newObj3.ObjectName = "stoneandplant";
+				newObj3.Concentration = 5f;
+
+				NaturalObject pine = new NaturalObject();
+				pine.ObjectName = "pine_tree_1";
+				pine.Concentration = 0.01f;
+				
+
+				NaturalObject newObstone = new NaturalObject();
+				newObstone.ObjectName = "schroom";
+				newObstone.Concentration = 0.1f;
+				newObstone.MinSize = 0.8f;
+				newObstone.MaxSize = 2f;
+
 				NaturalObjects.Add(newObj);
 				NaturalObjects.Add(newObj2);
+				NaturalObjects.Add(newObjbush);
+				NaturalObjects.Add(newObj3);
+				NaturalObjects.Add(newObstone);
+				NaturalObjects.Add(tree);
+				NaturalObjects.Add(pine);
+
 				Pathway = new PathwaySettings();
 				GameplayObject powerUp1 = new GameplayObject();
 				powerUp1.ObjectName = "power_up";
-				powerUp1.Concentration = 10;
+				powerUp1.Concentration = 3;
 				powerUp1.Levitation =6;
 				GameplayObjects.Add(powerUp1);
 			}

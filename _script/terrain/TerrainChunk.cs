@@ -158,6 +158,16 @@ namespace Bouncerock.Terrain
 
 			return inclination;
 		}
+		public float[,] GetHeightmap()
+		{
+			if (heightMap.heightMap!=null){return heightMap.heightMap;}
+			return null;
+		}
+		public List<List<WorldItemData>> GetItems()
+		{
+			if (heightMap.DecorElements!=null){return heightMap.DecorElements;}
+			return null;
+		}
 
 
 
@@ -181,7 +191,7 @@ namespace Bouncerock.Terrain
 				//GD.Print("Loading terrain elements, with " + heightMap.DecorElements.Count + " elements");
 				Node3D parentNode = new Node3D();
 				parentNode.Name = "DecorObjects";
-				meshObject.AddChild(parentNode);
+				meshObject.CallDeferred("add_child", parentNode);
 				if (itemsLoaded) {return;}
 				int i = 0;
 				foreach (List<WorldItemData> worldItem in heightMap.DecorElements)
@@ -194,22 +204,22 @@ namespace Bouncerock.Terrain
 						Vector2 inGridLocation = new Vector2(25 - itm.GridLocation.X, 25 - itm.GridLocation.Y);
 						
 						Vector3 location = new Vector3(-1*inGridLocation.X, GetHeightAtChunkMapLocation(itm.GridLocation), inGridLocation.Y);
-						
+						itm.SetElevation(location.Y);
 						if (location.Y <0){continue;}
 						//GD.Print("itm.name" + itm.name);
 						var naturalObject = TerrainDetailsManager.Instance.GetSpawnedObject(itm.name);
 ;
-						if (naturalObject == null ) {GD.Print("Item " + itm.name + " couldn't be found");}
+						if (naturalObject == null ) {GD.Print("Item " + itm.name + " couldn't be found"); continue;}
 						
 						WorldItem item = await TerrainManager.Instance.DetailsManager.SpawnAndInitialize(naturalObject);
 						
 						//GD.Print("In grid "+itm.GridLocation);
-						parentNode.AddChild(item);
+						parentNode.CallDeferred("add_child", item);
 						item.Position = location;
 						//RandomNumberGenerator rnd = new RandomNumberGenerator();
 						//item.Scale = Vector3.One*rnd.RandfRange(0.1f,1f);
 
-						item.Name = "Decor-" + i;
+						item.Name = "Decor-"+itm.name + i;
 						items.Add(item);
 						
 

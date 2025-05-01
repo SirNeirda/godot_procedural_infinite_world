@@ -16,19 +16,25 @@ namespace Bouncerock
             Instance = this;
         }
 
+        Dictionary<string, PackedScene> cachedScenes = new();
+
+        public PackedScene GetCachedScene(string name)
+        {
+            if (!cachedScenes.ContainsKey(name))
+                cachedScenes[name] = ResourceLoader.Load<PackedScene>($"res://_scenes/decor/{name}.tscn");
+
+            return cachedScenes[name];
+        }
+
         public async Task <WorldItem>SpawnAndInitialize(SpawnedObject objectToSpawn)
         {
-            PackedScene Item = ResourceLoader.Load<PackedScene>("res://_scenes/decor/" + objectToSpawn.ObjectName+".tscn");
+            
+            PackedScene Item = GetCachedScene(objectToSpawn.ObjectName);
             WorldItem node = Item.Instantiate() as WorldItem;
             if (objectToSpawn is NaturalObject)
             {
                 NaturalObject objectSpawned = objectToSpawn as NaturalObject;
-                await Task.Run(async () =>
-                {
                 
-                    //RandomNumberGenerator rnd = new RandomNumberGenerator();
-                    //rnd.Seed = (ulong)TerrainManager.Instance.Seed;
-                    
                     if (objectSpawned.RandomizeYRotation)
                     {
                         float rotation = TerrainManager.Instance.TerrainDetailsRandom.RandfRange(0,360);
@@ -51,8 +57,8 @@ namespace Bouncerock
                         node.RotateX(rotation2);
                     // objectToSpawn.relevantItem.RotateX(rotation2);
                     }
+                    node.Scale = Vector3.One*TerrainManager.Instance.TerrainDetailsRandom.RandfRange(objectSpawned.MinSize, objectSpawned.MaxSize);
             // CallDeferred("add_sibling",node);
-                });
             }
             if (objectToSpawn is GameplayObject)
             {

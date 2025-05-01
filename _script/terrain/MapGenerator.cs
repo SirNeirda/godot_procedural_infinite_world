@@ -93,7 +93,7 @@ namespace Bouncerock.Terrain
 							WorldItemData item = await DetermineItemPresence(naturalObject);
 							List<WorldItemData> items = new List<WorldItemData>();
 							
-							if (item.GridLocation != Vector2.Zero)
+							if (item.name != "")
 							{
 								items.Add(item);
 								_worldItems.Add(items);
@@ -208,13 +208,17 @@ namespace Bouncerock.Terrain
 		{
 			WorldItemData item = new WorldItemData();
 			RandomNumberGenerator rnd = new RandomNumberGenerator();
-			rnd.Seed = 1234;
+			rnd.Seed = (ulong)DateTime.Now.ToBinary();
 			float chance = rnd.RandfRange(0,1);
+			GD.Print("Item present " + naturalObject.ObjectName + " chance " + chance);
 			if (naturalObject.Concentration >= chance)
 			 {
 				Vector2 location = new Vector2();
 				location.X = rnd.RandfRange(0, TerrainMeshSettings.numVertsPerLine);
 				location.Y= rnd.RandfRange(0, TerrainMeshSettings.numVertsPerLine);
+				item.name = naturalObject.ObjectName;
+				item.GridLocation = location;
+				return item;
 			 }
 			 return item;
 		}
@@ -223,8 +227,9 @@ namespace Bouncerock.Terrain
 		{
 			//List<Vector2> locations = await PoissonDiscSampling.Test(Vector2.One * (TerrainMeshSettings.numVertsPerLine-3), Vector2.Zero, 10);
 			int seed = (int)DateTime.Now.ToBinary();
-			List<Vector2> locations = await PoissonDiscSampling.GeneratePoints(Vector2.Zero, 20, Vector2.One *TerrainMeshSettings.numVertsPerLine, (int)naturalObject.Concentration, seed);
-			GD.Print("Poisson disc loc: " + locations.Count + " elements ");
+			//int minSpacing = Math.Clamp(70-(int)naturalObject.Concentration, 5,30);
+			List<Vector2> locations = await PoissonDiscSampling.GeneratePoints(Vector2.Zero, 10, Vector2.One *TerrainMeshSettings.numVertsPerLine, (int)naturalObject.Concentration, seed);
+			//GD.Print("Poisson disc loc: " + locations.Count + " elements ");
 			
 			List<WorldItemData> generated = new List<WorldItemData>();
 

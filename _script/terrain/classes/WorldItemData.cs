@@ -12,5 +12,12 @@ namespace Bouncerock.Terrain
             public Vector2 GridLocation;
             public string Hash;
             public Vector3 Size;
+
+            public float Elevation;
+
+            public void SetElevation(float elevation)
+            {
+                Elevation = elevation;
+            }
         }
 }

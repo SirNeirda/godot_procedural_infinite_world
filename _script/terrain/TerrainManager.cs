@@ -1,7 +1,6 @@
 using Godot;
 using Bouncerock.Events;
 using System.Collections.Generic;
-using Bouncerock;
 
 namespace Bouncerock.Terrain
 {
@@ -136,6 +135,23 @@ namespace Bouncerock.Terrain
 		void SetupMeshSettings()
 		{
 			//meshSettings = new MeshSettings();
+		}
+		public float[,] GetHeightmapForChunk(Vector2 chunkLoc)
+		{
+			if (chunksDictionary.ContainsKey(chunkLoc)) 
+			{
+				return chunksDictionary[chunkLoc].GetHeightmap();
+			}
+			return null;
+		}
+
+		public List<List<WorldItemData>> GetItemsForChunk(Vector2 chunkLoc)
+		{
+			if (chunksDictionary.ContainsKey(chunkLoc)) 
+			{
+				return chunksDictionary[chunkLoc].GetItems();
+			}
+			return null;
 		}
 
 		//This returns the height at a specific world space coordinate
