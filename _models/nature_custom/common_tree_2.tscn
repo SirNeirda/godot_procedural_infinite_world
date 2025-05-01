@@ -1,0 +1,53 @@
+[gd_scene load_steps=8 format=3 uid="uid://dpptisoj032oy"]
+
+[ext_resource type="PackedScene" uid="uid://bnfsuwatd61te" path="res://_models/nature/common_tree_2.glb" id="1_y3qdn"]
+
+[sub_resource type="Gradient" id="Gradient_0euix"]
+offsets = PackedFloat32Array(0.0878553, 1)
+colors = PackedColorArray(0, 0, 0, 1, 1, 1, 1, 0)
+
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_oxhf3"]
+gradient = SubResource("Gradient_0euix")
+fill = 1
+fill_from = Vector2(0.435897, 0.418803)
+fill_to = Vector2(0.115385, 0.162393)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_vciwl"]
+albedo_color = Color(0.50212, 0.731363, 0.33465, 1)
+roughness = 0.44
+rim_tint = 0.41
+rim_texture = SubResource("GradientTexture2D_oxhf3")
+clearcoat_roughness = 0.11
+ao_enabled = true
+ao_light_affect = 0.12
+backlight_enabled = true
+backlight = Color(0.845264, 0.705971, 0.0202476, 1)
+proximity_fade_distance = 0.01
+
+[sub_resource type="Gradient" id="Gradient_2awjv"]
+colors = PackedColorArray(0, 0, 0, 1, 0.833002, 0.326817, 0.385802, 1)
+
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_fo8l5"]
+gradient = SubResource("Gradient_2awjv")
+fill_to = Vector2(0.482906, 0.465812)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_sgws0"]
+albedo_color = Color(0.3119, 0.146727, 0.123977, 1)
+roughness = 0.68
+emission = Color(0.314316, 0.314316, 0.314316, 1)
+rim_tint = 0.32
+rim_texture = SubResource("GradientTexture2D_fo8l5")
+backlight_enabled = true
+backlight = Color(0.537011, 0.537011, 0.537011, 1)
+proximity_fade_distance = 0.01
+
+[node name="common_tree_2" instance=ExtResource("1_y3qdn")]
+
+[node name="common_tree_2_leaves_dark" parent="." index="0"]
+surface_material_override/0 = SubResource("StandardMaterial3D_vciwl")
+
+[node name="common_tree_2_trunk" parent="." index="1"]
+surface_material_override/0 = SubResource("StandardMaterial3D_sgws0")
+
+[node name="common_tree_2_leaves" parent="." index="2"]
+surface_material_override/0 = SubResource("StandardMaterial3D_vciwl")
