@@ -15,7 +15,7 @@ public partial class MobManager : Node
 	public int SpawnsPerTime = 4;
 
 	[Export]
-	public int MaxMobs = 40;
+	public int MaxMobs = 20;
 
 	[Export]
 		public bool ShowHelpers = false;
@@ -52,8 +52,9 @@ public partial class MobManager : Node
 			if (GenerationActive && MaxMobs > Mobs.Count)
 			{
 				SpawnMob(SpawnsPerTime);
-				MobsUpkeep();
+				
 			}
+			MobsUpkeep();
 			timer = DelayBetweenSpawns;
 		}
 		//GD.Print(timer);
@@ -112,20 +113,21 @@ public partial class MobManager : Node
 			}
 
 		}
-		GD.Print("Spawning mob: " + number);
+		//GD.Print("Spawning mob: " + number);
 		//PackedScene Mob = ResourceLoader.Load<PackedScene>("res://_scenes/mob.tscn");
             
-		CharacterMob node = Mob.Instantiate() as CharacterMob;
-		node.Position = GetSpawnLocation();
-		CallDeferred("add_child", node);//AddChild(node);
-		Mobs.Add(node);
-		node.Name = "Ennemy " + Mobs.Count;
+		//CharacterMob node = Mob.Instantiate() as CharacterMob;
+		//node.Position = GetSpawnLocation();
+		//CallDeferred("add_child", node);//AddChild(node);
+		
+		//node.Name = "Ennemy " + Mobs.Count;
 		for (int i = 1; i < number; i++)
 		{
-            node = Mob.Instantiate() as CharacterMob;
+           CharacterMob  node = Mob.Instantiate() as CharacterMob;
 			node.Position = GetSpawnLocation();
 			AddChild(node);
 			node.Name = "Ennemy " + Mobs.Count;
+			Mobs.Add(node);
 		}
 
 		

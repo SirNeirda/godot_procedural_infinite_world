@@ -1,4 +1,4 @@
-[gd_scene load_steps=18 format=3 uid="uid://dorvgphrel13u"]
+[gd_scene load_steps=19 format=3 uid="uid://dorvgphrel13u"]
 
 [ext_resource type="PackedScene" uid="uid://bw42mox3u02yq" path="res://_scenes/main_character.tscn" id="1_ciup7"]
 [ext_resource type="Material" uid="uid://wq3811s3nwm7" path="res://materials/sky.tres" id="1_f50i4"]
@@ -7,8 +7,12 @@
 [ext_resource type="Script" uid="uid://tk8lkgbaluti" path="res://_script/terrain/TerrainDetailsManager.cs" id="3_x21qi"]
 [ext_resource type="Material" uid="uid://cskxpml7do2lq" path="res://materials/base_terrain.tres" id="5_u8evv"]
 [ext_resource type="Script" uid="uid://h5w4bya8uxkc" path="res://_scenes/MobManager.cs" id="6_5h46a"]
-[ext_resource type="Texture2D" uid="uid://bwaewakix3di8" path="res://materials/textures/platformbase_Platform_1_top_flat-material_Normal.png" id="6_th4oj"]
 [ext_resource type="PackedScene" uid="uid://dydlmuscctvv2" path="res://_scenes/powerups/power_up.tscn" id="8_u7we2"]
+
+[sub_resource type="FastNoiseLite" id="FastNoiseLite_luoph"]
+
+[sub_resource type="NoiseTexture2D" id="NoiseTexture2D_ike5v"]
+noise = SubResource("FastNoiseLite_luoph")
 
 [sub_resource type="Sky" id="Sky_sqpy2"]
 sky_material = ExtResource("1_f50i4")
@@ -17,17 +21,20 @@ sky_material = ExtResource("1_f50i4")
 background_mode = 2
 sky = SubResource("Sky_sqpy2")
 ambient_light_source = 3
-ambient_light_color = Color(0.435294, 0.298039, 0.537255, 1)
+ambient_light_color = Color(0.714553, 0.617318, 0.684105, 1)
+reflected_light_source = 2
 tonemap_mode = 2
 sdfgi_use_occlusion = true
 sdfgi_bounce_feedback = 0.3
 glow_enabled = true
 glow_levels/1 = 0.28
 glow_normalized = true
-glow_intensity = 1.51
+glow_intensity = 1.12
+glow_strength = 1.35
 glow_bloom = 0.1
+glow_map = SubResource("NoiseTexture2D_ike5v")
 fog_enabled = true
-fog_light_color = Color(0.596078, 0.533333, 0.517647, 1)
+fog_light_color = Color(0.619917, 0.521605, 0.522265, 1)
 fog_light_energy = 2.02
 fog_sun_scatter = 0.41
 fog_density = 0.002
@@ -48,16 +55,8 @@ roughness_texture = ExtResource("3_ike5v")
 [sub_resource type="PlaneMesh" id="PlaneMesh_dnkau"]
 size = Vector2(1000, 1000)
 
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_8mvw7"]
-transparency = 1
-blend_mode = 4
-depth_draw_mode = 1
-albedo_color = Color(0.427451, 0.435294, 0.615686, 0.882353)
-roughness = 0.05
-normal_enabled = true
-normal_scale = 0.5
-normal_texture = ExtResource("6_th4oj")
-uv1_scale = Vector3(2, 2, 2)
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_y5dfv"]
+albedo_color = Color(0.447059, 0.517647, 0.772549, 0.733333)
 
 [node name="World" type="Node3D"]
 
@@ -65,10 +64,10 @@ uv1_scale = Vector3(2, 2, 2)
 environment = SubResource("Environment_673ij")
 
 [node name="PlayingCharacter" parent="." instance=ExtResource("1_ciup7")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 7.73144, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 13.9087, 37.1025)
 
 [node name="StaticBody3D" type="StaticBody3D" parent="."]
-transform = Transform3D(2.095, 0, 0, 0, 2.095, 0, 0, 0, 2.095, 0, 7.28011, 0)
+transform = Transform3D(2.095, 0, 0, 0, 2.095, 0, 0, 0, 2.095, 0, 13.4573, 37.1025)
 physics_material_override = SubResource("PhysicsMaterial_23t8k")
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="StaticBody3D"]
@@ -91,24 +90,25 @@ script = ExtResource("3_x21qi")
 
 [node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 0.88759, 0.460634, 0, -0.460634, 0.88759, 0, 4.00946, 4.97494)
-light_color = Color(0.94374, 0.696508, 0.609449, 1)
-light_energy = 2.133
+light_color = Color(0.932094, 0.710711, 0.539878, 1)
+light_energy = 2.964
 light_indirect_energy = 1.267
 light_volumetric_fog_energy = 1.266
 light_angular_distance = 3.0
 light_bake_mode = 0
 shadow_enabled = true
-shadow_bias = 0.0
-shadow_transmittance_bias = -7.283
+shadow_bias = 0.043
+shadow_normal_bias = 1.683
+shadow_transmittance_bias = -7.837
 shadow_opacity = 0.87
-shadow_blur = 0.938
+shadow_blur = 1.847
 directional_shadow_blend_splits = true
 directional_shadow_fade_start = 0.73
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.0218635, 0)
+transform = Transform3D(10, 0, 0, 0, 10, 0, 0, 0, 10, 0, 0.0218635, 0)
 mesh = SubResource("PlaneMesh_dnkau")
-surface_material_override/0 = SubResource("StandardMaterial3D_8mvw7")
+surface_material_override/0 = SubResource("StandardMaterial3D_y5dfv")
 
 [node name="MobsManager" type="Node3D" parent="."]
 script = ExtResource("6_5h46a")

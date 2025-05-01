@@ -30,6 +30,7 @@ transform = Transform3D(2, 0, 0, 0, 2, 0, 0, 0, 2, 0, 0, 0)
 shape = SubResource("SphereShape3D_7p7in")
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="Area3D/CollisionShape3D"]
+cast_shadow = 0
 mesh = SubResource("SphereMesh_lvdfn")
 skeleton = NodePath("../../..")
 surface_material_override/0 = SubResource("StandardMaterial3D_47efx")
@@ -39,6 +40,8 @@ transform = Transform3D(0.477327, 0, 0, 0, 0.477327, 0, 0, 0, 0.477327, 0, 1.108
 light_color = Color(0.898014, 0.630767, 0.737439, 1)
 light_energy = 5.133
 light_volumetric_fog_energy = 5.599
+distance_fade_enabled = true
+distance_fade_begin = 20.0
 
 [connection signal="area_entered" from="Area3D" to="." method="_on_area_3d_area_entered"]
 [connection signal="body_entered" from="Area3D" to="." method="_on_area_3d_body_entered"]

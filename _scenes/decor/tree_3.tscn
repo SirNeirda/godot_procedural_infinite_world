@@ -1,19 +1,19 @@
-[gd_scene load_steps=4 format=3 uid="uid://ririv7e6tmwp"]
+[gd_scene load_steps=4 format=3 uid="uid://c74eftxt5hdl7"]
 
-[ext_resource type="Script" uid="uid://d5h3hc38qpa7" path="res://_script/terrain/world/static/Tree.cs" id="1_fvdkc"]
-[ext_resource type="PackedScene" uid="uid://0sc202fhou3r" path="res://_models/nature_custom/common_tree_1.tscn" id="2_j4svi"]
+[ext_resource type="Script" uid="uid://d5h3hc38qpa7" path="res://_script/terrain/world/static/Tree.cs" id="1_prfxr"]
+[ext_resource type="PackedScene" uid="uid://dpptisoj032oy" path="res://_models/nature_custom/common_tree_2.tscn" id="2_prfxr"]
 
 [sub_resource type="CylinderShape3D" id="CylinderShape3D_ieu8c"]
 height = 8.48896
 radius = 1.306
 
 [node name="Tree2" type="Node3D"]
-script = ExtResource("1_fvdkc")
+script = ExtResource("1_prfxr")
 
 [node name="RigidBody3D" type="RigidBody3D" parent="."]
 freeze = true
 
-[node name="common_tree_1" parent="RigidBody3D" instance=ExtResource("2_j4svi")]
+[node name="common_tree_2" parent="RigidBody3D" instance=ExtResource("2_prfxr")]
 transform = Transform3D(3, 0, 0, 0, 3, 0, 0, 0, 3, 0, 0, 0)
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="RigidBody3D"]

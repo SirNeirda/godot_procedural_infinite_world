@@ -1,12 +1,12 @@
-[gd_scene load_steps=14 format=3 uid="uid://bf04of4xrt142"]
+[gd_scene load_steps=15 format=3 uid="uid://bf04of4xrt142"]
 
 [ext_resource type="Script" uid="uid://bg7jhdjqxgqbk" path="res://_script/GameManager.cs" id="1_jovvh"]
 [ext_resource type="Script" uid="uid://epcqve8dqtnd" path="res://_script/SoftwareManager.cs" id="2_gqgyk"]
 [ext_resource type="Script" uid="uid://ccilq7mlhnfyg" path="res://_script/ui/GlobalUIManager.cs" id="3_7t23k"]
 [ext_resource type="Script" uid="uid://bp76k8vnf3pn" path="res://_scenes/ScreenSpaceMainUI.cs" id="4_3e8h3"]
 [ext_resource type="Shader" uid="uid://chnahpefqhrhb" path="res://materials/shaders/chroma.gdshader" id="5_ce27d"]
-[ext_resource type="Script" uid="uid://df2k2g3a8ktxw" path="res://_scenes/ButtonMobile.cs" id="6_ce27d"]
 [ext_resource type="Shader" uid="uid://b1x6scjuekwl4" path="res://materials/shaders/sharpen.gdshader" id="6_urak4"]
+[ext_resource type="Script" uid="uid://b5nx0gco7dnfh" path="res://_script/terrain/map/Minimap.cs" id="8_hi6yo"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_lavtb"]
 bg_color = Color(0.6, 0.6, 0.6, 0.0627451)
@@ -35,8 +35,20 @@ shader = ExtResource("6_urak4")
 shader_parameter/blur_sharp = -0.9
 shader_parameter/pixel = 1.0
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_ce27d"]
-bg_color = Color(1, 0.341498, 0.317505, 0.635294)
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_hi6yo"]
+bg_color = Color(0.15407, 0.424114, 0.579969, 0.560784)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.256069, 0.483205, 0.670249, 1)
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+corner_radius_bottom_right = 3
+corner_radius_bottom_left = 3
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_urak4"]
+size = Vector2(500, 150)
 
 [node name="Main" type="Node"]
 
@@ -48,7 +60,7 @@ script = ExtResource("2_gqgyk")
 
 [node name="UI" type="Node" parent="." node_paths=PackedStringArray("MobileUI")]
 script = ExtResource("3_7t23k")
-MobileUI = NodePath("Control")
+MobileUI = NodePath("Control2")
 
 [node name="ScreenSpaceUI" type="Control" parent="UI" node_paths=PackedStringArray("Distance", "ActionBar", "Record")]
 layout_mode = 3
@@ -158,112 +170,111 @@ layout_mode = 2
 material = SubResource("ShaderMaterial_owtmn")
 layout_mode = 2
 
-[node name="Control" type="Control" parent="UI"]
+[node name="Label3" type="Label" parent="UI"]
+custom_minimum_size = Vector2(80, 0)
+offset_left = 997.0
+offset_top = 622.0
+offset_right = 1147.0
+offset_bottom = 645.0
+size_flags_horizontal = 3
+text = "Version 1.0a"
+
+[node name="Control2" type="Control" parent="UI"]
+layout_mode = 3
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -40.0
+offset_top = -40.0
+grow_horizontal = 0
+grow_vertical = 0
+
+[node name="VBoxContainer" type="VBoxContainer" parent="UI/Control2"]
+layout_mode = 0
+offset_left = -515.0
+offset_top = -479.0
+offset_right = -15.0
+offset_bottom = -9.0
+theme_override_constants/separation = 10
+
+[node name="PanelContainer" type="PanelContainer" parent="UI/Control2/VBoxContainer"]
+custom_minimum_size = Vector2(500, 150)
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_hi6yo")
+
+[node name="JumpButton" type="TouchScreenButton" parent="UI/Control2/VBoxContainer/PanelContainer"]
+position = Vector2(253, 76)
+shape = SubResource("RectangleShape2D_urak4")
+action = "jump"
+visibility_mode = 1
+
+[node name="Label" type="Label" parent="UI/Control2/VBoxContainer/PanelContainer/JumpButton"]
+offset_left = -68.0
+offset_top = -32.0
+offset_right = 61.0
+offset_bottom = 37.0
+theme_override_colors/font_shadow_color = Color(0, 0, 0, 1)
+theme_override_font_sizes/font_size = 50
+text = "JUMP"
+
+[node name="PanelContainer2" type="PanelContainer" parent="UI/Control2/VBoxContainer"]
+custom_minimum_size = Vector2(500, 150)
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_hi6yo")
+
+[node name="JumpButton" type="TouchScreenButton" parent="UI/Control2/VBoxContainer/PanelContainer2"]
+position = Vector2(253, 75)
+shape = SubResource("RectangleShape2D_urak4")
+action = "attack"
+visibility_mode = 1
+
+[node name="Label" type="Label" parent="UI/Control2/VBoxContainer/PanelContainer2/JumpButton"]
+offset_left = -132.0
+offset_top = -33.0
+offset_right = 150.0
+offset_bottom = 36.0
+theme_override_colors/font_shadow_color = Color(0, 0, 0, 1)
+theme_override_font_sizes/font_size = 50
+text = "TOSS STUFF"
+
+[node name="PanelContainer3" type="PanelContainer" parent="UI/Control2/VBoxContainer"]
+custom_minimum_size = Vector2(500, 150)
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_hi6yo")
+
+[node name="JumpButton" type="TouchScreenButton" parent="UI/Control2/VBoxContainer/PanelContainer3"]
+position = Vector2(250, 71)
+shape = SubResource("RectangleShape2D_urak4")
+action = "fly"
+visibility_mode = 1
+
+[node name="Label" type="Label" parent="UI/Control2/VBoxContainer/PanelContainer3/JumpButton"]
+offset_left = -50.0
+offset_top = -35.0
+offset_right = 79.0
+offset_bottom = 34.0
+theme_override_colors/font_shadow_color = Color(0, 0, 0, 1)
+theme_override_font_sizes/font_size = 50
+text = "FLY"
+
+[node name="Control3" type="Control" parent="UI" node_paths=PackedStringArray("MinimapTexture")]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+script = ExtResource("8_hi6yo")
+MinimapTexture = NodePath("PanelContainer/TextureRect")
 
-[node name="PanelContainer2" type="PanelContainer" parent="UI/Control"]
-layout_mode = 1
-anchors_preset = 3
-anchor_left = 1.0
-anchor_top = 1.0
-anchor_right = 1.0
-anchor_bottom = 1.0
-offset_left = -556.0
-offset_top = -475.0
-offset_right = -56.0
-offset_bottom = -75.0
-grow_horizontal = 0
-grow_vertical = 0
-
-[node name="VBoxContainer" type="VBoxContainer" parent="UI/Control/PanelContainer2"]
-layout_mode = 2
-
-[node name="Button3" type="Button" parent="UI/Control/PanelContainer2/VBoxContainer"]
-custom_minimum_size = Vector2(70, 50)
-layout_mode = 2
-size_flags_vertical = 3
-theme_override_font_sizes/font_size = 50
-theme_override_styles/pressed = SubResource("StyleBoxFlat_ce27d")
-text = "FLY"
-script = ExtResource("6_ce27d")
-ActionName = "fly"
-
-[node name="Button5" type="Button" parent="UI/Control/PanelContainer2/VBoxContainer"]
-custom_minimum_size = Vector2(70, 50)
-layout_mode = 2
-size_flags_vertical = 3
-theme_override_font_sizes/font_size = 50
-theme_override_styles/pressed = SubResource("StyleBoxFlat_ce27d")
-text = "TOSS STUFF"
-script = ExtResource("6_ce27d")
-ActionName = "attack"
-
-[node name="Button4" type="Button" parent="UI/Control/PanelContainer2/VBoxContainer"]
-custom_minimum_size = Vector2(70, 50)
-layout_mode = 2
-size_flags_vertical = 3
-theme_override_font_sizes/font_size = 50
-theme_override_styles/pressed = SubResource("StyleBoxFlat_ce27d")
-text = "JUMP"
-script = ExtResource("6_ce27d")
-ActionName = "jump"
-
-[node name="PanelContainer" type="PanelContainer" parent="UI/Control"]
-visible = false
+[node name="PanelContainer" type="PanelContainer" parent="UI/Control3"]
 layout_mode = 0
-offset_left = 108.0
-offset_top = 351.0
-offset_right = 148.0
-offset_bottom = 391.0
+offset_left = 23.0
+offset_top = 374.0
+offset_right = 223.0
+offset_bottom = 574.0
 
-[node name="VBoxContainer" type="VBoxContainer" parent="UI/Control/PanelContainer"]
+[node name="TextureRect" type="TextureRect" parent="UI/Control3/PanelContainer"]
 layout_mode = 2
-
-[node name="Button" type="Button" parent="UI/Control/PanelContainer/VBoxContainer"]
-custom_minimum_size = Vector2(70, 50)
-layout_mode = 2
-theme_override_styles/pressed = SubResource("StyleBoxFlat_ce27d")
-toggle_mode = true
-text = "FORWARD RUN"
-script = ExtResource("6_ce27d")
-ActionName = "run"
-
-[node name="Button2" type="Button" parent="UI/Control/PanelContainer/VBoxContainer"]
-custom_minimum_size = Vector2(70, 50)
-layout_mode = 2
-theme_override_styles/pressed = SubResource("StyleBoxFlat_ce27d")
-text = "FORWARD WALK"
-script = ExtResource("6_ce27d")
-ActionName = "ui_up"
-
-[node name="HBoxContainer" type="HBoxContainer" parent="UI/Control/PanelContainer/VBoxContainer"]
-layout_mode = 2
-
-[node name="Button2" type="Button" parent="UI/Control/PanelContainer/VBoxContainer/HBoxContainer"]
-custom_minimum_size = Vector2(80, 50)
-layout_mode = 2
-theme_override_styles/pressed = SubResource("StyleBoxFlat_ce27d")
-text = "STARBOARD"
-script = ExtResource("6_ce27d")
-ActionName = "ui_left"
-
-[node name="Button3" type="Button" parent="UI/Control/PanelContainer/VBoxContainer/HBoxContainer"]
-custom_minimum_size = Vector2(50, 50)
-layout_mode = 2
-theme_override_styles/pressed = SubResource("StyleBoxFlat_ce27d")
-text = "DOWN"
-script = ExtResource("6_ce27d")
-ActionName = "ui_down"
-
-[node name="Button4" type="Button" parent="UI/Control/PanelContainer/VBoxContainer/HBoxContainer"]
-custom_minimum_size = Vector2(100, 50)
-layout_mode = 2
-theme_override_styles/pressed = SubResource("StyleBoxFlat_ce27d")
-text = "PORT"
-script = ExtResource("6_ce27d")
-ActionName = "ui_right"
