@@ -1,6 +1,8 @@
 # Infinite Runner - A Godot Procedural World Generation Demo Project
 
-![Alt Text](./images/screenshot_2.jpg.jpg)
+![Alt Text](./images/screenshot_5.jpg.jpg)
+
+![Alt Text](./images/screenshot_1_android.jpg)
 
 Run away from Evil Godots forever. 
 
@@ -14,9 +16,9 @@ In the demo, you can play a simple character in third person view. Obstacles are
 This is a simple starter demo to showcase the project, but can be extended to support any actual gameplay.
 How to Play
 - You start on an elevated platform.
-- Move using WASD
+- Move using WASD. On mobile, control buttons are available.
 - Run using Shift. Consumes stamina.
-- Throw crates with Left Click. Crates don't do anything special. Consumes stamina.
+- Throw crates with Left Click. Crates don't do anything special, it's just a demonstration of physics capabilities. Consumes stamina.
 - Jump with Space
 - Fly with F. You must be in the air. Consumes stamina.
 
@@ -26,14 +28,11 @@ Mobs are constantly spawned around the player.
 Mobs are cleaned-up when they get too far.
 Doing any sort of action will consume stamina, shown in the upper right bar. Once you're out of stamina, you can only walk. 
 
-Full Godot C# project for procedural infinite terrain generation, with random items or obstacles spreading throughout the map, with physics enabled. 
-Mesh generation logic based on Sebastian Lague's Procedural Landmass Generation, optimized and customized to work in Godot 4.4 and lower. Works on PC and Android. Other platforms still untested, but probably work as well.
-
 ## Key Features
 - Terrain generation, by default using Godot's Simplex Perlin Noise, but fully extensible and allowing any type of blend or crazy stuff.
 - Terrain LOD. Adjustable draw distance.
 - The mesh is generated around the player and cleaned depending on distance.
-- Objects can be spawned throughout the map, using Poisson Disc spread logic, here again customizeable.
+- Objects can be spawned throughout the map, customizable and randomizable.
 - Physics enabled playable character and items.
 - Works surprisingly well on Android
   
@@ -45,4 +44,4 @@ Mesh generation logic based on Sebastian Lague's Procedural Landmass Generation,
 - The project is somewhat over-engineered with some overkill functions and classes.
 - Works on Android, but there is no logic for touch movement
 
-If you like this project, need help or have cool ideas, join our [Discord](https://discord.gg/JhnQwUpFBm)! 
+Overall, it would be super nice to turn this into a neat plugin, but I do lack the time to work more than a couple of minutes here and there, so if you would like to help or receive help, join our [Discord](https://discord.gg/JhnQwUpFBm)! 
