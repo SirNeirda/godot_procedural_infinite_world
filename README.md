@@ -1,6 +1,6 @@
 # Infinite Runner - A Godot Procedural World Generation Demo Project
 
-![Alt Text](./images/screenshot_2.jpg)
+![Alt Text](./images/screenshot_2.jpg.jpg)
 
 Run away from Evil Godots forever. 
 
@@ -33,7 +33,7 @@ Mesh generation logic based on Sebastian Lague's Procedural Landmass Generation,
 - Terrain generation, by default using Godot's Simplex Perlin Noise, but fully extensible and allowing any type of blend or crazy stuff.
 - Terrain LOD. Adjustable draw distance.
 - The mesh is generated around the player and cleaned depending on distance.
-- Objects can be spawned throughout the map, customizable and randomizable.
+- Objects can be spawned throughout the map, using Poisson Disc spread logic, here again customizeable.
 - Physics enabled playable character and items.
 - Works surprisingly well on Android
   
