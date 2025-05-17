@@ -171,6 +171,7 @@ material = SubResource("ShaderMaterial_owtmn")
 layout_mode = 2
 
 [node name="Label3" type="Label" parent="UI"]
+visible = false
 custom_minimum_size = Vector2(80, 0)
 offset_left = 997.0
 offset_top = 622.0
@@ -260,6 +261,7 @@ theme_override_font_sizes/font_size = 50
 text = "FLY"
 
 [node name="Control3" type="Control" parent="UI" node_paths=PackedStringArray("MinimapTexture")]
+visible = false
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
