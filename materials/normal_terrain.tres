@@ -1,0 +1,18 @@
+[gd_resource type="StandardMaterial3D" load_steps=5 format=3 uid="uid://bombiqvk3sr0f"]
+
+[ext_resource type="Texture2D" uid="uid://x2vlyi22jd8y" path="res://materials/textures/mixue/Export_Unity_standard_BasecolourOpacity.png" id="1_rytig"]
+[ext_resource type="Texture2D" uid="uid://hm123q246tx5" path="res://materials/textures/mixue/Export_Unity_standard_Occlusion.png" id="2_43e7t"]
+[ext_resource type="Texture2D" uid="uid://ddgm4rsbs0pnq" path="res://materials/textures/mixue/Export_Unity_standard_Normal.png" id="3_m5qwu"]
+[ext_resource type="Texture2D" uid="uid://foo4u17a53t6" path="res://materials/textures/mixue/Export_Unity_standard_MetallicSmoothness.png" id="4_oy81m"]
+
+[resource]
+albedo_texture = ExtResource("1_rytig")
+roughness_texture = ExtResource("4_oy81m")
+normal_enabled = true
+normal_scale = 1.32
+normal_texture = ExtResource("3_m5qwu")
+rim_enabled = true
+ao_enabled = true
+ao_texture = ExtResource("2_43e7t")
+ao_texture_channel = 1
+uv1_scale = Vector3(4, 4, 4)

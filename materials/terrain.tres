@@ -1,7 +1,10 @@
 [gd_resource type="ShaderMaterial" load_steps=2 format=3 uid="uid://dqdhww7pkcjnb"]
 
-[ext_resource type="Shader" uid="uid://b0la2we3pp8s7" path="res://materials/shaders/vertex_color.gdshader" id="1_05mh6"]
+[ext_resource type="Shader" uid="uid://bk0p06c2cmk1n" path="res://materials/shaders/terrain_new.gdshader" id="1_uupk1"]
 
 [resource]
 render_priority = 0
-shader = ExtResource("1_05mh6")
+shader = ExtResource("1_uupk1")
+shader_parameter/uv_scale = 4.0
+shader_parameter/normal_strength = 1.0
+shader_parameter/specular_strength = 1.0
