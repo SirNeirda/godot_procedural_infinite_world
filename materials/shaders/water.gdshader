@@ -1,62 +1,73 @@
 shader_type spatial;
-render_mode cull_disabled, blend_add, unshaded;
-uniform float time_speed = 1.0;
-//time specifically for the wave noise texture
-uniform float surface_speed = 1.0;
-uniform float spin = 0.0; //Twisting motion of the water
-uniform float brightness = 0.6;
-uniform float color_intensity = 0.0;
-//Tiling frequency of the noise accross the mesh
-uniform float horizontal_frequency = 2.0;
-uniform float vertical_frequency = 2.0;
-//overall size muliplier
-uniform float size = 3.0;
-//affects total size
-uniform float banding_bias = 0.6;
+render_mode blend_mix, depth_draw_never, cull_back, world_vertex_coords;
 
-uniform sampler2D wave_texture;
-uniform sampler2D noise_texture;
-//wave height, use for ocean waves
-uniform float wave_height = 0.5;
-//water surface height variation based on the noise texture
-uniform float texture_height = 0.5;
-//preset band colors
-uniform vec4 color1 : source_color = vec4(0.59, 0.761, 1.0, 1.0);
-uniform vec4 color2 : source_color = vec4(0.274, 0.474, 0.98, 1.0);
-uniform vec4 color3 : source_color = vec4(0.059, 0.389, 0.85, 1.0);
-uniform vec4 color4 : source_color = vec4(0.0, 0.267, 1.0, 1.0);
+// ── TINT -----------------------------------------------------------------------
+uniform vec3  shallow_color : source_color = vec3(0.02, 0.45, 0.55);
+uniform vec3  deep_color    : source_color = vec3(0.00, 0.10, 0.28);
+uniform vec3  sky_color     : source_color = vec3(0.55, 0.67, 0.82);
+uniform float depth_fade_distance : hint_range(1.0, 100.0) = 15.0;
 
+// ── NORMAL / WAVES -------------------------------------------------------------
+uniform sampler2D normal_map : hint_normal, repeat_enable;
+uniform float normal_strength : hint_range(0.0, 2.0) = 0.6;
+uniform vec2  normal_speed1 = vec2( 0.04,  0.02);
+uniform vec2  normal_speed2 = vec2(-0.03,  0.03);
+uniform float wave_height   : hint_range(0.0, 2.0) = 0.15;
+
+// ── UV TILING ------------------------------------------------------------------
+uniform float repeat_size : hint_range(0.1, 512.0) = 8.0;
+
+// ── REFLECTION -----------------------------------------------------------------
+uniform float fresnel_power : hint_range(1.0, 8.0) = 5.0;
+
+// ── DEPTH TEXTURE --------------------------------------------------------------
+uniform sampler2D depth_texture : source_color, hint_depth_texture;
+
+// ── Transparency & Rim ---------------------------------------------------------
+uniform float transparency_shallow : hint_range(0.0, 1.0) = 0.0;
+uniform float transparency_deep    : hint_range(0.0, 1.0) = 1.0;
+uniform vec3  rim_color  : source_color = vec3(1.0);
+uniform float rim_width  : hint_range(0.0, 0.5) = 0.15;
+uniform float rim_softness : hint_range(0.0, 1.0) = 0.05;
+
+varying vec2 world_uv;
+
+// ── VERTEX ---------------------------------------------------------------------
 void vertex() {
-	float time = -TIME * time_speed;
-	VERTEX += NORMAL * wave_height * texture(wave_texture, vec2(UV.x + time * surface_speed, UV.y + time * surface_speed)).r;
-	VERTEX += NORMAL * texture_height * texture(noise_texture,vec2(UV.x * horizontal_frequency + spin * (time /2.0), (UV.y * vertical_frequency) + time)).r;;
+    vec3 p = VERTEX;
+    vec2 disp_uv = p.xz / repeat_size + TIME * normal_speed1;
+    p.y += (texture(normal_map, disp_uv).r - 0.5) * wave_height;
+    VERTEX = p;
+    world_uv = p.xz / repeat_size;
 }
 
+// ── FRAGMENT -------------------------------------------------------------------
 void fragment() {
-	float time = -TIME * time_speed;
+    // Scrolling normals
+    vec3 n1 = texture(normal_map, world_uv + TIME * normal_speed1).rgb * 2.0 - 1.0;
+    vec3 n2 = texture(normal_map, world_uv + TIME * normal_speed2).rgb * 2.0 - 1.0;
+    vec3 Nn = normalize(NORMAL + (n1 + n2) * 0.5 * normal_strength);
+    NORMAL = Nn;
 
-// Calculate dot product of normals and combine with noise texture value
-	float normal_facing = dot(NORMAL, VIEW);
-	float noise_value = texture(noise_texture,vec2(UV.x * horizontal_frequency + spin * (time /2.0), (UV.y * vertical_frequency) + time)).r;
-	normal_facing += (noise_value -0.5 + size) * 0.3;
+    // Depthmix (0 = shallow, 1 = deep).  Doesnt work thu idk why depth seems complicated
+    float depth_mix = 1.0;
+    #ifdef TEXTURE_DEPTH_SUPPORTED
+        float scene_d   = texture(depth_texture, SCREEN_UV).r;
+        float current_d = SCREEN_VERTEX.z / SCREEN_VERTEX.w;
+        depth_mix = clamp((current_d - scene_d) / depth_fade_distance, 0.0, 1.0);
+    #endif
 
-	float band = normal_facing * 3.0 * banding_bias;
-	vec4 band_color = vec4(0,0,0,0);
-	if (band <= 1.5) {
-		discard;
-	}
-	else if(band <= 2.0){
-		band_color = mix(color1, color2, -0.01 / (band-2.01)); //Mixes the color bands to make a slight gradient
-	}
-	else if (band <= 2.5) {
-		band_color = mix(color2, color3, -0.01 / (band-2.51));
-	}
-	else if (band <= 2.9) {
-		band_color = mix(color3, color4, -0.01 / (band-2.91));
-	}
-	else if (band >= 0.0) {
-		band_color = color4;
-	}
-	//Final color adjestment
-	ALBEDO = clamp(brightness * (vec3(1.0, 1.0, 1.0) - (band_color.xyz * -color_intensity)) * band_color.xyz, vec3(0.0, 0.0, 0.0), vec3(brightness, brightness, brightness));
+    // Color & reflection
+    vec3 tint   = mix(shallow_color, deep_color, depth_mix);
+    float fres  = pow(1.0 - max(dot(Nn, VIEW), 0.0), fresnel_power);
+    vec3 base   = mix(tint, sky_color, fres);
+
+    // Transparency & rim
+    ALPHA  = mix(transparency_shallow, transparency_deep, depth_mix);
+    float rim  = smoothstep(rim_width + rim_softness, rim_width, depth_mix);
+    ALBEDO = mix(base, rim_color, rim);
+
+    METALLIC  = 0.0;
+    ROUGHNESS = 0.05;
+    SPECULAR  = 0.08;
 }

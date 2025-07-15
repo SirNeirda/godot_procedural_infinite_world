@@ -1,0 +1,32 @@
+[gd_scene load_steps=8 format=3 uid="uid://bwox4b2q7phmk"]
+
+[ext_resource type="PackedScene" uid="uid://wn5ra42fuayg" path="res://_models/vertex_color_test.glb" id="1_b0e5b"]
+[ext_resource type="Shader" uid="uid://bk0p06c2cmk1n" path="res://materials/shaders/terrain_new.gdshader" id="2_t3b7y"]
+[ext_resource type="Texture2D" uid="uid://lunuvyo62vsa" path="res://materials/textures/Grass_1_colourOpacity.png" id="3_8gpg2"]
+[ext_resource type="Texture2D" uid="uid://x2vlyi22jd8y" path="res://materials/textures/mixue/Export_Unity_standard_BasecolourOpacity.png" id="4_movb7"]
+[ext_resource type="Texture2D" uid="uid://bfjr6o1faw61k" path="res://materials/textures/Grass_1__Normal.png" id="5_4fyce"]
+[ext_resource type="Texture2D" uid="uid://dph0ib2xplb4c" path="res://materials/textures/Grass_1_MetallicSmoothness.png" id="6_00rw6"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_a4rhn"]
+render_priority = 0
+shader = ExtResource("2_t3b7y")
+shader_parameter/albedo0 = ExtResource("3_8gpg2")
+shader_parameter/normal0 = ExtResource("5_4fyce")
+shader_parameter/rough0 = ExtResource("6_00rw6")
+shader_parameter/albedo1 = ExtResource("4_movb7")
+shader_parameter/channel_mask0 = Vector3(1, 0, 0)
+shader_parameter/channel_mask1 = Vector3(0, 1, 0)
+shader_parameter/channel_mask2 = Vector3(0, 0, 1)
+shader_parameter/uv_scale = 4.0
+shader_parameter/normal_strength = 1.0
+shader_parameter/rough_strength = 1.0
+shader_parameter/invert_normal_y = false
+shader_parameter/invert_roughness = false
+
+[node name="vertex_color_test" instance=ExtResource("1_b0e5b")]
+
+[node name="Plane" parent="." index="0"]
+surface_material_override/0 = SubResource("ShaderMaterial_a4rhn")
+
+[node name="SpotLight3D" type="SpotLight3D" parent="." index="1"]
+transform = Transform3D(1, 0, 0, 0, -0.199111, 0.979977, 0, -0.979977, -0.199111, 0, 0.793257, 0)
