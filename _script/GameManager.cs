@@ -29,6 +29,7 @@ public partial class GameManager : Node
     public static GameManager Instance;
 	private static Camera3D mainCamera;
 	private static MainCharacter mainCharacter;
+	
 	public bool Initialized = false;
 	public static PackedScene World;
 	public static Resource UI;
@@ -53,8 +54,12 @@ public partial class GameManager : Node
 
 	public void OnLoseGame()
 	{
+		GD.Print("Lost");
 		//Record = StartingPoint.DistanceTo(GetMainCharacterPosition())>Record?StartingPoint.DistanceTo(GetMainCharacterPosition());
+		
+		MobManager.Instance.DespawnAllMobs();
 		StartingPoint = GetMainCharacterPosition();
+		MobManager.Instance.ResetSecureZone(StartingPoint);
 	}
 
 	public void SoftwareInitialized()

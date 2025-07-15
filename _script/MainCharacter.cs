@@ -35,7 +35,7 @@ public partial class MainCharacter : CharacterBody3D
 	Vector3 CameraRotationAxis = Vector3.Zero;
 
 	List<RigidBody3D> Crates = new List<RigidBody3D>();
-	
+
 
 	float mouse_speed = 0.05f;
 
@@ -46,8 +46,8 @@ public partial class MainCharacter : CharacterBody3D
 	[Export]
 	public float RunningSpeed = 20;
 
-	public float SpeedMultiplier= 1;
-	
+	public float SpeedMultiplier = 1;
+
 	[Export]
 	public float JumpVelocity = 5;
 	public float JumpVelocityMultiplier = 1;
@@ -59,13 +59,15 @@ public partial class MainCharacter : CharacterBody3D
 
 	float velocity = 0;
 
-	public enum CharacterActions {Idle, Jumping, Running, Attacking, Walking, Falling, Gliding, Flying}
+	public enum CharacterActions { Idle, Jumping, Running, Attacking, Walking, Falling, Gliding, Flying }
 
-	public enum CharacterPowers {Crates, RotoPunch, Jetpack}
+	public enum CharacterPowers { Crates, RotoPunch, Jetpack }
 
 	public CharacterPowers CurrentPower = CharacterPowers.Crates;
 
-	float upkeepTimer=0;
+	float upkeepTimer = 0;
+
+	public bool Initialized = false;
 
 	public class CharacterInput
 	{
@@ -76,142 +78,174 @@ public partial class MainCharacter : CharacterBody3D
 		bool fly = false;
 		public Vector3 Direction = Vector3.Zero;
 
-		public Vector3 CameraDirection= Vector3.Zero;
+		public Vector3 CameraDirection = Vector3.Zero;
 
 		public void SetRun()
 		{
 			run = true;
 			jump = false;
 			attack = false;
-			fly=false;
+			fly = false;
 		}
 		public void SetJump()
 		{
 			run = false;
 			jump = true;
 			attack = false;
-			fly=false;
+			fly = false;
 		}
 		public void SetFly()
 		{
 			run = false;
 			jump = false;
 			attack = false;
-			fly=true;
+			fly = true;
 		}
 		public void SetAttack()
 		{
 			run = false;
 			jump = false;
-			fly=false;
+			fly = false;
 			attack = true;
 		}
 		public void EndAttack()
 		{
 			attack = false;
-			
+
 		}
 		public void Reset()
 		{
 			run = false;
 			jump = false;
 			attack = false;
-			fly=false;
+			fly = false;
 		}
 
-		public bool IsRunning(){return run;}
-		public bool IsJumping(){return jump;}
-		public bool IsAttacking(){return attack;}
+		public bool IsRunning() { return run; }
+		public bool IsJumping() { return jump; }
+		public bool IsAttacking() { return attack; }
 
-		public bool IsFlying(){return fly;}
-	} 
+		public bool IsFlying() { return fly; }
+	}
 
 	public CharacterInput CurrentInput = new CharacterInput();
 
 	public CharacterActions CurrentAction;
-	
 
-	float cam_rot_x=0;
-	float cam_rot_y=0;
+
+	float cam_rot_x = 0;
+	float cam_rot_y = 0;
 
 	[Export] public TouchInputManager touchInputManager;
 
 
 
-	
+
 
 	// Get the gravity from the project settings to be synced with RigidBody nodes.
 	public float gravity = ProjectSettings.GetSetting("physics/3d/default_gravity").AsSingle();
 
 	public override void _Ready()
 	{
-		
+
 		Initialization();
 	}
 
 	protected virtual void Initialization()
-		{
-			
-			Input.MouseMode = Input.MouseModeEnum.Captured;
-			FloorMaxAngle = Mathf.DegToRad(50);
-			GameManager.Instance.SetMainCamera(PlayerCamera);
-			GameManager.Instance.SetMainCharacter(this);
+	{
 
-			Cube = GD.Load<PackedScene>("res://_scenes/decor/crate.tscn");
-		}
+		Input.MouseMode = Input.MouseModeEnum.Captured;
+		FloorMaxAngle = Mathf.DegToRad(50);
+		GameManager.Instance.SetMainCamera(PlayerCamera);
+		GameManager.Instance.SetMainCharacter(this);
+
+		Cube = GD.Load<PackedScene>("res://_scenes/decor/crate.tscn");
+	}
 
 	public override void _PhysicsProcess(double delta)
+	{
+		if (Initialized)
 		{
 			float deltaFloat = (float)delta;
 			UpdateMovement(deltaFloat);
-		} 
+		}
+	}
 
 
 	public override void _Process(double delta)
+	{
+		if (!TerrainManager.Instance.Initialized)
 		{
-			float deltaFloat = (float)delta;
-			//GD.Print(RaycastDown.IsColliding());
-			UpdateAction(deltaFloat);
-			//UpdateMovement(deltaFloat);
-			UpdateCamera(deltaFloat);
-			UpdateHelpers(deltaFloat);
-			//UpdateInput(deltaFloat);
-			UpdateAnimations();
-			upkeepTimer = upkeepTimer-(float)delta;
-			if (upkeepTimer < 0)
-			{
-				CratesUpkeep();
-				upkeepTimer = 1;
-			}
+			return;
 		}
+		if (!Initialized)
+		{
+			Vector2 position = new Vector2(Position.X, Position.Z);
+			float height = TerrainManager.Instance.GetTerrainHeightAtGlobalCoordinate(position);
+			if (height != -201)
+			{
+
+				GD.Print("original pos " + position);
+				int attempts = 0;
+
+				while (height <= 0 && attempts < 9999)
+				{
+					GD.Print("current height " + height + " pos " + position);
+					position += new Vector2(0, 100);
+					height = TerrainManager.Instance.GetTerrainHeightAtGlobalCoordinate(position);
+					attempts++;
+				}
+
+				GlobalPosition = new Vector3(Position.X, height, Position.Y);
+				MobManager.Instance.CallDeferred("ResetSecureZone", GlobalPosition);
+				GD.Print("final " + GlobalPosition);
+				Initialized = true;
+			}
+			return;
+		}
+		float deltaFloat = (float)delta;
+		//GD.Print(RaycastDown.IsColliding());
+		UpdateAction(deltaFloat);
+		//UpdateMovement(deltaFloat);
+		UpdateCamera(deltaFloat);
+		UpdateHelpers(deltaFloat);
+		//UpdateInput(deltaFloat);
+		UpdateAnimations();
+		upkeepTimer = upkeepTimer - (float)delta;
+		if (upkeepTimer < 0)
+		{
+			CratesUpkeep();
+			upkeepTimer = 1;
+		}
+	}
 
 
 	protected void UpdateAction(float deltaFloat)
 	{
 		CharacterActions previousAction = CurrentAction;
-		if (CurrentInput.IsRunning() && CurrentInput.Direction != Vector3.Zero && Action >0)
+		if (CurrentInput.IsRunning() && CurrentInput.Direction != Vector3.Zero && Action > 0)
 		{
-			if (IsOnFloor() || timeOffGround <1f)
+			if (IsOnFloor() || timeOffGround < 1f)
 			{
-				CurrentAction = CharacterActions.Running; 
-				timeOffGround =0;
+				CurrentAction = CharacterActions.Running;
+				timeOffGround = 0;
 				Action = Mathf.Clamp(Action - (deltaFloat * 10), 0, 100);
 				return;
 			}
 			if (!IsOnFloor())
 			{
 				//GD.Print("off ground " + timeOffGround);
-				timeOffGround +=deltaFloat;
+				timeOffGround += deltaFloat;
 			}
-		
+
 		}
-		if (CurrentInput.IsJumping() && !CurrentInput.IsFlying()){CurrentAction = CharacterActions.Jumping; return;}
+		if (CurrentInput.IsJumping() && !CurrentInput.IsFlying()) { CurrentAction = CharacterActions.Jumping; return; }
 		if (!IsOnFloor())
 		{
-			if (CurrentInput.IsFlying() && Action >0) {CurrentAction = CharacterActions.Flying; return;}
+			if (CurrentInput.IsFlying() && Action > 0) { CurrentAction = CharacterActions.Flying; return; }
 			CurrentAction = CharacterActions.Falling; return;
 		}
-		if (CurrentInput.IsAttacking() && Action >5)
+		if (CurrentInput.IsAttacking() && Action > 5)
 		{
 			Action = Mathf.Clamp(Action - 5, 0, 100);
 			LaunchAttack();
@@ -219,17 +253,18 @@ public partial class MainCharacter : CharacterBody3D
 			{
 				CurrentAction = CharacterActions.Attacking;
 			}
-			return;}
-		if (CurrentInput.Direction != Vector3.Zero) 
-		{
-			Action = Mathf.Clamp(Action + deltaFloat,0,100);
-			CurrentAction = CharacterActions.Walking; 
 			return;
 		}
-		Action = Mathf.Clamp(Action + deltaFloat*3,0,100);
+		if (CurrentInput.Direction != Vector3.Zero)
+		{
+			Action = Mathf.Clamp(Action + deltaFloat, 0, 100);
+			CurrentAction = CharacterActions.Walking;
+			return;
+		}
+		Action = Mathf.Clamp(Action + deltaFloat * 3, 0, 100);
 		CurrentAction = CharacterActions.Idle;
 
-		
+
 	}
 
 	void LaunchAttack()
@@ -243,24 +278,24 @@ public partial class MainCharacter : CharacterBody3D
 
 			Crates.Add(newCube);
 
-			newCube.Position = GlobalTransform.Origin + (forwardDirection*2)+Vector3.Up;
+			newCube.Position = GlobalTransform.Origin + (forwardDirection * 2) + Vector3.Up;
 
-			Vector3 velocityDirection = (forwardDirection*2 + Vector3.Up).Normalized();
+			Vector3 velocityDirection = (forwardDirection * 2 + Vector3.Up).Normalized();
 			newCube.LinearVelocity = velocityDirection * 10;
 			CurrentInput.EndAttack();
 		}
 		if (CurrentPower == CharacterPowers.RotoPunch)
-			{
-				Animator.Set("parameters/conditions/tossing", true);
-				
-				CurrentInput.EndAttack();
-			}
+		{
+			Animator.Set("parameters/conditions/tossing", true);
+
+			CurrentInput.EndAttack();
+		}
 
 	}
 
 	public void CratesUpkeep()
 	{
-		 foreach (RigidBody3D crate in Crates.ToArray()) // Iterate over a copy of the list
+		foreach (RigidBody3D crate in Crates.ToArray()) // Iterate over a copy of the list
 		{
 			if (Position.DistanceTo(crate.Position) > 200)
 			{
@@ -272,12 +307,12 @@ public partial class MainCharacter : CharacterBody3D
 	async void DespawnCrate(RigidBody3D crate, float delay = -1)
 	{
 		Crates.Remove(crate);
-        if (delay > 0)
-        {
-            await ToSignal(GetTree().CreateTimer(delay), "timeout");
-        }
-        crate.QueueFree();
-		
+		if (delay > 0)
+		{
+			await ToSignal(GetTree().CreateTimer(delay), "timeout");
+		}
+		crate.QueueFree();
+
 	}
 
 	/*public override void _Input(InputEvent keyEvent)
@@ -328,7 +363,7 @@ public partial class MainCharacter : CharacterBody3D
 
 	protected void UpdateAnimations()
 	{
-		
+
 		Animator.Set("parameters/conditions/falling", false);
 		Animator.Set("parameters/conditions/idle", false);
 		Animator.Set("parameters/conditions/sprinting", false);
@@ -347,7 +382,7 @@ public partial class MainCharacter : CharacterBody3D
 		}
 		if (CurrentAction == CharacterActions.Walking)
 		{
-			
+
 			Animator.Set("parameters/conditions/running", true);
 			return;
 		}
@@ -361,7 +396,7 @@ public partial class MainCharacter : CharacterBody3D
 			Animator.Set("parameters/conditions/flying", true);
 			return;
 		}
-		
+
 	}
 
 	protected void ChangeAnimState()
@@ -376,7 +411,7 @@ public partial class MainCharacter : CharacterBody3D
 		// Handle Jump.
 		if (CurrentAction == CharacterActions.Jumping && IsOnFloor())
 		{
-			velocity.Y = JumpVelocity* JumpVelocityMultiplier;
+			velocity.Y = JumpVelocity * JumpVelocityMultiplier;
 		}
 
 		// Get the input direction and handle the movement/deceleration.
@@ -385,10 +420,10 @@ public partial class MainCharacter : CharacterBody3D
 		CurrentInput.Direction = (Transform.Basis * new Vector3(inputDir.X, 0, inputDir.Y)).Normalized();
 		if (IsOnFloor())
 		{
-			if (Action >0)
+			if (Action > 0)
 			{
-				speed = CurrentAction == CharacterActions.Running?RunningSpeed:WalkingSpeed;
-				speed = speed*SpeedMultiplier;
+				speed = CurrentAction == CharacterActions.Running ? RunningSpeed : WalkingSpeed;
+				speed = speed * SpeedMultiplier;
 			}
 		}
 		if (!IsOnFloor())
@@ -402,12 +437,16 @@ public partial class MainCharacter : CharacterBody3D
 			}
 			else
 			{
-				Action = Mathf.Clamp(Action + (int)deltaFloat,0,100);
+				Action = Mathf.Clamp(Action + (int)deltaFloat, 0, 100);
 				velocity.Y -= gravity * deltaFloat;
+				//float ratio = (speed - WalkingSpeed) / (RunningSpeed - WalkingSpeed);
+				//float newRatio = Mathf.MoveToward(ratio, 0, deltaFloat * 1.5f); // adjust the 1.5f as needed
+				//speed = Mathf.Lerp(WalkingSpeed, RunningSpeed, newRatio);
 				float t = Mathf.MoveToward((float)(speed - WalkingSpeed) / (RunningSpeed - WalkingSpeed), 0, 1);
 				speed = Mathf.Lerp(WalkingSpeed, RunningSpeed, t);
+
 			}
-			
+
 		}
 		if (CurrentInput.Direction != Vector3.Zero)
 		{
@@ -431,125 +470,125 @@ public partial class MainCharacter : CharacterBody3D
 	}
 
 	protected void UpdateCamera(float deltaFloat)
-		{
-			#if GODOT_ANDROID
+	{
+#if GODOT_ANDROID
 			//if (touchInputManager == null) {GD.Print("wtf"); return;}
 			CameraRotationAxis.X = touchInputManager.CameraRotationAxis.X;
 			CameraRotationAxis.Y= touchInputManager.CameraRotationAxis.Y;
-			#endif
-			float targetFov = 75;
-			float fovLerpTime = 0.5f; // adjust this value to control the speed of the FOV change
+#endif
+		float targetFov = 75;
+		float fovLerpTime = 0.5f; // adjust this value to control the speed of the FOV change
 
-			if (CurrentInput.Direction.Z != 0)
-			{
-				if (CurrentAction == CharacterActions.Running || CurrentAction == CharacterActions.Gliding)
-				{
-					targetFov = 100;
-				}
-				else
-				{
-					targetFov = 75;
-				}
-			}
-			if (CameraRotationAxis!= Vector3.Zero)
-			{
-				cam_rot_x -= CameraRotationAxis.Y;
-				cam_rot_y += Mathf.Clamp(CameraRotationAxis.X, -25, 60);
-			} 
-			PlayerCamera.Fov = Mathf.Lerp(PlayerCamera.Fov, targetFov, fovLerpTime * deltaFloat);
-
-			Vector3 rotateCam = new Vector3(cam_rot_x, CameraPivot.RotationDegrees.Y, CameraPivot.RotationDegrees.Z );
-			//this.RotationDegrees = this.RotationDegrees * (Vector3.up * 
-			Vector3 rotateChar = new Vector3(RotationDegrees.X, cam_rot_y, RotationDegrees.Z );
-			//CameraPivot.RotationDegrees = rotateChar;
-			RotationDegrees = rotateChar;
-			CameraPivot.RotationDegrees = rotateCam;
-			//Rotation = (rotate.X);
-			RotateY(Mathf.DegToRad(cam_rot_y));
-			//RotateObjectLocal(Vector3.Right, Mathf.DegToRad(-pitch));
-		}
-	
-	public void UpdateHelpers(float deltaFloat)
+		if (CurrentInput.Direction.Z != 0)
 		{
-			string text = CharacterName;
-			if (PopupInfo == null)
+			if (CurrentAction == CharacterActions.Running || CurrentAction == CharacterActions.Gliding)
 			{
-				PopupInfo = Debug.SetTextHelper(text, CameraPivot.Position, CameraPivot);
-				PopupInfo.MaxViewDistance = 1000;
+				targetFov = 100;
 			}
-			if (PopupInfo != null)
+			else
 			{
-				text = text+ "\n" + CurrentAction;
-				//Mathf.RadToDeg(GetFloorAngle()) + " Pos: X: " + string.Format("{0:0. #}", Position.X) + " Y: " + string.Format("{0:0. #}", Position.Y) + " Z: " + string.Format("{0:0. #}", Position.Z) ;
-				//GD.Print(TerrainGenerator.Instance.CameraInChunk());
-				PopupInfo.SetText(text);
-				#if GODOT_ANDROID
-				PopupInfo.SetSize(50);
-				#endif
-				PopupInfo.Position = CameraPivot.Position+ Vector3.Down*0.7f;
-				//GD.Print("Position " + PopupInfo.Position);
+				targetFov = 75;
 			}
-			/*string text = "Adrien" + "\n" + TerrainManager.Instance.CameraInChunk();
-			
-			if (PopupInfo == null)
-			{
-				PopupInfo = Debug.SetTextHelper(text, CameraPivot.Position, CameraPivot);
-				PopupInfo.MaxViewDistance = 1000;
-			}
-			if (PopupInfo != null)
-			{
-				text = "AdrienSetup" + "\n" + Mathf.RadToDeg(GetFloorAngle()) + " Pos: \nX: " + string.Format("{0:0. #}", Position.X) + "\nY: " + string.Format("{0:0. #}", Position.Y) + "\nZ: " + string.Format("{0:0. #}", Position.Z) ;
-				//GD.Print(TerrainGenerator.Instance.CameraInChunk());
-				PopupInfo.SetText(text);
-				//PopupInfo.Position = CameraPivot.Position+ Vector3.Up *0.2f;
-			}*/
 		}
+		if (CameraRotationAxis != Vector3.Zero)
+		{
+			cam_rot_x -= CameraRotationAxis.Y;
+			cam_rot_y += Mathf.Clamp(CameraRotationAxis.X, -25, 60);
+		}
+		PlayerCamera.Fov = Mathf.Lerp(PlayerCamera.Fov, targetFov, fovLerpTime * deltaFloat);
+
+		Vector3 rotateCam = new Vector3(cam_rot_x, CameraPivot.RotationDegrees.Y, CameraPivot.RotationDegrees.Z);
+		//this.RotationDegrees = this.RotationDegrees * (Vector3.up * 
+		Vector3 rotateChar = new Vector3(RotationDegrees.X, cam_rot_y, RotationDegrees.Z);
+		//CameraPivot.RotationDegrees = rotateChar;
+		RotationDegrees = rotateChar;
+		CameraPivot.RotationDegrees = rotateCam;
+		//Rotation = (rotate.X);
+		RotateY(Mathf.DegToRad(cam_rot_y));
+		//RotateObjectLocal(Vector3.Right, Mathf.DegToRad(-pitch));
+	}
+
+	public void UpdateHelpers(float deltaFloat)
+	{
+		string text = CharacterName;
+		if (PopupInfo == null)
+		{
+			PopupInfo = Debug.SetTextHelper(text, CameraPivot.Position, CameraPivot);
+			PopupInfo.MaxViewDistance = 1000;
+		}
+		if (PopupInfo != null)
+		{
+			text = text + "\n" + CurrentAction + " " + TerrainManager.Instance.GetTerrainHeightAtGlobalCoordinate(new Vector2(Position.X, Position.Z)).ToString();
+			//Mathf.RadToDeg(GetFloorAngle()) + " Pos: X: " + string.Format("{0:0. #}", Position.X) + " Y: " + string.Format("{0:0. #}", Position.Y) + " Z: " + string.Format("{0:0. #}", Position.Z) ;
+			//GD.Print(TerrainGenerator.Instance.CameraInChunk());
+			PopupInfo.SetText(text);
+#if GODOT_ANDROID
+				PopupInfo.SetSize(50);
+#endif
+			PopupInfo.Position = CameraPivot.Position + Vector3.Down * 0.7f;
+			//GD.Print("Position " + PopupInfo.Position);
+		}
+		/*string text = "Adrien" + "\n" + TerrainManager.Instance.CameraInChunk();
+
+		if (PopupInfo == null)
+		{
+			PopupInfo = Debug.SetTextHelper(text, CameraPivot.Position, CameraPivot);
+			PopupInfo.MaxViewDistance = 1000;
+		}
+		if (PopupInfo != null)
+		{
+			text = "AdrienSetup" + "\n" + Mathf.RadToDeg(GetFloorAngle()) + " Pos: \nX: " + string.Format("{0:0. #}", Position.X) + "\nY: " + string.Format("{0:0. #}", Position.Y) + "\nZ: " + string.Format("{0:0. #}", Position.Z) ;
+			//GD.Print(TerrainGenerator.Instance.CameraInChunk());
+			PopupInfo.SetText(text);
+			//PopupInfo.Position = CameraPivot.Position+ Vector3.Up *0.2f;
+		}*/
+	}
 
 	public override void _Input(InputEvent keyEvent)
+	{
+		CurrentInput.Reset();
+		if (Input.IsActionPressed("run"))
 		{
-			CurrentInput.Reset();
-			if (Input.IsActionPressed("run"))
+			CurrentInput.SetRun();
+		}
+		if (Input.IsActionPressed("jump"))
+		{
+			CurrentInput.SetJump();
+		}
+		if (Input.IsActionPressed("fly"))
+		{
+			CurrentInput.SetFly();
+		}
+#if GODOT_WINDOWS
+
+		if (keyEvent is InputEventMouseButton _mouseButton)
+		{
+			switch (_mouseButton.ButtonIndex)
 			{
-				CurrentInput.SetRun();
-			}
-			if (Input.IsActionPressed("jump"))
-			{
-				CurrentInput.SetJump();
-			}
-			if (Input.IsActionPressed("fly"))
-			{
-				CurrentInput.SetFly();
-			}
-			#if GODOT_WINDOWS 
-			
-			if (keyEvent is InputEventMouseButton _mouseButton)
-			{
-				switch (_mouseButton.ButtonIndex)
-				{
-					case MouseButton.Right:
-					Input.MouseMode = _mouseButton.Pressed? Input.MouseModeEnum.Captured:Input.MouseModeEnum.Visible;
+				case MouseButton.Right:
+					Input.MouseMode = _mouseButton.Pressed ? Input.MouseModeEnum.Captured : Input.MouseModeEnum.Visible;
 					break;
-				}
-				if (_mouseButton.ButtonIndex == MouseButton.Left && _mouseButton.Pressed)
-				{
-					CurrentInput.SetAttack();
-					
-					//Toss a crate
-					/*Animator.Set("parameters/conditions/tossing", true);
-					RigidBody3D newCube = Cube.Instantiate() as RigidBody3D;
-					GetTree().Root.AddChild(newCube);
-					Crates.Add(newCube);
-					Vector3 forwardDirection = GlobalTransform.Basis.Z;
-
-					newCube.Position = GlobalTransform.Origin + (forwardDirection*2)+Vector3.Up;
-
-					Vector3 velocityDirection = (forwardDirection*2 + Vector3.Up).Normalized();
-        			newCube.LinearVelocity = velocityDirection * 10;*/
-
-				}
 			}
-			#endif 
-			#if GODOT_ANDROID 
+			if (_mouseButton.ButtonIndex == MouseButton.Left && _mouseButton.Pressed)
+			{
+				CurrentInput.SetAttack();
+
+				//Toss a crate
+				/*Animator.Set("parameters/conditions/tossing", true);
+				RigidBody3D newCube = Cube.Instantiate() as RigidBody3D;
+				GetTree().Root.AddChild(newCube);
+				Crates.Add(newCube);
+				Vector3 forwardDirection = GlobalTransform.Basis.Z;
+
+				newCube.Position = GlobalTransform.Origin + (forwardDirection*2)+Vector3.Up;
+
+				Vector3 velocityDirection = (forwardDirection*2 + Vector3.Up).Normalized();
+				newCube.LinearVelocity = velocityDirection * 10;*/
+
+			}
+		}
+#endif
+#if GODOT_ANDROID
 			if (Input.IsActionPressed("attack"))
 			{
 				CurrentInput.SetAttack();
@@ -565,44 +604,44 @@ public partial class MainCharacter : CharacterBody3D
 					Vector3 velocityDirection = (forwardDirection*2 + Vector3.Up).Normalized();
         			newCube.LinearVelocity = velocityDirection * 10;
 			}
-			#endif 
-			#if GODOT_WINDOWS 
-			if (keyEvent is InputEventJoypadMotion joypadMotionEvent)
+#endif
+#if GODOT_WINDOWS
+		if (keyEvent is InputEventJoypadMotion joypadMotionEvent)
+		{
+			// Get the joystick axis values
+			JoyAxis axis = joypadMotionEvent.Axis; // X-axis of the joystick
+			if (axis == JoyAxis.RightX || axis == JoyAxis.RightY)//axis goes from -1 to 0
+			{
+				// Get the joystick axis values
+				if (axis == JoyAxis.RightY)
 				{
-					// Get the joystick axis values
-					JoyAxis axis = joypadMotionEvent.Axis; // X-axis of the joystick
-					if (axis == JoyAxis.RightX || axis == JoyAxis.RightY)//axis goes from -1 to 0
-					{
-						 // Get the joystick axis values
-						 if (axis == JoyAxis.RightY)
-						 {
-							CameraRotationAxis.Y = joypadMotionEvent.AxisValue;
-						 }
-						  if (axis == JoyAxis.RightX)
-						 {
-							CameraRotationAxis.X = joypadMotionEvent.AxisValue;
-						 }
-					}
-					//GD.Print(axis + joypadMotionEvent.AxisValue.ToString());
+					CameraRotationAxis.Y = joypadMotionEvent.AxisValue;
 				}
-				
-			if (keyEvent is InputEventMouseMotion motion)
-			{
-				cam_rot_x = Mathf.Clamp((cam_rot_x +(-motion.Relative.Y * mouse_speed)), -25,60);
-				cam_rot_y += -motion.Relative.X * mouse_speed;
+				if (axis == JoyAxis.RightX)
+				{
+					CameraRotationAxis.X = joypadMotionEvent.AxisValue;
+				}
 			}
-			#endif 
-			if (Input.IsActionPressed("run"))
-			{
-				CurrentInput.SetRun();
-				float height = TerrainManager.Instance.GetTerrainHeightAtGlobalCoordinate(new Vector2(GlobalPosition.X, GlobalPosition.Z));
-				
-				float degree = TerrainManager.Instance.GetTerrainInclinationAtGlobalCoordinate(new Vector2(GlobalPosition.X, GlobalPosition.Z));
-				
-				Vector3 location = new Vector3(GlobalPosition.X, height, GlobalPosition.Z);
-				//GD.Print("Degree inclination: " + degree);
-				
-			}
+			//GD.Print(axis + joypadMotionEvent.AxisValue.ToString());
+		}
+
+		if (keyEvent is InputEventMouseMotion motion)
+		{
+			cam_rot_x = Mathf.Clamp((cam_rot_x + (-motion.Relative.Y * mouse_speed)), -25, 60);
+			cam_rot_y += -motion.Relative.X * mouse_speed;
+		}
+#endif
+		if (Input.IsActionPressed("run"))
+		{
+			CurrentInput.SetRun();
+			float height = TerrainManager.Instance.GetTerrainHeightAtGlobalCoordinate(new Vector2(GlobalPosition.X, GlobalPosition.Z));
+
+			float degree = TerrainManager.Instance.GetTerrainInclinationAtGlobalCoordinate(new Vector2(GlobalPosition.X, GlobalPosition.Z));
+
+			Vector3 location = new Vector3(GlobalPosition.X, height, GlobalPosition.Z);
+			//GD.Print("Degree inclination: " + degree);
 
 		}
+
+	}
 }
