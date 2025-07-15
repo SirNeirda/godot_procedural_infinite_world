@@ -1,6 +1,7 @@
 using Godot;
 using Bouncerock.Events;
 using System.Collections.Generic;
+using System;
 
 namespace Bouncerock.Terrain
 {
@@ -19,6 +20,8 @@ namespace Bouncerock.Terrain
 		public int ViewingDistance = 3;
 		[Export]
 		public int Seed = 1234;
+		[Export]
+		public bool UseRandomSeed = true;
 		[Export]
 		public Material TerrainMaterial;
 		
@@ -63,12 +66,25 @@ namespace Bouncerock.Terrain
 
 		Vector2 currentHalfChunkPosition = Vector2.Zero;
 
+		public bool Initialized = false;
+
 		//bool set = false;
 
-		public override void _Ready() 
+		public override void _Ready()
 		{
 			this.BouncerockEventStartListening<EvtCameraChanged>();
-			TerrainDetailsRandom.Seed= (ulong)Seed;
+			//ulong seed = (ulong)Seed;
+			if (UseRandomSeed)
+			{
+				Seed = (int)DateTime.UtcNow.Ticks;
+			}
+			TerrainDetailsRandom.Seed = (ulong)Seed;
+			LoadNewTerrain();
+		}
+
+		public void LoadNewTerrain()
+		{
+			Initialized = false;
 			GD.Print("Initializing map");
 			CurrentMapSettings = new MapGenerationSettings();
 			CurrentMapSettings.DefaultValues();
@@ -78,9 +94,10 @@ namespace Bouncerock.Terrain
 				Viewer = GameManager.Instance.MainCamera;
 			}
 			SetupLOD();
-			SetupMeshSettings();
+			//SetupMeshSettings();
 			DetailsManager = GetNode<TerrainDetailsManager>("TerrainDetailsManager");
 			meshWorldSize = TerrainMeshSettings.meshWorldSize;
+			Initialized = true;
 		}
 
 		void SetupLOD()
@@ -238,6 +255,7 @@ namespace Bouncerock.Terrain
 		public override void _Process(double time) 
 		{
 			if (Viewer == null) {;return;}
+			if (Initialized == false) {;return;}
 			viewerPosition = new Vector2 (Viewer.GlobalPosition.X, Viewer.GlobalPosition.Z);
 			
 			updateTimer = updateTimer + (float)time;

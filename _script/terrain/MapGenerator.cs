@@ -210,7 +210,7 @@ namespace Bouncerock.Terrain
 			RandomNumberGenerator rnd = new RandomNumberGenerator();
 			rnd.Seed = (ulong)DateTime.Now.ToBinary();
 			float chance = rnd.RandfRange(0,1);
-			GD.Print("Item present " + naturalObject.ObjectName + " chance " + chance);
+			//GD.Print("Item present " + naturalObject.ObjectName + " chance " + chance);
 			if (naturalObject.Concentration >= chance)
 			 {
 				Vector2 location = new Vector2();

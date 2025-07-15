@@ -130,7 +130,7 @@ namespace Bouncerock.Terrain
 			}
 			catch (Exception )
 			{
-				GD.Print("out of bounds" + location.X +"/"+location.Y);
+				//GD.Print("out of bounds" + location.X +"/"+location.Y);
 				// Return -201 if any exception occurs (e.g., out of bounds).
 				return -201;
 			}
@@ -209,7 +209,10 @@ namespace Bouncerock.Terrain
 						//GD.Print("itm.name" + itm.name);
 						var naturalObject = TerrainDetailsManager.Instance.GetSpawnedObject(itm.name);
 ;
-						if (naturalObject == null ) {GD.Print("Item " + itm.name + " couldn't be found"); continue;}
+						if (naturalObject == null )
+					{ //GD.Print("Item " + itm.name + " couldn't be found");
+						continue;
+					}
 						
 						WorldItem item = await TerrainManager.Instance.DetailsManager.SpawnAndInitialize(naturalObject);
 						

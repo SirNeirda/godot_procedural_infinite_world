@@ -5,11 +5,11 @@ using System.Threading.Tasks;
 
 namespace Bouncerock.Terrain
 {
-	public static class MeshGenerator 
+	public static class MeshGenerator
 	{
 		public static async Task<MeshData> GenerateTerrainMeshAsync(Map map, int levelOfDetail)
 		{
-			if (map.heightMap == null){GD.Print("Null heightmap"); return null;}
+			if (map.heightMap == null) { GD.Print("Null heightmap"); return null; }
 			int skipIncrement = (levelOfDetail == 0) ? 1 : levelOfDetail * 2;
 			int numVertsPerLine = TerrainMeshSettings.numVertsPerLine;
 			Vector2 topLeft = new Vector2(-1, 1) * TerrainMeshSettings.meshWorldSize / 2f;
@@ -100,10 +100,10 @@ namespace Bouncerock.Terrain
 			return meshData;
 		}
 
-		
+
 	}
 
-	public class MeshData 
+	public class MeshData
 	{
 		Vector3[] vertices;
 		int[] triangles;
@@ -111,7 +111,7 @@ namespace Bouncerock.Terrain
 		Vector3[] bakedNormals;
 
 		// Vertex colors for slope-based coloring
-    	Color[] vertexColors; // Added: Array for storing vertex colors
+		Color[] vertexColors; // Added: Array for storing vertex colors
 
 		Vector3[] outOfMeshVertices;
 		int[] outOfMeshTriangles;
@@ -121,7 +121,7 @@ namespace Bouncerock.Terrain
 
 		bool useFlatShading;
 
-		public MeshData(int numVertsPerLine, int skipIncrement, bool useFlatShading) 
+		public MeshData(int numVertsPerLine, int skipIncrement, bool useFlatShading)
 		{
 			this.useFlatShading = useFlatShading;
 
@@ -139,44 +139,55 @@ namespace Bouncerock.Terrain
 			triangles = new int[(numMeshEdgeTriangles + numMainTriangles) * 3];
 
 			outOfMeshVertices = new Vector3[numVertsPerLine * 4 - 4];
-			outOfMeshTriangles = new int[24 * (numVertsPerLine-2)];
+			outOfMeshTriangles = new int[24 * (numVertsPerLine - 2)];
 		}
 
-		public void AddVertex(Vector3 vertexPosition, Vector2 uv, int vertexIndex) 
+		public void AddVertex(Vector3 vertexPosition, Vector2 uv, int vertexIndex)
 		{
-			if (vertexIndex < 0) 
+			if (vertexIndex < 0)
 			{
-				outOfMeshVertices [-vertexIndex - 1] = vertexPosition;
-			} 
-			else 
+				outOfMeshVertices[-vertexIndex - 1] = vertexPosition;
+			}
+			else
 			{
-				vertices [vertexIndex] = vertexPosition;
-				uvs [vertexIndex] = uv;
+				vertices[vertexIndex] = vertexPosition;
+				uvs[vertexIndex] = uv;
 
 
 			}
 		}
 
-		private Color ColorFromSlope(float slope)
+		private Color ColorFromSlope(float slope, float height)
 		{
-			// Gradient from green (flat) to red (steep)
-			return new Color(1.0f - slope, 0.0f, 0.0f);
+			float angleDegrees = Mathf.RadToDeg(Mathf.Acos(1.0f - slope));
+			//GD.Print("Slope: " + angleDegrees + "° // Height: " + height);
+
+			// Red = flatter is brighter
+			float red = Mathf.Clamp(1.0f - slope * 250.0f, 0.0f, 1.0f);
+
+			// Green = height mapped from -200 to +200
+			float green = Mathf.Clamp((height + 200.0f) / 400.0f, 0.0f, 1.0f);
+
+			// Blue = fade in from height 2.0 to 0.0
+			float blue = Mathf.Clamp((2.0f - height) / 2.0f, 0.0f, 1.0f);
+
+			return new Color(red, green, blue);
 		}
 
-		public void AddTriangle(int a, int b, int c) 
+		public void AddTriangle(int a, int b, int c)
 		{
-			if (a < 0 || b < 0 || c < 0) 
+			if (a < 0 || b < 0 || c < 0)
 			{
-				outOfMeshTriangles [outOfMeshTriangleIndex] = a;
-				outOfMeshTriangles [outOfMeshTriangleIndex + 1] = b;
-				outOfMeshTriangles [outOfMeshTriangleIndex + 2] = c;
+				outOfMeshTriangles[outOfMeshTriangleIndex] = a;
+				outOfMeshTriangles[outOfMeshTriangleIndex + 1] = b;
+				outOfMeshTriangles[outOfMeshTriangleIndex + 2] = c;
 				outOfMeshTriangleIndex += 3;
-			} 
-			else 
+			}
+			else
 			{
-				triangles [triangleIndex] = a;
-				triangles [triangleIndex + 1] = b;
-				triangles [triangleIndex + 2] = c;
+				triangles[triangleIndex] = a;
+				triangles[triangleIndex + 1] = b;
+				triangles[triangleIndex + 2] = c;
 				triangleIndex += 3;
 			}
 		}
@@ -189,72 +200,72 @@ namespace Bouncerock.Terrain
 			}
 		}*/
 
-		(Vector3[], Color[]) CalculateNormals() 
+		(Vector3[], Color[]) CalculateNormals()
 		{
 
 			Vector3[] vertexNormals = new Vector3[vertices.Length];
 			Color[] vertexColors = new Color[vertices.Length];
 			int triangleCount = triangles.Length / 3;
-			for (int i = 0; i < triangleCount; i++) 
+			for (int i = 0; i < triangleCount; i++)
 			{
 				int normalTriangleIndex = i * 3;
-				int vertexIndexA = triangles [normalTriangleIndex];
-				int vertexIndexB = triangles [normalTriangleIndex + 1];
-				int vertexIndexC = triangles [normalTriangleIndex + 2];
+				int vertexIndexA = triangles[normalTriangleIndex];
+				int vertexIndexB = triangles[normalTriangleIndex + 1];
+				int vertexIndexC = triangles[normalTriangleIndex + 2];
 
-				Vector3 triangleNormal = SurfaceNormalFromIndices (vertexIndexA, vertexIndexB, vertexIndexC);
-				vertexNormals [vertexIndexA] += triangleNormal;
-				vertexNormals [vertexIndexB] += triangleNormal;
-				vertexNormals [vertexIndexC] += triangleNormal;
+				Vector3 triangleNormal = SurfaceNormalFromIndices(vertexIndexA, vertexIndexB, vertexIndexC);
+				vertexNormals[vertexIndexA] += triangleNormal;
+				vertexNormals[vertexIndexB] += triangleNormal;
+				vertexNormals[vertexIndexC] += triangleNormal;
 
-				 
+
 			}
 
 			int borderTriangleCount = outOfMeshTriangles.Length / 3;
-			for (int i = 0; i < borderTriangleCount; i++) 
+			for (int i = 0; i < borderTriangleCount; i++)
 			{
 				int normalTriangleIndex = i * 3;
-				int vertexIndexA = outOfMeshTriangles [normalTriangleIndex];
-				int vertexIndexB = outOfMeshTriangles [normalTriangleIndex + 1];
-				int vertexIndexC = outOfMeshTriangles [normalTriangleIndex + 2];
+				int vertexIndexA = outOfMeshTriangles[normalTriangleIndex];
+				int vertexIndexB = outOfMeshTriangles[normalTriangleIndex + 1];
+				int vertexIndexC = outOfMeshTriangles[normalTriangleIndex + 2];
 
-				Vector3 triangleNormal = SurfaceNormalFromIndices (vertexIndexA, vertexIndexB, vertexIndexC);
-				if (vertexIndexA >= 0) 
+				Vector3 triangleNormal = SurfaceNormalFromIndices(vertexIndexA, vertexIndexB, vertexIndexC);
+				if (vertexIndexA >= 0)
 				{
-					vertexNormals [vertexIndexA] += triangleNormal;
+					vertexNormals[vertexIndexA] += triangleNormal;
 				}
-				if (vertexIndexB >= 0) 
+				if (vertexIndexB >= 0)
 				{
-					vertexNormals [vertexIndexB] += triangleNormal;
+					vertexNormals[vertexIndexB] += triangleNormal;
 				}
-				if (vertexIndexC >= 0) 
+				if (vertexIndexC >= 0)
 				{
-					vertexNormals [vertexIndexC] += triangleNormal;
+					vertexNormals[vertexIndexC] += triangleNormal;
 				}
 			}
 
 
-			for (int i = 0; i < vertexNormals.Length; i++) 
+			for (int i = 0; i < vertexNormals.Length; i++)
 			{
-				vertexNormals [i].Normalized ();
+				vertexNormals[i].Normalized();
 			}
-			 for (int i = 0; i < vertexNormals.Length; i++)
+			for (int i = 0; i < vertexNormals.Length; i++)
 			{
 				vertexNormals[i] = vertexNormals[i].Normalized();
 				float slope = 1.0f - Mathf.Abs(vertexNormals[i].Dot(Vector3.Up));
-				
-				vertexColors[i] = ColorFromSlope(slope);
+				float y = vertices[i].Y;
+				vertexColors[i] = ColorFromSlope(slope, y);
 				//GD.Print(vertexColors[i]);
 			}
 			return (vertexNormals, vertexColors);
 
 		}
 
-		Vector3 SurfaceNormalFromIndices(int indexA, int indexB, int indexC) 
+		Vector3 SurfaceNormalFromIndices(int indexA, int indexB, int indexC)
 		{
-			Vector3 pointA = (indexA < 0)?outOfMeshVertices[-indexA-1] : vertices [indexA];
-			Vector3 pointB = (indexB < 0)?outOfMeshVertices[-indexB-1] : vertices [indexB];
-			Vector3 pointC = (indexC < 0)?outOfMeshVertices[-indexC-1] : vertices [indexC];
+			Vector3 pointA = (indexA < 0) ? outOfMeshVertices[-indexA - 1] : vertices[indexA];
+			Vector3 pointB = (indexB < 0) ? outOfMeshVertices[-indexB - 1] : vertices[indexB];
+			Vector3 pointC = (indexC < 0) ? outOfMeshVertices[-indexC - 1] : vertices[indexC];
 
 			Vector3 sideAB = pointB - pointA;
 			Vector3 sideAC = pointC - pointA;
@@ -262,39 +273,40 @@ namespace Bouncerock.Terrain
 			return sideAC.Cross(sideAB).Normalized();
 		}
 
-		public void ProcessMesh() 
+		public void ProcessMesh()
 		{
-			if (useFlatShading) 
+			if (useFlatShading)
 			{
-				FlatShading ();
-			} 
-			else 
+				FlatShading();
+			}
+			else
 			{
-				BakeNormals ();
+				BakeNormals();
 			}
 		}
 
-		void BakeNormals() 
+		void BakeNormals()
 		{
-			(bakedNormals, vertexColors) = CalculateNormals ();
+			(bakedNormals, vertexColors) = CalculateNormals();
 		}
 
-		void FlatShading() 
+		void FlatShading()
 		{
 			Vector3[] flatShadedVertices = new Vector3[triangles.Length];
 			Vector2[] flatShadedUvs = new Vector2[triangles.Length];
 
-			for (int i = 0; i < triangles.Length; i++) {
-				flatShadedVertices [i] = vertices [triangles [i]];
-				flatShadedUvs [i] = uvs [triangles [i]];
-				triangles [i] = i;
+			for (int i = 0; i < triangles.Length; i++)
+			{
+				flatShadedVertices[i] = vertices[triangles[i]];
+				flatShadedUvs[i] = uvs[triangles[i]];
+				triangles[i] = i;
 			}
 
 			vertices = flatShadedVertices;
 			uvs = flatShadedUvs;
 		}
 
-		public async Task<ArrayMesh> CreateMesh() 
+		public async Task<ArrayMesh> CreateMesh()
 		{
 			ArrayMesh arrayMesh = new ArrayMesh();
 			await Task.Run(() =>
@@ -302,10 +314,10 @@ namespace Bouncerock.Terrain
 				//GD.Print("Number of verticles : " + vertices.Length);
 				Array array = new();
 				array.Resize((int)ArrayMesh.ArrayType.Max);
-				array[(int)ArrayMesh.ArrayType.Vertex] = Variant.CreateFrom(vertices); 
-				array[(int)ArrayMesh.ArrayType.TexUV] = Variant.CreateFrom(uvs); 
-				array[(int)ArrayMesh.ArrayType.Index] = Variant.CreateFrom(triangles); 
-				array[(int)ArrayMesh.ArrayType.Normal] = Variant.CreateFrom(bakedNormals); 
+				array[(int)ArrayMesh.ArrayType.Vertex] = Variant.CreateFrom(vertices);
+				array[(int)ArrayMesh.ArrayType.TexUV] = Variant.CreateFrom(uvs);
+				array[(int)ArrayMesh.ArrayType.Index] = Variant.CreateFrom(triangles);
+				array[(int)ArrayMesh.ArrayType.Normal] = Variant.CreateFrom(bakedNormals);
 				array[(int)ArrayMesh.ArrayType.Color] = Variant.CreateFrom(vertexColors);
 				arrayMesh.AddSurfaceFromArrays(Mesh.PrimitiveType.Triangles, array);
 				arrayMesh.RegenNormalMaps();
@@ -314,6 +326,6 @@ namespace Bouncerock.Terrain
 			});
 			return arrayMesh;
 		}
-		
+
 	}
 }
