@@ -1,7 +1,7 @@
 [gd_scene load_steps=4 format=3 uid="uid://dajnvlcn5tfjt"]
 
 [ext_resource type="Script" uid="uid://d5h3hc38qpa7" path="res://_script/terrain/world/static/Tree.cs" id="1_4efm0"]
-[ext_resource type="PackedScene" uid="uid://15ufgivk4dud" path="res://_models/obstacles/wall.tscn" id="2_niplh"]
+[ext_resource type="PackedScene" uid="uid://el3re1c0bjq6" path="res://_models/obstacles/wall2.tscn" id="2_niplh"]
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_q2fs2"]
 size = Vector3(1.115, 3.71931, 7.71069)
@@ -16,5 +16,5 @@ freeze = true
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.075022, 1.994, -0.492798)
 shape = SubResource("BoxShape3D_q2fs2")
 
-[node name="wall2" parent="RigidBody3D" instance=ExtResource("2_niplh")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.0095762, 0.00748754, -0.0177867)
+[node name="wall4" parent="RigidBody3D" instance=ExtResource("2_niplh")]
+transform = Transform3D(2.59821, 0, 0, 0, 1.96185, 0, 0, 0, 1.86711, 0, 0, -0.535936)
