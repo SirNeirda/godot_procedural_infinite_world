@@ -36,18 +36,18 @@ namespace Bouncerock.Terrain
 				Passes = new List<TerrainPass>();
 				TerrainPass pass1 = new TerrainPass();
 				pass1.VerticalScale = 10000;
-				pass1.HorizontalScale = 200;
+				pass1.HorizontalScale = 150;
 
 				TerrainPass pass2 = new TerrainPass();
-				pass2.VerticalScale = 1700;
-				pass2.HorizontalScale = 70;
-				pass2.Octaves = 3;
+				pass2.VerticalScale = 5000;
+				pass2.HorizontalScale = 80;
+				//pass2.Octaves = 3;
 				pass2.Contrast = 3;
 
 				TerrainPass pass3 = new TerrainPass();
-				pass2.VerticalScale = 100;
-				pass2.HorizontalScale = 20;
-				pass2.Contrast = 3;
+				pass3.VerticalScale = 700;
+				pass3.HorizontalScale = 30;
+				pass3.Contrast = 1;
 
 				Passes.Add(pass1);
 				Passes.Add(pass2);
