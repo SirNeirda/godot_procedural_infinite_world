@@ -4,7 +4,7 @@
 [ext_resource type="Script" uid="uid://epcqve8dqtnd" path="res://_script/SoftwareManager.cs" id="2_gqgyk"]
 [ext_resource type="Script" uid="uid://ccilq7mlhnfyg" path="res://_script/ui/GlobalUIManager.cs" id="3_7t23k"]
 [ext_resource type="Script" uid="uid://bp76k8vnf3pn" path="res://_scenes/ScreenSpaceMainUI.cs" id="4_3e8h3"]
-[ext_resource type="Shader" uid="uid://chnahpefqhrhb" path="res://materials/shaders/chroma.gdshader" id="5_ce27d"]
+[ext_resource type="Shader" uid="uid://chxp22k8g5ne0" path="res://chroma_tint.gdshader" id="5_urak4"]
 [ext_resource type="Shader" uid="uid://b1x6scjuekwl4" path="res://materials/shaders/sharpen.gdshader" id="6_urak4"]
 [ext_resource type="Script" uid="uid://b5nx0gco7dnfh" path="res://_script/terrain/map/Minimap.cs" id="8_hi6yo"]
 
@@ -22,13 +22,15 @@ bg_color = Color(0.150357, 0.162971, 0.21575, 0.741176)
 bg_color = Color(0.6, 0.6, 0.6, 0)
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_hi6yo"]
-shader = ExtResource("5_ce27d")
-shader_parameter/strength = 0.067
+shader = ExtResource("5_urak4")
+shader_parameter/strength = 0.1
 shader_parameter/center = Vector2(0.5, 0.5)
-shader_parameter/radius = 0.336
-shader_parameter/aberration = 0.357
-shader_parameter/width = 0.0
+shader_parameter/radius = 0.639
+shader_parameter/aberration = 0.665
+shader_parameter/width = 0.0231
 shader_parameter/feather = 1.0
+shader_parameter/tint_color = Color(0.269948, 0.22791, 1, 1)
+shader_parameter/tint_strength = 0.49
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_owtmn"]
 shader = ExtResource("6_urak4")
@@ -62,7 +64,7 @@ script = ExtResource("2_gqgyk")
 script = ExtResource("3_7t23k")
 MobileUI = NodePath("Control2")
 
-[node name="ScreenSpaceUI" type="Control" parent="UI" node_paths=PackedStringArray("Distance", "ActionBar", "Record")]
+[node name="ScreenSpaceUI" type="Control" parent="UI" node_paths=PackedStringArray("Distance", "ActionBar", "Record", "TimeOfDay")]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -75,6 +77,7 @@ script = ExtResource("4_3e8h3")
 Distance = NodePath("PanelContainer/HBoxContainer/Label2")
 ActionBar = NodePath("PanelContainer2/VBoxContainer/ProgressBar")
 Record = NodePath("PanelContainer3/HBoxContainer/Label2")
+TimeOfDay = NodePath("PanelContainer5/HBoxContainer/Label2")
 
 [node name="PanelContainer3" type="PanelContainer" parent="UI/ScreenSpaceUI"]
 layout_mode = 2
@@ -95,6 +98,29 @@ text = "Record:"
 horizontal_alignment = 1
 
 [node name="Label2" type="Label" parent="UI/ScreenSpaceUI/PanelContainer3/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "0"
+
+[node name="PanelContainer5" type="PanelContainer" parent="UI/ScreenSpaceUI"]
+layout_mode = 2
+offset_left = 211.0
+offset_top = 591.0
+offset_right = 395.365
+offset_bottom = 631.0
+grow_horizontal = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_lavtb")
+
+[node name="HBoxContainer" type="HBoxContainer" parent="UI/ScreenSpaceUI/PanelContainer5"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="UI/ScreenSpaceUI/PanelContainer5/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 10
+text = "Record:"
+horizontal_alignment = 1
+
+[node name="Label2" type="Label" parent="UI/ScreenSpaceUI/PanelContainer5/HBoxContainer"]
 layout_mode = 2
 size_flags_horizontal = 3
 text = "0"
@@ -161,12 +187,17 @@ grow_vertical = 2
 mouse_filter = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_urak4")
 
-[node name="ColorRect" type="ColorRect" parent="UI/ScreenSpaceUI/PanelContainer4"]
+[node name="ChromaShader" type="ColorRect" parent="UI/ScreenSpaceUI/PanelContainer4"]
 visible = false
 material = SubResource("ShaderMaterial_hi6yo")
 layout_mode = 2
 
-[node name="ColorRect2" type="ColorRect" parent="UI/ScreenSpaceUI/PanelContainer4"]
+[node name="ChromaShader2" type="ColorRect" parent="UI/ScreenSpaceUI/PanelContainer4"]
+visible = false
+material = SubResource("ShaderMaterial_hi6yo")
+layout_mode = 2
+
+[node name="SharpenShader" type="ColorRect" parent="UI/ScreenSpaceUI/PanelContainer4"]
 material = SubResource("ShaderMaterial_owtmn")
 layout_mode = 2
 

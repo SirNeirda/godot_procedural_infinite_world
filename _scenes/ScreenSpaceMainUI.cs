@@ -6,21 +6,33 @@ public partial class ScreenSpaceMainUI : Control
 	// Called when the node enters the scene tree for the first time.
 
 	[Export]
-        public Label Distance;
-		[Export]
-        public ProgressBar ActionBar;
+	public Label Distance;
+	[Export]
+	public ProgressBar ActionBar;
 
-		[Export]
-        public Label Record;
+	[Export]
+	public Label Record;
+	[Export]
+	public Label TimeOfDay;
 
 	public override void _Ready()
 	{
 
 	}
 
+	void UpdateTime()
+
+	{
+		CallDeferred("updateTimeOfDay");
+	}
+
+
+
+
 	// Called every frame. 'delta' is the elapsed time since the previous frame.
 	public override void _Process(double delta)
 	{
+		UpdateTime();
 		UpdateDistance();
 		UpdateActionBar();
 		UpdateRecord();
@@ -62,5 +74,10 @@ public partial class ScreenSpaceMainUI : Control
 	void updateDistance()
 	{
 		Distance.Text = GameManager.Instance.StartingPoint.DistanceTo(GameManager.Instance.GetMainCharacterPosition()).ToString();
+	}
+
+	void updateTimeOfDay()
+	{
+		TimeOfDay.Text = EnvironmentManager.Instance.GetTime();
 	}
 }

@@ -4,11 +4,13 @@ using Godot;
 using System;
 using Bouncerock.UI;
 using System.Threading;
+using System.Threading.Tasks;
 using System.Collections.Generic;
 public partial class MobManager : Node
 {
 	// Called when the node enters the scene tree for the first time.
 
+	public static MobManager Instance;
 	[Export]
 	public float DelayBetweenSpawns = 3f;
 	[Export]
@@ -16,6 +18,8 @@ public partial class MobManager : Node
 
 	[Export]
 	public int MaxMobs = 20;
+	[Export]
+		public MeshInstance3D SafetyBubble;
 
 	[Export]
 		public bool ShowHelpers = false;
@@ -23,6 +27,8 @@ public partial class MobManager : Node
 	float timer=0;
 
 	bool GenerationActive = false;
+
+	public Vector3 SecureZone = Vector3.Zero;
 
 	PackedScene Mob = ResourceLoader.Load<PackedScene>("res://_scenes/mob.tscn");
 
@@ -32,19 +38,28 @@ public partial class MobManager : Node
 	public override void _Ready()
 	{
 		//SpawnMob(SpawnsPerTime);
+		Instance = this;
 		Mob = ResourceLoader.Load<PackedScene>("res://_scenes/mob.tscn");
+	}
+
+	public void ResetSecureZone(Vector3 Zone)
+	{
+		GenerationActive = false;
+		SecureZone = Zone;
+		SafetyBubble.GlobalPosition = SecureZone;
 	}
 
 	public override void _Process(double delta)
 	{
-		timer = timer-(float)delta;
+		timer = timer - (float)delta;
 		if (timer < 0)
 		{
 			if (!GenerationActive)
 			{
 				Vector3 charPos = GameManager.Instance.GetMainCharacterPosition();
-				float distance = charPos.DistanceTo(new Vector3(0,13,37));//the current default spawn position
-				if (distance >10)
+
+				float distance = charPos.DistanceTo(SecureZone);//the current default spawn position
+				if (distance > 15)
 				{
 					GenerationActive = true;
 				}
@@ -52,7 +67,6 @@ public partial class MobManager : Node
 			if (GenerationActive && MaxMobs > Mobs.Count)
 			{
 				SpawnMob(SpawnsPerTime);
-				
 			}
 			MobsUpkeep();
 			timer = DelayBetweenSpawns;
@@ -60,7 +74,7 @@ public partial class MobManager : Node
 		//GD.Print(timer);
 	}
 
-	protected void MobsUpkeep()
+	protected async Task MobsUpkeep()
 	{
 		foreach (CharacterMob mob in Mobs)
 		{
@@ -134,14 +148,33 @@ public partial class MobManager : Node
 		
 	}
 
-	async void DespawnMob(CharacterMob mob, float delay = -1)
+	public void DespawnAllMobs()
 	{
-        if (delay > 0)
-        {
-            await ToSignal(GetTree().CreateTimer(delay), "timeout");
-        }
-        
-        mob.QueueFree();
+		GenerationActive = false;
+		timer = DelayBetweenSpawns;
+		List<CharacterMob> mobsToDespawn = new List<CharacterMob>(Mobs);
+		foreach (CharacterMob mob in mobsToDespawn)
+		{
+			timer = DelayBetweenSpawns;
+			DespawnMob(mob, 0);
+		}
+		timer = DelayBetweenSpawns;
+		Mobs.Clear();
+		
+	}
+
+	void DespawnMob(CharacterMob mob, float delay = -1)
+	{
+		if (mob == null)
+		{
+			return;
+		}
+		if (delay > 0)
+			{
+				ToSignal(GetTree().CreateTimer(delay), "timeout");
+			}
+
+		mob.QueueFree();
 		Mobs.Remove(mob);
 	}
 
