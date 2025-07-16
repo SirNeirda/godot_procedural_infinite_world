@@ -1,0 +1,13 @@
+[gd_scene load_steps=3 format=3 uid="uid://bvi8gv0hb0e7"]
+
+[ext_resource type="PackedScene" uid="uid://c07g4bj2mbrj5" path="res://_models/nature/stone_4.glb" id="1_emov7"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_emov7"]
+albedo_color = Color(0.700133, 0.700281, 0.887054, 1)
+roughness_texture_channel = 4
+grow_amount = 0.29
+
+[node name="stone_42" instance=ExtResource("1_emov7")]
+
+[node name="stone_4" parent="." index="0"]
+surface_material_override/0 = SubResource("StandardMaterial3D_emov7")

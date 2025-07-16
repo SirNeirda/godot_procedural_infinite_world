@@ -1,0 +1,25 @@
+[gd_scene load_steps=6 format=3 uid="uid://el3re1c0bjq6"]
+
+[ext_resource type="PackedScene" uid="uid://4kijwao5nrvs" path="res://_models/obstacles/wall2.glb" id="1_kf5au"]
+[ext_resource type="Texture2D" uid="uid://v0lv6km1kdam" path="res://materials/textures/wall/wall_BaseColor.png" id="2_lbi8t"]
+[ext_resource type="Texture2D" uid="uid://clfvdbvsg7tf" path="res://materials/textures/wall/wall_l_Normal.png" id="3_ay5ni"]
+[ext_resource type="Texture2D" uid="uid://cbauua608mumu" path="res://materials/textures/wall/wall__Roughness.png" id="4_b3pew"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_qo7aw"]
+albedo_texture = ExtResource("2_lbi8t")
+metallic = 0.05
+metallic_specular = 0.0
+metallic_texture_channel = 4
+roughness_texture = ExtResource("4_b3pew")
+normal_enabled = true
+normal_scale = 0.71
+normal_texture = ExtResource("3_ay5ni")
+ao_enabled = true
+ao_light_affect = 0.08
+backlight_enabled = true
+backlight = Color(0.371146, 0.402355, 0.221775, 1)
+
+[node name="wall2" instance=ExtResource("1_kf5au")]
+
+[node name="Cube" parent="." index="0"]
+surface_material_override/0 = SubResource("StandardMaterial3D_qo7aw")

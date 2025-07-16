@@ -1,0 +1,31 @@
+[gd_scene load_steps=5 format=3 uid="uid://b2at4cdnme56n"]
+
+[ext_resource type="PackedScene" uid="uid://bo5ud1xqmpf8v" path="res://_models/nature/bush_berries_1.glb" id="1_ae7jl"]
+
+[sub_resource type="Gradient" id="Gradient_0euix"]
+offsets = PackedFloat32Array(0.0878553, 1)
+colors = PackedColorArray(0, 0, 0, 1, 1, 1, 1, 0)
+
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_oxhf3"]
+gradient = SubResource("Gradient_0euix")
+fill = 1
+fill_from = Vector2(0.435897, 0.418803)
+fill_to = Vector2(0.115385, 0.162393)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_mip3p"]
+albedo_color = Color(0.50212, 0.731363, 0.33465, 1)
+roughness = 0.44
+rim_tint = 0.41
+rim_texture = SubResource("GradientTexture2D_oxhf3")
+ao_enabled = true
+backlight_enabled = true
+backlight = Color(0.537011, 0.537011, 0.537011, 1)
+proximity_fade_distance = 0.5
+distance_fade_mode = 2
+distance_fade_min_distance = 0.2
+distance_fade_max_distance = 0.8
+
+[node name="bush_berries_12" instance=ExtResource("1_ae7jl")]
+
+[node name="bush_berries_1" parent="." index="0"]
+surface_material_override/0 = SubResource("StandardMaterial3D_mip3p")
