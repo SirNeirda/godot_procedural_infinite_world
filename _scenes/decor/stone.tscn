@@ -1,0 +1,20 @@
+[gd_scene load_steps=4 format=3 uid="uid://b33anl76vbfjc"]
+
+[ext_resource type="Script" uid="uid://d5h3hc38qpa7" path="res://_script/terrain/world/static/Tree.cs" id="1_0tnni"]
+[ext_resource type="PackedScene" uid="uid://cuacuit040ggv" path="res://_models/nature/mushroom_1.glb" id="2_0tnni"]
+
+[sub_resource type="CylinderShape3D" id="CylinderShape3D_m66f8"]
+height = 0.381302
+radius = 0.0668945
+
+[node name="Schroom" type="Node3D"]
+script = ExtResource("1_0tnni")
+
+[node name="RigidBody3D" type="RigidBody3D" parent="."]
+freeze = true
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="RigidBody3D"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.0090396, 0.210377, -0.00959434)
+shape = SubResource("CylinderShape3D_m66f8")
+
+[node name="mushroom_12" parent="RigidBody3D" instance=ExtResource("2_0tnni")]

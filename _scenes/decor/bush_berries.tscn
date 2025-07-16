@@ -1,0 +1,27 @@
+[gd_scene load_steps=4 format=3 uid="uid://dbwx5ycgix7s4"]
+
+[ext_resource type="Script" uid="uid://23i6i4njtgcd" path="res://_script/terrain/world/static/Bush.cs" id="1_vty7y"]
+[ext_resource type="PackedScene" uid="uid://b2at4cdnme56n" path="res://_models/nature_custom/bush_berries_12.tscn" id="2_vty7y"]
+
+[sub_resource type="CylinderShape3D" id="CylinderShape3D_m66f8"]
+height = 1.4834
+radius = 0.909668
+
+[node name="BushBerries" type="Node3D" node_paths=PackedStringArray("collider")]
+script = ExtResource("1_vty7y")
+collider = NodePath("RigidBody3D/CollisionShape3D")
+
+[node name="RigidBody3D" type="Area3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.175379, 0)
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="RigidBody3D"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.761426, 0)
+shape = SubResource("CylinderShape3D_m66f8")
+
+[node name="bush_berries_13" parent="RigidBody3D/CollisionShape3D" instance=ExtResource("2_vty7y")]
+transform = Transform3D(2, 0, 0, 0, 2, 0, 0, 0, 2, 0, -0.761426, 0)
+
+[connection signal="area_entered" from="RigidBody3D" to="." method="_on_area_3d_body_entered"]
+[connection signal="area_exited" from="RigidBody3D" to="." method="_on_area_3d_body_exited"]
+[connection signal="body_entered" from="RigidBody3D" to="." method="_on_area_3d_body_entered"]
+[connection signal="body_exited" from="RigidBody3D" to="." method="_on_area_3d_body_exited"]
