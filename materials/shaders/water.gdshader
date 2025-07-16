@@ -1,29 +1,29 @@
 shader_type spatial;
 render_mode blend_mix, depth_draw_never, cull_back, world_vertex_coords;
 
-// ── TINT -----------------------------------------------------------------------
+//  TINT 
 uniform vec3  shallow_color : source_color = vec3(0.02, 0.45, 0.55);
 uniform vec3  deep_color    : source_color = vec3(0.00, 0.10, 0.28);
 uniform vec3  sky_color     : source_color = vec3(0.55, 0.67, 0.82);
 uniform float depth_fade_distance : hint_range(1.0, 100.0) = 15.0;
 
-// ── NORMAL / WAVES -------------------------------------------------------------
+//  NORMAL / WAVES
 uniform sampler2D normal_map : hint_normal, repeat_enable;
 uniform float normal_strength : hint_range(0.0, 2.0) = 0.6;
 uniform vec2  normal_speed1 = vec2( 0.04,  0.02);
 uniform vec2  normal_speed2 = vec2(-0.03,  0.03);
 uniform float wave_height   : hint_range(0.0, 2.0) = 0.15;
 
-// ── UV TILING ------------------------------------------------------------------
+// UV TILING 
 uniform float repeat_size : hint_range(0.1, 512.0) = 8.0;
 
-// ── REFLECTION -----------------------------------------------------------------
+// REFLECTION
 uniform float fresnel_power : hint_range(1.0, 8.0) = 5.0;
 
-// ── DEPTH TEXTURE --------------------------------------------------------------
+//DEPTH TEXTURE 
 uniform sampler2D depth_texture : source_color, hint_depth_texture;
 
-// ── Transparency & Rim ---------------------------------------------------------
+//Transparency & Rim 
 uniform float transparency_shallow : hint_range(0.0, 1.0) = 0.0;
 uniform float transparency_deep    : hint_range(0.0, 1.0) = 1.0;
 uniform vec3  rim_color  : source_color = vec3(1.0);
@@ -32,7 +32,7 @@ uniform float rim_softness : hint_range(0.0, 1.0) = 0.05;
 
 varying vec2 world_uv;
 
-// ── VERTEX ---------------------------------------------------------------------
+// VERTEX
 void vertex() {
     vec3 p = VERTEX;
     vec2 disp_uv = p.xz / repeat_size + TIME * normal_speed1;
@@ -41,7 +41,7 @@ void vertex() {
     world_uv = p.xz / repeat_size;
 }
 
-// ── FRAGMENT -------------------------------------------------------------------
+// FRAGMENT 
 void fragment() {
     // Scrolling normals
     vec3 n1 = texture(normal_map, world_uv + TIME * normal_speed1).rgb * 2.0 - 1.0;
