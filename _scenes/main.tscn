@@ -4,7 +4,7 @@
 [ext_resource type="Script" uid="uid://epcqve8dqtnd" path="res://_script/SoftwareManager.cs" id="2_gqgyk"]
 [ext_resource type="Script" uid="uid://ccilq7mlhnfyg" path="res://_script/ui/GlobalUIManager.cs" id="3_7t23k"]
 [ext_resource type="Script" uid="uid://bp76k8vnf3pn" path="res://_scenes/ScreenSpaceMainUI.cs" id="4_3e8h3"]
-[ext_resource type="Shader" uid="uid://chxp22k8g5ne0" path="res://chroma_tint.gdshader" id="5_urak4"]
+[ext_resource type="Shader" uid="uid://8ii1spmkav7h" path="res://materials/shaders/chroma_tint.gdshader" id="5_urak4"]
 [ext_resource type="Shader" uid="uid://b1x6scjuekwl4" path="res://materials/shaders/sharpen.gdshader" id="6_urak4"]
 [ext_resource type="Script" uid="uid://b5nx0gco7dnfh" path="res://_script/terrain/map/Minimap.cs" id="8_hi6yo"]
 
