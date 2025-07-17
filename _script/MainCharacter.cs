@@ -182,23 +182,30 @@ public partial class MainCharacter : CharacterBody3D
 		{
 			Vector2 position = new Vector2(Position.X, Position.Z);
 			float height = TerrainManager.Instance.GetTerrainHeightAtGlobalCoordinate(position);
+			Vector2 origin = position;
+			int radius = 50;
+			int directions = 500;
+			int attempts = 0;
 			if (height != -201)
 			{
 
 				GD.Print("original pos " + position);
-				int attempts = 0;
 
-				while (height <= 0 && attempts < 9999)
+				while (height <= 5 && attempts < directions)
 				{
-					GD.Print("current height " + height + " pos " + position);
-					position += new Vector2(0, 100);
+					float angle = Mathf.Tau * attempts / directions;
+					Vector2 offset = new Vector2(Mathf.Cos(angle), Mathf.Sin(angle)) * radius;
+					position = origin + offset;
 					height = TerrainManager.Instance.GetTerrainHeightAtGlobalCoordinate(position);
+
+					//GD.Print($"Attempt {attempts} | height: {height} | pos: {position}");
+
 					attempts++;
 				}
 
 				GlobalPosition = new Vector3(Position.X, height, Position.Y);
 				MobManager.Instance.CallDeferred("ResetSecureZone", GlobalPosition);
-				GD.Print("final " + GlobalPosition);
+				//GD.Print("final " + GlobalPosition);
 				Initialized = true;
 			}
 			return;
