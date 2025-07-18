@@ -183,7 +183,7 @@ public partial class MainCharacter : CharacterBody3D
 			Vector2 position = new Vector2(Position.X, Position.Z);
 			float height = TerrainManager.Instance.GetTerrainHeightAtGlobalCoordinate(position);
 			Vector2 origin = position;
-			int radius = 50;
+			int radius = 5;
 			int directions = 500;
 			int attempts = 0;
 			if (height != -201)
@@ -191,24 +191,32 @@ public partial class MainCharacter : CharacterBody3D
 
 				GD.Print("original pos " + position);
 
-				while (height <= 5 && attempts < directions)
+				Vector2[] directionsToTry = new Vector2[]
 				{
-					float angle = Mathf.Tau * attempts / directions;
-					Vector2 offset = new Vector2(Mathf.Cos(angle), Mathf.Sin(angle)) * radius;
-					position = origin + offset;
-					height = TerrainManager.Instance.GetTerrainHeightAtGlobalCoordinate(position);
+					new Vector2(0, -radius), // up
+					new Vector2(0, radius),  // down
+					new Vector2(-radius, 0), // left
+					new Vector2(radius, 0),  // right
+				};
 
-					//GD.Print($"Attempt {attempts} | height: {height} | pos: {position}");
+				foreach (Vector2 dir in directionsToTry)
+				{
+					Vector2 checkPos = origin + dir;
+					float testHeight = TerrainManager.Instance.GetTerrainHeightAtGlobalCoordinate(checkPos);
+					//GD.Print($"Checking {checkPos}  height: {testHeight}");
 
-					attempts++;
+					if (testHeight > 5.0f)
+					{
+						position = checkPos;
+						height = testHeight;
+						break;
+					}
 				}
-
 				GlobalPosition = new Vector3(Position.X, height, Position.Y);
 				MobManager.Instance.CallDeferred("ResetSecureZone", GlobalPosition);
-				//GD.Print("final " + GlobalPosition);
+				GD.Print("final " + GlobalPosition);
 				Initialized = true;
 			}
-			return;
 		}
 		float deltaFloat = (float)delta;
 		//GD.Print(RaycastDown.IsColliding());
