@@ -84,7 +84,7 @@ noise = SubResource("FastNoiseLite_ike5v")
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_hvdyj"]
 render_priority = 0
 shader = ExtResource("8_ike5v")
-shader_parameter/shallow_color = Color(0.903637, 3.17663e-06, 0.551421, 1)
+shader_parameter/shallow_color = Color(0.356972, 0.559843, 0.474713, 1)
 shader_parameter/deep_color = Color(0.132247, 0.319624, 0.460249, 1)
 shader_parameter/sky_color = Color(0.604868, 0.661417, 0.767725, 1)
 shader_parameter/depth_fade_distance = 6.284
@@ -97,7 +97,7 @@ shader_parameter/repeat_size = 47.377
 shader_parameter/fresnel_power = 8.0
 shader_parameter/transparency_shallow = 0.1
 shader_parameter/transparency_deep = 0.937
-shader_parameter/rim_color = Color(1, 0.41202, 0.840045, 1)
+shader_parameter/rim_color = Color(0.602533, 0.68198, 0.757827, 1)
 shader_parameter/rim_width = 0.0
 shader_parameter/rim_softness = 0.0
 
