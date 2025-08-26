@@ -1,4 +1,4 @@
-[gd_scene load_steps=29 format=3 uid="uid://dorvgphrel13u"]
+[gd_scene load_steps=31 format=3 uid="uid://dorvgphrel13u"]
 
 [ext_resource type="PackedScene" uid="uid://bw42mox3u02yq" path="res://_scenes/main_character.tscn" id="1_ciup7"]
 [ext_resource type="Material" uid="uid://wq3811s3nwm7" path="res://materials/sky.tres" id="1_f50i4"]
@@ -7,7 +7,8 @@
 [ext_resource type="Texture2D" uid="uid://dvprrws80mh2u" path="res://materials/start.png" id="3_ike5v"]
 [ext_resource type="Script" uid="uid://tk8lkgbaluti" path="res://_script/terrain/TerrainDetailsManager.cs" id="3_x21qi"]
 [ext_resource type="Script" uid="uid://h5w4bya8uxkc" path="res://_scenes/MobManager.cs" id="6_5h46a"]
-[ext_resource type="Material" uid="uid://cskxpml7do2lq" path="res://materials/base_terrain.tres" id="6_hvdyj"]
+[ext_resource type="Material" uid="uid://knjtxqt2cr3q" path="res://materials/terrain_vertex_test.tres" id="6_hvdyj"]
+[ext_resource type="Shader" uid="uid://b0la2we3pp8s7" path="res://materials/shaders/vertex_color.gdshader" id="7_osuqp"]
 [ext_resource type="Shader" uid="uid://bbbd88hpmov1l" path="res://materials/shaders/water.gdshader" id="8_ike5v"]
 [ext_resource type="PackedScene" uid="uid://dydlmuscctvv2" path="res://_scenes/powerups/power_up.tscn" id="8_u7we2"]
 [ext_resource type="Script" uid="uid://v0qb14g4bte7" path="res://_script/terrain/world/SeaWater.cs" id="9_hvdyj"]
@@ -63,6 +64,10 @@ size = Vector3(2, 0.1, 2)
 albedo_texture = ExtResource("3_ike5v")
 roughness_texture = ExtResource("3_ike5v")
 
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_lq8db"]
+render_priority = 0
+shader = ExtResource("7_osuqp")
+
 [sub_resource type="PlaneMesh" id="PlaneMesh_dnkau"]
 size = Vector2(20, 20)
 
@@ -102,16 +107,19 @@ shader_parameter/rim_width = 0.0
 shader_parameter/rim_softness = 0.0
 
 [sub_resource type="CapsuleMesh" id="CapsuleMesh_luoph"]
+lightmap_size_hint = Vector2i(235, 118)
+flip_faces = true
+uv2_padding = 1.91
 radius = 7.443
 height = 14.886
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_ike5v"]
 render_priority = 0
 shader = ExtResource("9_u8evv")
-shader_parameter/color1 = Color(0.835294, 0.482353, 0.666667, 0.760784)
-shader_parameter/color2 = Color(0.690196, 0.329412, 0.568627, 0.207843)
-shader_parameter/threshold = 0.1
-shader_parameter/fresnel_sharpness = 2.0
+shader_parameter/color1 = Color(0.85098, 0.67451, 0.678431, 0.376471)
+shader_parameter/color2 = Color(0.917647, 0.231373, 0.384314, 0.396078)
+shader_parameter/threshold = 0.245
+shader_parameter/fresnel_sharpness = 8.41
 
 [node name="World" type="Node3D"]
 
@@ -150,7 +158,9 @@ surface_material_override/0 = SubResource("StandardMaterial3D_hvdyj")
 [node name="TerrainManager" type="Node" parent="."]
 script = ExtResource("2_hui18")
 SaveTerrainToLocalDisk = false
+UseDebugMaterial = false
 TerrainMaterial = ExtResource("6_hvdyj")
+DebugTerrainMaterial = SubResource("ShaderMaterial_lq8db")
 
 [node name="TerrainDetailsManager" type="Node" parent="TerrainManager"]
 script = ExtResource("3_x21qi")
@@ -185,6 +195,9 @@ SafetyBubble = NodePath("SafetyBubble")
 
 [node name="SafetyBubble" type="MeshInstance3D" parent="MobsManager"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.63792, -0.291809)
+layers = 2052
+cast_shadow = 0
+gi_mode = 0
 mesh = SubResource("CapsuleMesh_luoph")
 skeleton = NodePath("../..")
 surface_material_override/0 = SubResource("ShaderMaterial_ike5v")
