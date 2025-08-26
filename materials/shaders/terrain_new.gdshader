@@ -81,7 +81,7 @@ NORMAL = final_N;
     float r2 = texture(rough2, uv).r;
     float rough = r0 * w.x + r1 * w.y + r2 * w.z;
     if (invert_roughness) rough = 1.0 - rough;
-    ROUGHNESS = clamp(rough, 0.0, 1.0);//ROUGHNESS = clamp(rough * rough_strength, 0.04, 1.0);  // 0.04 - never 0
+    ROUGHNESS = clamp(pow(rough, 2.0) * rough_strength, 0.04, 1.0);
 
     /* 6.  Specular is just a constant */
     SPECULAR = 0.5;
