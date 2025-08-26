@@ -23,7 +23,11 @@ namespace Bouncerock.Terrain
 		[Export]
 		public bool UseRandomSeed = true;
 		[Export]
+		public bool UseDebugMaterial = true;
+		[Export]
 		public Material TerrainMaterial;
+		[Export]
+		public Material DebugTerrainMaterial;
 		
 		[Export]
 		public float UpdateFrequency = 1;
@@ -269,7 +273,7 @@ namespace Bouncerock.Terrain
 		void UpdateChunks()
 		{
 			// (set) {return;}
-			GD.Print("Updating chunks");
+			//GD.Print("Updating chunks");
 			Vector2 newChunkPosition = CameraInChunk();
 			if (currentChunk == null) 
 				{

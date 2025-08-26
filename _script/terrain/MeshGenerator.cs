@@ -163,14 +163,29 @@ namespace Bouncerock.Terrain
 			//GD.Print("Slope: " + angleDegrees + "° // Height: " + height);
 
 			// Red = flatter is brighter
-			float red = Mathf.Clamp(1.0f - slope * 250.0f, 0.0f, 1.0f);
+			float red = Mathf.Clamp(1.0f - slope * 250.0f , 0.0f, 1.0f);
 
 			// Green = height mapped from -200 to +200
 			float green = Mathf.Clamp((height + 200.0f) / 400.0f, 0.0f, 1.0f);
 
 			// Blue = fade in from height 2.0 to 0.0
-			float blue = Mathf.Clamp((2.0f - height) / 2.0f, 0.0f, 1.0f);
-
+			float blue = Mathf.Clamp((5.0f - height) / 2.0f, 0.0f, 1.0f);
+			if (height <0) { green = 1; }
+			if (blue >= 0.9f)
+			{
+				red = 0;
+				green = 0;
+			}
+			if (red >= 0.9f)
+			{
+				green = 0;
+				blue = 0;
+			}
+			if (green >= 0.9f)
+			{
+				red = 0;
+				blue = 0;
+			}
 			return new Color(red, green, blue);
 		}
 

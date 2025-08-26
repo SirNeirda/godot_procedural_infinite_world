@@ -355,6 +355,10 @@ namespace Bouncerock.Terrain
 			{
 				//Material mat = GD.Load<Material>("_material/test_standard_material_3d.tres");
 				Material mat = TerrainManager.Instance.TerrainMaterial;
+				if (TerrainManager.Instance.UseDebugMaterial)
+				{
+mat = TerrainManager.Instance.DebugTerrainMaterial;
+				}
 				//Material mat = GD.Load<Material>("_material/testmat.tres");
 				meshObject.SetSurfaceOverrideMaterial(0,mat);
 				hasSetMaterial = true;
