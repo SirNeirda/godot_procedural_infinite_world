@@ -49,13 +49,16 @@ namespace Bouncerock.Terrain
 			pass2.VerticalScale = 20;
 			pass2.HorizontalScale = Vector2.One*210;
 			//pass2.Octaves = 3;
+			
 
 			TerrainPass pass3 = new TerrainPass();
 			pass3.VerticalScale = 10;
-			pass3.HorizontalScale = Vector2.One*100f;
+			pass3.HorizontalScale = Vector2.One*150;
 			pass1.Octaves = 2;
 			pass1.Frequency = 5;
 			pass3.Contrast = 1.5f;
+			//pass2.MinHeight = 40;
+			pass2.MaxHeight = 100;
 
 			Passes.Add(pass1);
 			Passes.Add(pass2);
