@@ -28,6 +28,9 @@ public partial class MainCharacter : CharacterBody3D
 	[Export]
 	public AnimationTree Animator;
 
+	[ExportGroup("Powers")]
+	[Export]public Node3D PowerJetpack;
+
 	[ExportGroup("Player Attributes")]
 
 	//Vector3 Direction = Vector3.Zero;
@@ -59,7 +62,7 @@ public partial class MainCharacter : CharacterBody3D
 
 	float velocity = 0;
 
-	public enum CharacterActions { Idle, Jumping, Running, Attacking, Walking, Falling, Gliding, Flying }
+	public enum CharacterActions { Idle, Jumping, Running, Attacking, Walking, Falling, Gliding, Flying, Sitting }
 
 	public enum CharacterPowers { Crates, RotoPunch, Jetpack }
 
@@ -69,6 +72,8 @@ public partial class MainCharacter : CharacterBody3D
 
 	public bool Initialized = false;
 
+	public bool hasGlided = false;
+
 	public class CharacterInput
 	{
 		bool run = false;
@@ -76,6 +81,7 @@ public partial class MainCharacter : CharacterBody3D
 
 		bool attack = false;
 		bool fly = false;
+		bool sit = false;
 		public Vector3 Direction = Vector3.Zero;
 
 		public Vector3 CameraDirection = Vector3.Zero;
@@ -86,6 +92,15 @@ public partial class MainCharacter : CharacterBody3D
 			jump = false;
 			attack = false;
 			fly = false;
+			sit = false;
+		}
+		public void SetSit()
+		{
+			run = false;
+			jump = false;
+			attack = false;
+			fly = false;
+			sit = true;
 		}
 		public void SetJump()
 		{
@@ -93,6 +108,7 @@ public partial class MainCharacter : CharacterBody3D
 			jump = true;
 			attack = false;
 			fly = false;
+			sit = false;
 		}
 		public void SetFly()
 		{
@@ -100,6 +116,7 @@ public partial class MainCharacter : CharacterBody3D
 			jump = false;
 			attack = false;
 			fly = true;
+			sit = false;
 		}
 		public void SetAttack()
 		{
@@ -107,6 +124,7 @@ public partial class MainCharacter : CharacterBody3D
 			jump = false;
 			fly = false;
 			attack = true;
+			sit = false;
 		}
 		public void EndAttack()
 		{
@@ -119,11 +137,13 @@ public partial class MainCharacter : CharacterBody3D
 			jump = false;
 			attack = false;
 			fly = false;
+			sit = false;
 		}
 
 		public bool IsRunning() { return run; }
 		public bool IsJumping() { return jump; }
 		public bool IsAttacking() { return attack; }
+		public bool IsSitting() { return sit; }
 
 		public bool IsFlying() { return fly; }
 	}
@@ -237,6 +257,7 @@ public partial class MainCharacter : CharacterBody3D
 
 	protected void UpdateAction(float deltaFloat)
 	{
+		
 		CharacterActions previousAction = CurrentAction;
 		if (CurrentInput.IsRunning() && CurrentInput.Direction != Vector3.Zero && Action > 0)
 		{
@@ -247,33 +268,42 @@ public partial class MainCharacter : CharacterBody3D
 				Action = Mathf.Clamp(Action - (deltaFloat * 10), 0, 100);
 				return;
 			}
-			if (!IsOnFloor())
-			{
-				//GD.Print("off ground " + timeOffGround);
-				timeOffGround += deltaFloat;
-			}
 
 		}
 		if (CurrentInput.IsJumping() && !CurrentInput.IsFlying()) { CurrentAction = CharacterActions.Jumping; return; }
 		if (!IsOnFloor())
 		{
+			timeOffGround+= deltaFloat;
+			if (CurrentInput.IsRunning() && (!hasGlided || CurrentAction == CharacterActions.Gliding)) { hasGlided = true; CurrentAction = CharacterActions.Gliding; return; }
 			if (CurrentInput.IsFlying() && Action > 0) { CurrentAction = CharacterActions.Flying; return; }
 			CurrentAction = CharacterActions.Falling; return;
 		}
-		if (CurrentInput.IsAttacking() && Action > 5)
+		else
 		{
-			Action = Mathf.Clamp(Action - 5, 0, 100);
-			LaunchAttack();
-			if (previousAction == CharacterActions.Attacking)
+			timeOffGround = 0;
+			hasGlided = false;
+			if (CurrentInput.IsAttacking() && Action > 5)
 			{
-				CurrentAction = CharacterActions.Attacking;
+				Action = Mathf.Clamp(Action - 5, 0, 100);
+				LaunchAttack();
+				if (previousAction == CharacterActions.Attacking)
+				{
+					CurrentAction = CharacterActions.Attacking;
+				}
+				return;
 			}
-			return;
 		}
-		if (CurrentInput.Direction != Vector3.Zero)
+		
+		if (CurrentInput.Direction != Vector3.Zero && IsOnFloor() )
 		{
 			Action = Mathf.Clamp(Action + deltaFloat, 0, 100);
 			CurrentAction = CharacterActions.Walking;
+			return;
+		}
+		if ((CurrentInput.IsSitting() || previousAction == CharacterActions.Sitting) && IsOnFloor() && CurrentInput.Direction == Vector3.Zero)
+		{
+			Action = Mathf.Clamp(Action + deltaFloat * 2, 0, 100);
+			CurrentAction = CharacterActions.Sitting;
 			return;
 		}
 		Action = Mathf.Clamp(Action + deltaFloat * 3, 0, 100);
@@ -385,9 +415,17 @@ public partial class MainCharacter : CharacterBody3D
 		Animator.Set("parameters/conditions/running", false);
 		Animator.Set("parameters/conditions/tossing", false);
 		Animator.Set("parameters/conditions/flying", false);
+		Animator.Set("parameters/conditions/glide", false);
+		Animator.Set("parameters/conditions/sitting", false);
+		PowerJetpack.Visible = false;
 		if (CurrentAction == CharacterActions.Falling)
 		{
 			Animator.Set("parameters/conditions/falling", true);
+			return;
+		}
+		if (CurrentAction == CharacterActions.Sitting)
+		{
+			Animator.Set("parameters/conditions/sitting", true);
 			return;
 		}
 		if (CurrentAction == CharacterActions.Idle)
@@ -397,7 +435,6 @@ public partial class MainCharacter : CharacterBody3D
 		}
 		if (CurrentAction == CharacterActions.Walking)
 		{
-
 			Animator.Set("parameters/conditions/running", true);
 			return;
 		}
@@ -409,6 +446,12 @@ public partial class MainCharacter : CharacterBody3D
 		if (CurrentAction == CharacterActions.Flying)
 		{
 			Animator.Set("parameters/conditions/flying", true);
+			PowerJetpack.Visible = true;
+			return;
+		}
+		if (CurrentAction == CharacterActions.Gliding)
+		{
+			Animator.Set("parameters/conditions/glide", true);
 			return;
 		}
 
@@ -449,6 +492,14 @@ public partial class MainCharacter : CharacterBody3D
 				velocity.Y += 4 * deltaFloat;
 				float t = Mathf.MoveToward((float)(speed - WalkingSpeed) / (RunningSpeed - WalkingSpeed), 0, 1);
 				speed = Mathf.Lerp(WalkingSpeed, RunningSpeed, t);
+			}
+			else if (CurrentAction == CharacterActions.Gliding)
+			{
+				//Action = Mathf.Clamp(Action - (deltaFloat * 10), 0, 100);
+				velocity.Y = -1;
+				//float t = Mathf.MoveToward((float)(speed - WalkingSpeed) / (RunningSpeed - WalkingSpeed), 0, 1);
+				speed = RunningSpeed;
+				speed = speed * SpeedMultiplier;
 			}
 			else
 			{
@@ -516,10 +567,18 @@ public partial class MainCharacter : CharacterBody3D
 		//this.RotationDegrees = this.RotationDegrees * (Vector3.up * 
 		Vector3 rotateChar = new Vector3(RotationDegrees.X, cam_rot_y, RotationDegrees.Z);
 		//CameraPivot.RotationDegrees = rotateChar;
-		RotationDegrees = rotateChar;
-		CameraPivot.RotationDegrees = rotateCam;
-		//Rotation = (rotate.X);
-		RotateY(Mathf.DegToRad(cam_rot_y));
+		if (CurrentAction != CharacterActions.Sitting)
+		{
+			RotationDegrees = rotateCam;
+			RotateY(Mathf.DegToRad(cam_rot_y));
+		}
+		if (CurrentAction == CharacterActions.Sitting)
+		{
+			//RotationDegrees = rotateCam;
+			//CameraPivot.RotateY(Mathf.DegToRad(cam_rot_y));
+		}
+				//Rotation = (rotate.X);
+
 		//RotateObjectLocal(Vector3.Right, Mathf.DegToRad(-pitch));
 	}
 
@@ -573,6 +632,10 @@ public partial class MainCharacter : CharacterBody3D
 		if (Input.IsActionPressed("fly"))
 		{
 			CurrentInput.SetFly();
+		}
+		if (Input.IsActionPressed("sit"))
+		{
+			CurrentInput.SetSit();
 		}
 #if GODOT_WINDOWS
 

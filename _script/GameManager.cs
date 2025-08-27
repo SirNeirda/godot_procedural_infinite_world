@@ -87,6 +87,10 @@ public partial class GameManager : Node
 	{
 		return mainCharacter.Action;
 	}
+	public MainCharacter GetMainCharacter()
+	{
+		return mainCharacter;
+	}
 
 	public Vector3 GetMainCharacterPosition()
 	{
