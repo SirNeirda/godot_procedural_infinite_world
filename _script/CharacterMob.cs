@@ -41,6 +41,8 @@ public partial class CharacterMob : CharacterBody3D
 	float MaxSpeed = 4;*/
 	float speed = 1;
 
+	public float SpeedMultiplier = 1;
+
 	float velocity = 0;
 
 
@@ -135,8 +137,8 @@ public partial class CharacterMob : CharacterBody3D
 		
 		Animator.Set("parameters/conditions/falling", false);
 		Animator.Set("parameters/conditions/idle", false);
-		Animator.Set("parameters/conditions/sprinting", true);
-		Animator.Set("parameters/conditions/running", false);
+		Animator.Set("parameters/conditions/sprinting", false);
+		Animator.Set("parameters/conditions/running", true);
 		Animator.Set("parameters/conditions/tossing", false);
 		return;
 		if (!IsOnFloor())
@@ -199,7 +201,9 @@ public partial class CharacterMob : CharacterBody3D
 		LookAt(goal);
 		Rotate(Vector3.Up, Mathf.Pi);
 
-		speed = WalkingSpeed;
+		speed = WalkingSpeed*SpeedMultiplier;
+
+		
 
 		Vector3 forwardDirection = GlobalTransform.Basis.Z;
 
@@ -243,7 +247,7 @@ public partial class CharacterMob : CharacterBody3D
 			{
 				//text = text+ "\n" + Mathf.RadToDeg(GetFloorAngle()) + " Pos: X: " + string.Format("{0:0. #}", Position.X) + " Y: " + string.Format("{0:0. #}", Position.Y) + " Z: " + string.Format("{0:0. #}", Position.Z) ;
 				//GD.Print(TerrainGenerator.Instance.CameraInChunk());
-				PopupInfo.SetText(text + '\n' + dist);
+				PopupInfo.SetText(text);
 				PopupInfo.Position = CameraPivot.Position+ Vector3.Down*0.7f;
 				//GD.Print("Position " + PopupInfo.Position);
 			}

@@ -62,6 +62,8 @@ public partial class MainCharacter : CharacterBody3D
 
 	float velocity = 0;
 
+	private float _baseGravity;
+
 	public enum CharacterActions { Idle, Jumping, Running, Attacking, Walking, Falling, Gliding, Flying, Sitting }
 
 	public enum CharacterPowers { Crates, RotoPunch, Jetpack }
@@ -178,7 +180,7 @@ public partial class MainCharacter : CharacterBody3D
 		FloorMaxAngle = Mathf.DegToRad(50);
 		GameManager.Instance.SetMainCamera(PlayerCamera);
 		GameManager.Instance.SetMainCharacter(this);
-
+		_baseGravity = gravity;
 		Cube = GD.Load<PackedScene>("res://_scenes/decor/crate.tscn");
 	}
 
@@ -259,11 +261,13 @@ public partial class MainCharacter : CharacterBody3D
 	{
 		
 		CharacterActions previousAction = CurrentAction;
+		gravity = _baseGravity;
 		if (CurrentInput.IsRunning() && CurrentInput.Direction != Vector3.Zero && Action > 0)
 		{
-			if (IsOnFloor() || timeOffGround < 1f)
+			if (IsOnFloor())// || timeOffGround < 1f)
 			{
 				CurrentAction = CharacterActions.Running;
+				gravity = _baseGravity * 4f;
 				timeOffGround = 0;
 				Action = Mathf.Clamp(Action - (deltaFloat * 10), 0, 100);
 				return;
@@ -486,6 +490,8 @@ public partial class MainCharacter : CharacterBody3D
 		}
 		if (!IsOnFloor())
 		{
+			
+			
 			if (CurrentAction == CharacterActions.Flying)
 			{
 				Action = Mathf.Clamp(Action - (deltaFloat * 10), 0, 100);
@@ -508,6 +514,7 @@ public partial class MainCharacter : CharacterBody3D
 				//float ratio = (speed - WalkingSpeed) / (RunningSpeed - WalkingSpeed);
 				//float newRatio = Mathf.MoveToward(ratio, 0, deltaFloat * 1.5f); // adjust the 1.5f as needed
 				//speed = Mathf.Lerp(WalkingSpeed, RunningSpeed, newRatio);
+				//GD.Print("speed " + speed);
 				float t = Mathf.MoveToward((float)(speed - WalkingSpeed) / (RunningSpeed - WalkingSpeed), 0, 1);
 				speed = Mathf.Lerp(WalkingSpeed, RunningSpeed, t);
 
@@ -683,7 +690,7 @@ public partial class MainCharacter : CharacterBody3D
         			newCube.LinearVelocity = velocityDirection * 10;
 			}
 #endif
-#if GODOT_WINDOWS
+#if GODOT_PC
 		if (keyEvent is InputEventJoypadMotion joypadMotionEvent)
 		{
 			// Get the joystick axis values
