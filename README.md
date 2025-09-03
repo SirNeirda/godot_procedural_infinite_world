@@ -7,7 +7,7 @@
 ![Alt Text](./images/screenshot_6_daynight.jpg)
 
 
-New! Summer 2025 Update: Now With Day/Night Cycle And Better Water Shader!
+New! Autumn 2025 Update: Now With Beaches, Coconuts and a Compass!
 
 Full Godot C# project for procedural infinite terrain generation, including random items or obstacles spreading throughout the map, and physics enabled. 
 Contains a dynamic day/night cycle, simulating day light and sky color.  
@@ -25,10 +25,11 @@ How to Play:
 - Throw crates with Left Click. Crates don't do anything special, it's just a demonstration of physics capabilities. Consumes stamina.
 - Jump with Space
 - Fly with F. You must be in the air. Consumes stamina.
+- NEW！ Glide while in the air by pressing SHIFT.
 
 Replenish your stamina by collecting pink orbs.
 
-Mobs are constantly spawned around the player.
+Mobs are constantly spawned around the player. NEW! The farther away, the more mobs will spawn, and they'll be faster !
 Mobs are cleaned-up when they get too far.
 Doing any sort of action will consume stamina, shown in the upper right bar. Once you're out of stamina, you can only walk. 
 If any mob gets too close, the distance counter resets, the safe zone resets around you, and you need to start over.
@@ -45,7 +46,7 @@ If any mob gets too close, the distance counter resets, the safe zone resets aro
 - No external dependency, completely self-contained.
   
 ## Incomplete features
-- Terrain shader is being extended to support different textures.
+- NEW! Terrain shader now supports blended textures.
 - There is the base code logic to create and save chunk files (FileWriter.cs), making it potentially possible to save chunks data on disk or transfer them to a remote server. This would allow persitent terrain deformation, but still untested.
 - Water spawns at elevation 0, but it's a simple mesh with no logic. Although terrain objects will not spawn under elevation zero, the character and mobs will not drown or swim.
 - For now there isn't any kind of variable exposed to customize generation, all must be done through code.
