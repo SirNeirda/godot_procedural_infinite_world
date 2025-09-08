@@ -2,6 +2,8 @@
 
 ![Alt Text](./images/screenshot_5.jpg.jpg)
 
+![Alt Text](./images/screenshot_6.jpg)
+
 ![Alt Text](./images/screenshot_1_android.jpg)
 
 ![Alt Text](./images/screenshot_6_daynight.jpg)
