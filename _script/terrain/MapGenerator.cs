@@ -31,7 +31,7 @@ public static async Task<Map> GenerateMapAsync(Vector2 sampleCentre)
     {
         try
         {
-           //  Base heightmap 
+            // --- Base heightmap ---
             TerrainPass basePass = TerrainManager.Instance.CurrentMapSettings.Passes[0];
             float[,] heightMap = GenerateHeightMapSimplex(
                 TerrainMeshSettings.numVertsPerLine,
@@ -41,7 +41,7 @@ public static async Task<Map> GenerateMapAsync(Vector2 sampleCentre)
 
             ApplyContrast(heightMap, basePass.Contrast);
 
-            // Additive passes 
+            // --- Additive passes ---
             for (int i = 1; i < TerrainManager.Instance.CurrentMapSettings.Passes.Count; i++)
             {
                 TerrainPass pass = TerrainManager.Instance.CurrentMapSettings.Passes[i];
@@ -63,6 +63,8 @@ public static async Task<Map> GenerateMapAsync(Vector2 sampleCentre)
                 }
             }
 
+            // (Pathways, lakes, world items as before...)
+            // --- Finalize map ---
             map = new Map(heightMap, Map.Origins.Generated);
 
             List<List<WorldItemData>> _worldItems = new List<List<WorldItemData>>();

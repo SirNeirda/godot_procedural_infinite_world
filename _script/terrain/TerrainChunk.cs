@@ -204,6 +204,7 @@ namespace Bouncerock.Terrain
 					Vector2 inGridLocation = new Vector2(25 - itm.GridLocation.X, 25 - itm.GridLocation.Y);
 
 					Vector3 location = new Vector3(-1 * inGridLocation.X, GetHeightAtChunkMapLocation(itm.GridLocation), inGridLocation.Y);
+					
 					itm.SetElevation(location.Y);
 					//if (location.Y < 0) { continue; }
 					//GD.Print("itm.name" + itm.name);
@@ -338,10 +339,9 @@ namespace Bouncerock.Terrain
 
 						staticBody = new StaticBody3D();
 						staticBody.Name = "Collision - " + meshObject.Name;
-
-						meshObject.AddChild(staticBody);
+						meshObject.CallDeferred("add_child", staticBody);
 						collisionShape = new CollisionShape3D();
-						staticBody.AddChild(collisionShape);
+						staticBody.CallDeferred("add_child", collisionShape);
 
 						collisionShape.Shape = meshObject.Mesh.CreateTrimeshShape();
 
@@ -357,6 +357,8 @@ namespace Bouncerock.Terrain
 				collisionShape.Disabled = true;
 			}
 		}
+
+		
 
 
 

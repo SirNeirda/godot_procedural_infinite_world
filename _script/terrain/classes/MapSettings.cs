@@ -40,22 +40,22 @@ namespace Bouncerock.Terrain
 		{
 			Passes = new List<TerrainPass>();
 			TerrainPass pass1 = new TerrainPass();
-			pass1.VerticalScale = 120;
+			pass1.VerticalScale = 100;
 			pass1.HorizontalScale = Vector2.One*5000;
-			pass1.Frequency = 5;
-			pass1.Octaves = 5;
+			pass1.Frequency = 2;
+			pass1.Octaves = 2;
 
 			TerrainPass pass2 = new TerrainPass();
 			pass2.VerticalScale = 20;
 			pass2.HorizontalScale = Vector2.One*210;
 			//pass2.Octaves = 3;
-			
 
 			TerrainPass pass3 = new TerrainPass();
 			pass3.VerticalScale = 5;
-			pass3.HorizontalScale = Vector2.One*150;
+			pass3.HorizontalScale = Vector2.One*150f;
+			pass1.Octaves = 2;
+			pass1.Frequency = 5;
 			pass3.Contrast = 1.5f;
-			//pass2.MinHeight = 40;
 			pass2.MaxHeight = 150;
 
 			Passes.Add(pass1);
@@ -69,7 +69,6 @@ namespace Bouncerock.Terrain
 			newObj.RandomizeTiltAngle = 5;
 			newObj.RandomizeYRotation = true;
 			newObj.MinSize = 0.8f;
-			newObj.MinimumSpawnAltitude = 9f;
 			newObj.MaxSize = 1.2f;
 
 			NaturalObjects = new List<NaturalObject>();
@@ -77,7 +76,6 @@ namespace Bouncerock.Terrain
 			tree.ObjectName = "tree_3";
 			tree.Concentration = 2f;
 			tree.RandomizeTiltAngle = 5;
-			tree.MinimumSpawnAltitude = 8f;
 			tree.RandomizeYRotation = true;
 			tree.MinSize = 0.8f;
 			tree.MaxSize = 1.2f;
@@ -100,17 +98,6 @@ namespace Bouncerock.Terrain
 			NaturalObject pine = new NaturalObject();
 			pine.ObjectName = "pine_tree_1";
 			pine.Concentration = 0.01f;
-			newObj.MinimumSpawnAltitude = 30f;
-
-			NaturalObject palm = new NaturalObject();
-			palm.ObjectName = "palm_tree";
-			palm.Concentration = 3f;
-			palm.RandomizeTiltAngle = 3;
-			palm.MinimumSpawnAltitude = -0.2f;
-			palm.MaximumSpawnAltitude = 6f;
-			palm.RandomizeYRotation = true;
-			palm.MinSize = 1.5f;
-			palm.MaxSize = 1.8f;
 
 
 			NaturalObject newObstone = new NaturalObject();
@@ -119,6 +106,24 @@ namespace Bouncerock.Terrain
 			newObstone.MinSize = 0.8f;
 			newObstone.MaxSize = 2f;
 
+			NaturalObject palm = new NaturalObject();
+			palm.ObjectName = "palm_tree_1";
+			palm.Concentration = 3f;
+			palm.RandomizeTiltAngle = 3;
+			palm.MinimumSpawnAltitude = -0.2f;
+			palm.MaximumSpawnAltitude = 6f;
+			palm.RandomizeYRotation = true;
+			palm.MinSize = 1.5f;
+			palm.MaxSize = 1.8f;
+
+			NaturalObject tower = new NaturalObject();
+			tower.ObjectName = "tower";
+			tower.Concentration = 0.02f;
+			tower.MinSize = 0.7f;
+			tower.MaxSize = 0.7f;
+			tower.RandomizeYRotation = false;
+			tower.RandomizeTiltAngle = 0;
+
 			NaturalObjects.Add(newObj);
 			NaturalObjects.Add(newObj2);
 			NaturalObjects.Add(newObjbush);
@@ -126,6 +131,7 @@ namespace Bouncerock.Terrain
 			NaturalObjects.Add(newObstone);
 			NaturalObjects.Add(tree);
 			NaturalObjects.Add(pine);
+			NaturalObjects.Add(tower);
 			NaturalObjects.Add(palm);
 
 			Pathway = new PathwaySettings();

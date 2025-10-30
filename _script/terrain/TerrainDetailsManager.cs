@@ -28,8 +28,9 @@ namespace Bouncerock
 
         public async Task <WorldItem>SpawnAndInitialize(SpawnedObject objectToSpawn)
         {
-            
+
             PackedScene Item = GetCachedScene(objectToSpawn.ObjectName);
+           // GD.Print("Instantiating : " + objectToSpawn.ObjectName);
             WorldItem node = Item.Instantiate() as WorldItem;
             if (objectToSpawn is NaturalObject)
             {
