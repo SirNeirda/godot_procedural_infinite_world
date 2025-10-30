@@ -21,8 +21,8 @@ colors = PackedColorArray(0.377919, 0.377919, 0.377919, 1, 0.321728, 0.321728, 0
 [sub_resource type="FastNoiseLite" id="FastNoiseLite_luoph"]
 
 [sub_resource type="NoiseTexture2D" id="NoiseTexture2D_ike5v"]
-color_ramp = SubResource("Gradient_hvdyj")
 noise = SubResource("FastNoiseLite_luoph")
+color_ramp = SubResource("Gradient_hvdyj")
 
 [sub_resource type="Sky" id="Sky_sqpy2"]
 sky_material = ExtResource("1_f50i4")
@@ -81,10 +81,10 @@ fractal_octaves = 2
 fractal_weighted_strength = 0.87
 
 [sub_resource type="NoiseTexture2D" id="NoiseTexture2D_hvdyj"]
+noise = SubResource("FastNoiseLite_ike5v")
+color_ramp = SubResource("Gradient_ike5v")
 seamless = true
 normalize = false
-color_ramp = SubResource("Gradient_ike5v")
-noise = SubResource("FastNoiseLite_ike5v")
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_hvdyj"]
 render_priority = 0
@@ -116,10 +116,10 @@ height = 14.886
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_ike5v"]
 render_priority = 0
 shader = ExtResource("9_u8evv")
-shader_parameter/color1 = Color(0.85098, 0.67451, 0.678431, 0.376471)
-shader_parameter/color2 = Color(0.917647, 0.231373, 0.384314, 0.396078)
-shader_parameter/threshold = 0.245
-shader_parameter/fresnel_sharpness = 8.41
+shader_parameter/color1 = Color(1.3000866, 1.0361373, 1.0420029, 0.3764706)
+shader_parameter/color2 = Color(2.5346742, 1.2000551, 2.066987, 0.14901961)
+shader_parameter/threshold = 0.2
+shader_parameter/fresnel_sharpness = 6.0
 
 [node name="World" type="Node3D"]
 

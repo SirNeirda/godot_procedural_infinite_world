@@ -76,9 +76,10 @@ public partial class MobManager : Node
 
 	protected async Task MobsUpkeep()
 	{
+		Vector3 charPos = GameManager.Instance.GetMainCharacterPosition();
 		foreach (CharacterMob mob in Mobs)
 		{
-			Vector3 charPos = GameManager.Instance.GetMainCharacterPosition();
+			
 			float distance = charPos.DistanceTo(mob.Position);
 			if (distance >50)
 			{
@@ -139,7 +140,7 @@ public partial class MobManager : Node
 		{
            CharacterMob  node = Mob.Instantiate() as CharacterMob;
 			node.Position = GetSpawnLocation();
-			AddChild(node);
+			CallDeferred("add_child", node); //AddChild(node);
 			node.Name = "Ennemy " + Mobs.Count;
 			Mobs.Add(node);
 		}
