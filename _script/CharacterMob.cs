@@ -24,7 +24,7 @@ public partial class CharacterMob : CharacterBody3D
 	[ExportGroup("Player Attributes")]
 
 	Vector3 Direction = Vector3.Zero;
-	
+
 
 	float mouse_speed = 0.05f;
 
@@ -34,19 +34,23 @@ public partial class CharacterMob : CharacterBody3D
 	public float WalkToRunSpeedIncrease = 1;
 	[Export]
 	public float RunningSpeed = 20;
-	
+
 	[Export]
 	public float PunchedVelocity = 10;
 	/*[Export]
 	float MaxSpeed = 4;*/
 	float speed = 1;
 
-	public float SpeedMultiplier = 1;
-
 	float velocity = 0;
 
+	[Export] public float DirectionUpdateInterval = 2f;
+	[Export] public float RotationSmoothness = 4f;
 
-	public enum MobStates {Aggressive, Punched, Passive}
+	private float _directionTimer = 0f;
+	private Vector3 _cachedDirection;
+
+
+	public enum MobStates { Aggressive, Punched, Passive }
 
 	public MobStates CurrentState = MobStates.Passive;
 	// Get the gravity from the project settings to be synced with RigidBody nodes.
@@ -54,37 +58,69 @@ public partial class CharacterMob : CharacterBody3D
 
 	public override void _Ready()
 	{
-		
+
 		Initialization();
 	}
 
 	protected virtual void Initialization()
-		{
-			
-			//Input.MouseMode = Input.MouseModeEnum.Captured;
-			FloorMaxAngle = Mathf.DegToRad(50);
+	{
 
-		}
+		//Input.MouseMode = Input.MouseModeEnum.Captured;
+		FloorMaxAngle = Mathf.DegToRad(50);
+
+	}
 
 	public override void _PhysicsProcess(double delta)
-		{
-			float deltaFloat = (float)delta;
-			UpdateMovement(deltaFloat);
-		} 
+	{
+		float deltaFloat = (float)delta;
+		UpdateMovement(deltaFloat);
+	}
 
 
 	public override void _Process(double delta)
-		{
-			float deltaFloat = (float)delta;
-			//GD.Print(RaycastDown.IsColliding());
-			
-			//UpdateCamera(deltaFloat);
-			UpdateHelpers(deltaFloat);
-			//UpdateInput(deltaFloat);
-			UpdateAnimations();
-		} 
+	{
+		float deltaFloat = (float)delta;
+		//GD.Print(RaycastDown.IsColliding());
+		UpdateVelocity(deltaFloat);
+		//UpdateCamera(deltaFloat);
+		UpdateHelpers(deltaFloat);
+		//UpdateInput(deltaFloat);
+		UpdateAnimations();
+	}
 
-		
+	private void UpdateVelocity(float delta)
+	{
+		_directionTimer -= delta;
+		if (_directionTimer <= 0f)
+		{
+			_directionTimer = DirectionUpdateInterval;
+			_cachedDirection = GetDirection();
+		}
+
+		Vector3 velocity = Velocity;
+
+		if (CurrentState == MobStates.Punched && IsOnFloor())
+		{
+			velocity.Y = PunchedVelocity;
+		}
+
+		Vector3 forward = GlobalTransform.Basis.Z;
+		float speed = WalkingSpeed;
+
+		if (IsOnFloor())
+		{
+			velocity.X = forward.X * speed;
+			velocity.Z = forward.Z * speed;
+		}
+		else
+		{
+			velocity.Y -= gravity * delta;
+		}
+
+		Velocity = velocity;
+	}
+
+
 
 	/*public override void _Input(InputEvent keyEvent)
 		{
@@ -134,24 +170,24 @@ public partial class CharacterMob : CharacterBody3D
 
 	protected void UpdateAnimations()
 	{
-		
+
 		Animator.Set("parameters/conditions/falling", false);
 		Animator.Set("parameters/conditions/idle", false);
 		Animator.Set("parameters/conditions/sprinting", false);
-		Animator.Set("parameters/conditions/running", true);
+		Animator.Set("parameters/conditions/running", false);
 		Animator.Set("parameters/conditions/tossing", false);
-		return;
+		
 		if (!IsOnFloor())
 		{
 			Animator.Set("parameters/conditions/falling", true);
 			return;
 		}
-		if (Direction.Z == 0 && IsOnFloor())
+		if (Velocity.Z == 0 && IsOnFloor())
 		{
 			Animator.Set("parameters/conditions/idle", true);
 			return;
 		}
-		if (Direction.Z != 0)
+		if (Velocity.Z != 0)
 		{
 			if (Input.IsActionPressed("run"))
 			{
@@ -161,7 +197,7 @@ public partial class CharacterMob : CharacterBody3D
 			Animator.Set("parameters/conditions/running", true);
 			return;
 		}
-		
+
 	}
 
 	protected void ChangeAnimState()
@@ -190,92 +226,78 @@ public partial class CharacterMob : CharacterBody3D
 		return GameManager.Instance.GetMainCharacterPosition();
 	}
 
-	protected void UpdateMovement(float deltaFloat)
+	private void UpdateMovement(float delta)
 	{
-		Vector3 velocity = Velocity;
-		if (CurrentState == MobStates.Punched && IsOnFloor())
+		// --- Rotation ---
+		if (_cachedDirection != Vector3.Zero)
 		{
-			velocity.Y = PunchedVelocity;
-		}
-		Vector3 goal = GetDirection(); // Assume this is your goal position.
-		LookAt(goal);
-		Rotate(Vector3.Up, Mathf.Pi);
+			Vector3 lookDir = (_cachedDirection - GlobalTransform.Origin).Normalized();
 
-		speed = WalkingSpeed*SpeedMultiplier;
+			// Prevent zero or invalid direction
+			if (lookDir.LengthSquared() > 0.0001f)
+			{
+				Basis currentBasis = GlobalTransform.Basis.Orthonormalized(); // ensure normalization
+				Basis targetBasis = Basis.LookingAt(-lookDir, Vector3.Up).Orthonormalized();
 
-		
+				Basis smoothBasis = currentBasis.Slerp(targetBasis, delta * RotationSmoothness).Orthonormalized();
 
-		Vector3 forwardDirection = GlobalTransform.Basis.Z;
-
-		// Handle movement and gravity when the character is on the floor.
-		if (IsOnFloor())
-		{
-			velocity.X = 1;
-			velocity.Y = 1;
-			velocity.X = forwardDirection.X*speed;
-			velocity.Y = forwardDirection.Y;
-			velocity.Z = forwardDirection.Z*speed;
-		}
-		else
-		{
-			// Apply gravity when not on the floor.
-			velocity.Y -= gravity * deltaFloat;
+				GlobalTransform = new Transform3D(
+					smoothBasis,
+					GlobalTransform.Origin
+				);
+			}
 		}
 
-		// Assign the updated velocity
-		Velocity = velocity;
-
-		// Perform movement with collision response
 		MoveAndSlide();
 	}
 
 
 	protected void UpdateCamera(float deltaFloat)
-		{
-		}
-	
-	public void UpdateHelpers(float deltaFloat)
-		{
-			string text = CharacterName;
-			string dist =  GetDirection().DistanceTo(Position).ToString("0.00"); 
-			if (PopupInfo == null)
-			{
-				PopupInfo = Debug.SetTextHelper(text, CameraPivot.Position, CameraPivot);
-				PopupInfo.MaxViewDistance = 30;
-			}
-			if (PopupInfo != null)
-			{
-				//text = text+ "\n" + Mathf.RadToDeg(GetFloorAngle()) + " Pos: X: " + string.Format("{0:0. #}", Position.X) + " Y: " + string.Format("{0:0. #}", Position.Y) + " Z: " + string.Format("{0:0. #}", Position.Z) ;
-				//GD.Print(TerrainGenerator.Instance.CameraInChunk());
-				PopupInfo.SetText(text);
-				PopupInfo.Position = CameraPivot.Position+ Vector3.Down*0.7f;
-				//GD.Print("Position " + PopupInfo.Position);
-			}
-			if (GetDirection().DistanceTo(Position) < 1.5f)
-			{
-				GameManager.Instance.OnLoseGame();
-			}
+	{
+	}
 
-			/*string text = "Adrien" + "\n" + TerrainManager.Instance.CameraInChunk();
-			
-			if (PopupInfo == null)
-			{
-				PopupInfo = Debug.SetTextHelper(text, CameraPivot.Position, CameraPivot);
-				PopupInfo.MaxViewDistance = 1000;
-			}
-			if (PopupInfo != null)
-			{
-				text = "AdrienSetup" + "\n" + Mathf.RadToDeg(GetFloorAngle()) + " Pos: \nX: " + string.Format("{0:0. #}", Position.X) + "\nY: " + string.Format("{0:0. #}", Position.Y) + "\nZ: " + string.Format("{0:0. #}", Position.Z) ;
-				//GD.Print(TerrainGenerator.Instance.CameraInChunk());
-				PopupInfo.SetText(text);
-				//PopupInfo.Position = CameraPivot.Position+ Vector3.Up *0.2f;
-			}*/
+	public void UpdateHelpers(float deltaFloat)
+	{
+		string text = CharacterName;
+		string dist = GetDirection().DistanceTo(Position).ToString("0.00");
+		if (PopupInfo == null)
+		{
+			PopupInfo = Debug.SetTextHelper(text, CameraPivot.Position, CameraPivot);
+			PopupInfo.MaxViewDistance = 30;
 		}
+		if (PopupInfo != null)
+		{
+			//text = text+ "\n" + Mathf.RadToDeg(GetFloorAngle()) + " Pos: X: " + string.Format("{0:0. #}", Position.X) + " Y: " + string.Format("{0:0. #}", Position.Y) + " Z: " + string.Format("{0:0. #}", Position.Z) ;
+			//GD.Print(TerrainGenerator.Instance.CameraInChunk());
+			PopupInfo.SetText(text + '\n' + dist);
+			PopupInfo.Position = CameraPivot.Position + Vector3.Down * 0.7f;
+			//GD.Print("Position " + PopupInfo.Position);
+		}
+		if (GetDirection().DistanceTo(Position) < 1.5f)
+		{
+			GameManager.Instance.OnLoseGame();
+		}
+
+		/*string text = "Adrien" + "\n" + TerrainManager.Instance.CameraInChunk();
+
+		if (PopupInfo == null)
+		{
+			PopupInfo = Debug.SetTextHelper(text, CameraPivot.Position, CameraPivot);
+			PopupInfo.MaxViewDistance = 1000;
+		}
+		if (PopupInfo != null)
+		{
+			text = "AdrienSetup" + "\n" + Mathf.RadToDeg(GetFloorAngle()) + " Pos: \nX: " + string.Format("{0:0. #}", Position.X) + "\nY: " + string.Format("{0:0. #}", Position.Y) + "\nZ: " + string.Format("{0:0. #}", Position.Z) ;
+			//GD.Print(TerrainGenerator.Instance.CameraInChunk());
+			PopupInfo.SetText(text);
+			//PopupInfo.Position = CameraPivot.Position+ Vector3.Up *0.2f;
+		}*/
+	}
 
 	public override void _Input(InputEvent keyEvent)
-		{
-			
-			
+	{
 
-		}
+
+
+	}
 }
