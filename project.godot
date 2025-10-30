@@ -13,7 +13,7 @@ config_version=5
 config/name="Procedural Infinite Runner"
 config/description="Procedural world generation demo project, including random items or obstacles spawns and with physics enabled. Comes with a third-person infinite runner showcase project."
 run/main_scene="res://_scenes/main.tscn"
-config/features=PackedStringArray("4.4", "C#", "Forward Plus")
+config/features=PackedStringArray("4.5", "C#", "Forward Plus")
 config/icon="res://icon.svg"
 
 [dotnet]
@@ -22,9 +22,9 @@ project/assembly_name="Procedural Infinite Runner"
 
 [editor]
 
-movie_writer/mjpeg_quality=0.9
 movie_writer/movie_file="C:/Projects/Procedural Terrain Generation Godot 4.4/movie.avi"
 movie_writer/fps=30
+movie_writer/mjpeg_quality=0.9
 
 [filesystem]
 
