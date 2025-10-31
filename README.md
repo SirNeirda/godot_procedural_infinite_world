@@ -9,7 +9,7 @@
 ![Alt Text](./images/screenshot_6_daynight.jpg)
 
 
-New! Autumn 2025 Update: Now With Beaches, Coconuts and a Compass!
+New! Winter 2025 Update: A new Tower and optimization updates!
 
 Full Godot C# project for procedural infinite terrain generation, including random items or obstacles spreading throughout the map, and physics enabled. 
 Contains a dynamic day/night cycle, simulating day light and sky color.  
