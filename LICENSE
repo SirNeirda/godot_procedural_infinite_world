@@ -22,10 +22,10 @@ SOFTWARE.
 
 Credits:
 
-The Godot character model is by CaptainRipley
+- Godot character model by CaptainRipley
 https://captainripley.itch.io/godot-3d-robot-character
-The nature models come from:
+- Nature models from:
 https://3dmodels.org/fr/free/low-poly-tree/
 https://flo-bit.itch.io/low-poly-nature-pack
-The original code I based this project on comes from 
+Generation code based on: 
 https://github.com/SebLague/Procedural-Landmass-Generation
