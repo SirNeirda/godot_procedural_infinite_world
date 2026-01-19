@@ -1,3 +1,9 @@
+////////////////////////////////////////////////////////////////////////////////////////////
+/// This script is part of the project "Infinite Runner", a procedural generation project
+/// By Adrien Pierret
+/// 
+/// CharacterMob: This manages the generation and movement of characters.
+/// ///////////////////////////////////////////////////////////////////////////////////////
 using Godot;
 using System;
 using Bouncerock;
@@ -8,6 +14,8 @@ public partial class CharacterMob : CharacterBody3D
 {
 	[Export]
 	public string CharacterName = "Mob";
+
+	[Export] public bool ShowName = false;
 
 	[ExportGroup("Player Objects")]
 
@@ -54,6 +62,8 @@ public partial class CharacterMob : CharacterBody3D
 
 	public MobStates CurrentState = MobStates.Passive;
 	// Get the gravity from the project settings to be synced with RigidBody nodes.
+
+	bool hasTouchedGround = false;
 	public float gravity = ProjectSettings.GetSetting("physics/3d/default_gravity").AsSingle();
 
 	public override void _Ready()
@@ -64,7 +74,7 @@ public partial class CharacterMob : CharacterBody3D
 
 	protected virtual void Initialization()
 	{
-
+		Velocity = Vector3.Zero;
 		//Input.MouseMode = Input.MouseModeEnum.Captured;
 		FloorMaxAngle = Mathf.DegToRad(50);
 
@@ -73,6 +83,7 @@ public partial class CharacterMob : CharacterBody3D
 	public override void _PhysicsProcess(double delta)
 	{
 		float deltaFloat = (float)delta;
+		
 		UpdateMovement(deltaFloat);
 	}
 
@@ -109,14 +120,20 @@ public partial class CharacterMob : CharacterBody3D
 
 		if (IsOnFloor())
 		{
+			velocity.Y = 0;
 			velocity.X = forward.X * speed;
 			velocity.Z = forward.Z * speed;
 		}
 		else
 		{
-			velocity.Y -= gravity * delta;
+			
+			velocity.Y -= Mathf.Max(gravity * delta, gravity);
 		}
-
+		/*if (velocity.X  >2|| velocity.Z  >2)
+		{
+			GD.Print(Name + ": velocity " + velocity);
+		}*/
+		
 		Velocity = velocity;
 	}
 
@@ -228,6 +245,10 @@ public partial class CharacterMob : CharacterBody3D
 
 	private void UpdateMovement(float delta)
 	{
+		if (GetDirection().DistanceTo(Position) < 1.5f)
+		{
+			GameManager.Instance.OnLoseGame();
+		}
 		// --- Rotation ---
 		if (_cachedDirection != Vector3.Zero)
 		{
@@ -258,6 +279,7 @@ public partial class CharacterMob : CharacterBody3D
 
 	public void UpdateHelpers(float deltaFloat)
 	{
+		if (!ShowName) {return;}
 		string text = CharacterName;
 		string dist = GetDirection().DistanceTo(Position).ToString("0.00");
 		if (PopupInfo == null)
@@ -269,14 +291,11 @@ public partial class CharacterMob : CharacterBody3D
 		{
 			//text = text+ "\n" + Mathf.RadToDeg(GetFloorAngle()) + " Pos: X: " + string.Format("{0:0. #}", Position.X) + " Y: " + string.Format("{0:0. #}", Position.Y) + " Z: " + string.Format("{0:0. #}", Position.Z) ;
 			//GD.Print(TerrainGenerator.Instance.CameraInChunk());
-			PopupInfo.SetText(text + '\n' + dist);
+			PopupInfo.SetText(text);
 			PopupInfo.Position = CameraPivot.Position + Vector3.Down * 0.7f;
 			//GD.Print("Position " + PopupInfo.Position);
 		}
-		if (GetDirection().DistanceTo(Position) < 1.5f)
-		{
-			GameManager.Instance.OnLoseGame();
-		}
+		
 
 		/*string text = "Adrien" + "\n" + TerrainManager.Instance.CameraInChunk();
 

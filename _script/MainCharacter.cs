@@ -1,3 +1,10 @@
+////////////////////////////////////////////////////////////////////////////////////////////
+/// This script is part of the project "Infinite Runner", a procedural generation project
+/// By Adrien Pierret
+/// 
+/// GameManager: A manager for the main character, with basic animations, state machine, input manager.
+/// ///////////////////////////////////////////////////////////////////////////////////////
+
 using Godot;
 using System;
 using Bouncerock;
@@ -10,18 +17,28 @@ public partial class MainCharacter : CharacterBody3D
 	[Export]
 	public string CharacterName = "Bouncerock";
 
-	[ExportGroup("Player Objects")]
+	[ExportGroup("Camera and optics")]
 	[Export]
-	public Camera3D PlayerCamera;
+	public MainCharacterCamera PlayerCamera;
 
 	public WorldSpaceUI PopupInfo;
 
 	[Export]
 	public float Action = 100;
 
+	[Export]
+	public float Mojo = 0;
+
+	[Export]
+	public float Points = 0;
+
 
 	[Export]
 	public Node3D CameraPivot;
+
+
+
+	[ExportGroup("Player Objects")]
 
 	public PackedScene Cube;
 
@@ -29,7 +46,7 @@ public partial class MainCharacter : CharacterBody3D
 	public AnimationTree Animator;
 
 	[ExportGroup("Powers")]
-	[Export]public Node3D PowerJetpack;
+	[Export] public Node3D PowerJetpack;
 
 	[ExportGroup("Player Attributes")]
 
@@ -39,6 +56,8 @@ public partial class MainCharacter : CharacterBody3D
 
 	List<RigidBody3D> Crates = new List<RigidBody3D>();
 
+
+	[Export] public MeshInstance3D Faraway;
 
 	float mouse_speed = 0.05f;
 
@@ -50,6 +69,9 @@ public partial class MainCharacter : CharacterBody3D
 	public float RunningSpeed = 20;
 
 	public float SpeedMultiplier = 1;
+
+	[Export]
+	public Node3D SpotLight;
 
 	[Export]
 	public float JumpVelocity = 5;
@@ -73,6 +95,9 @@ public partial class MainCharacter : CharacterBody3D
 	public bool Initialized = false;
 
 	public bool hasGlided = false;
+
+	private float attackCooldown = 0.5f;
+	private float attackTimer = 0f;
 
 	public class CharacterInput
 	{
@@ -173,7 +198,7 @@ public partial class MainCharacter : CharacterBody3D
 
 	protected virtual void Initialization()
 	{
-
+		//Faraway = GetNode("/root/Faraway") as MeshInstance3D;
 		Input.MouseMode = Input.MouseModeEnum.Captured;
 		FloorMaxAngle = Mathf.DegToRad(50);
 		GameManager.Instance.SetMainCamera(PlayerCamera);
@@ -192,9 +217,11 @@ public partial class MainCharacter : CharacterBody3D
 	}
 
 
+
+
 	public override void _Process(double delta)
 	{
-		if (!TerrainManager.Instance.Initialized)
+		if (TerrainManager.Instance.CurrentLoadStatus != TerrainManager.LoadStatuses.Initialized)
 		{
 			return;
 		}
@@ -203,41 +230,64 @@ public partial class MainCharacter : CharacterBody3D
 			Vector2 position = new Vector2(Position.X, Position.Z);
 			float height = TerrainManager.Instance.GetTerrainHeightAtGlobalCoordinate(position);
 			Vector2 origin = position;
-			int radius = 5;
-			int directions = 500;
+			int radius = 20;
+			int maxAttempts = 500;
 			int attempts = 0;
+			float step = radius;
 			if (height != -201)
 			{
-
 				GD.Print("original pos " + position);
 
-				Vector2[] directionsToTry = new Vector2[]
-				{
-					new Vector2(0, -radius), // up
-					new Vector2(0, radius),  // down
-					new Vector2(-radius, 0), // left
-					new Vector2(radius, 0),  // right
-				};
+				int layer = 1; // how many steps away from origin
+				bool found = false;
 
-				foreach (Vector2 dir in directionsToTry)
+				while (!found && attempts < maxAttempts)
 				{
-					Vector2 checkPos = origin + dir;
-					float testHeight = TerrainManager.Instance.GetTerrainHeightAtGlobalCoordinate(checkPos);
-					//GD.Print($"Checking {checkPos}  height: {testHeight}");
-
-					if (testHeight > 5.0f)
+					// Iterate in a spiral-like pattern: right, down, left, up
+					for (int x = -layer; x <= layer; x++)
 					{
-						position = checkPos;
-						height = testHeight;
-						break;
+						for (int y = -layer; y <= layer; y++)
+						{
+							// Skip positions inside previous layers to avoid double-checking
+							if (Mathf.Abs(x) != layer && Mathf.Abs(y) != layer)
+							{
+								continue;
+							}
+
+
+							Vector2 checkPos = origin + new Vector2(x * step, y * step);
+							float testHeight = TerrainManager.Instance.GetTerrainHeightAtGlobalCoordinate(checkPos);
+
+							attempts++;
+							//GD.Print("testing position " + checkPos + " after " + attempts + " attempts . new height " + testHeight);
+							if (testHeight > 5.0f)
+							{
+								position = checkPos;
+								height = testHeight + 2;
+								found = true;
+								break;
+							}
+
+							if (attempts >= maxAttempts)
+							{
+								break;
+							}
+						}
+						if (found || attempts >= maxAttempts)
+						{
+							break;
+						}
 					}
+					layer++; // expand the search radius
 				}
-				GlobalPosition = new Vector3(Position.X, height, Position.Y);
+
+				GlobalPosition = new Vector3(position.X, height, position.Y);
 				MobManager.Instance.CallDeferred("ResetSecureZone", GlobalPosition);
-				GD.Print("final " + GlobalPosition);
+				GD.Print("final " + GlobalPosition + " after " + attempts + " attempts");
 				Initialized = true;
 			}
 		}
+		Faraway.Position = new Vector3(Position.X, 0, Position.Z);
 		float deltaFloat = (float)delta;
 		//GD.Print(RaycastDown.IsColliding());
 		UpdateAction(deltaFloat);
@@ -257,7 +307,11 @@ public partial class MainCharacter : CharacterBody3D
 
 	protected void UpdateAction(float deltaFloat)
 	{
-		
+		if (attackTimer > 0f)
+		{
+			attackTimer -= deltaFloat;
+		}
+
 		CharacterActions previousAction = CurrentAction;
 		if (CurrentInput.IsRunning() && CurrentInput.Direction != Vector3.Zero && Action > 0)
 		{
@@ -273,7 +327,7 @@ public partial class MainCharacter : CharacterBody3D
 		if (CurrentInput.IsJumping() && !CurrentInput.IsFlying()) { CurrentAction = CharacterActions.Jumping; return; }
 		if (!IsOnFloor())
 		{
-			timeOffGround+= deltaFloat;
+			timeOffGround += deltaFloat;
 			if (CurrentInput.IsRunning() && (!hasGlided || CurrentAction == CharacterActions.Gliding)) { hasGlided = true; CurrentAction = CharacterActions.Gliding; return; }
 			if (CurrentInput.IsFlying() && Action > 0) { CurrentAction = CharacterActions.Flying; return; }
 			CurrentAction = CharacterActions.Falling; return;
@@ -284,7 +338,7 @@ public partial class MainCharacter : CharacterBody3D
 			hasGlided = false;
 			if (CurrentInput.IsAttacking() && Action > 5)
 			{
-				Action = Mathf.Clamp(Action - 5, 0, 100);
+
 				LaunchAttack();
 				if (previousAction == CharacterActions.Attacking)
 				{
@@ -293,8 +347,8 @@ public partial class MainCharacter : CharacterBody3D
 				return;
 			}
 		}
-		
-		if (CurrentInput.Direction != Vector3.Zero && IsOnFloor() )
+
+		if (CurrentInput.Direction != Vector3.Zero && IsOnFloor())
 		{
 			Action = Mathf.Clamp(Action + deltaFloat, 0, 100);
 			CurrentAction = CharacterActions.Walking;
@@ -314,8 +368,11 @@ public partial class MainCharacter : CharacterBody3D
 
 	void LaunchAttack()
 	{
+		if (attackTimer > 0f) { return; }
+		attackTimer = attackCooldown;
 		if (CurrentPower == CharacterPowers.Crates)
 		{
+			Action = Mathf.Clamp(Action - 5, 0, 100);
 			Animator.Set("parameters/conditions/tossing", true);
 			RigidBody3D newCube = Cube.Instantiate() as RigidBody3D;
 			GetTree().Root.AddChild(newCube);
@@ -577,9 +634,38 @@ public partial class MainCharacter : CharacterBody3D
 			//RotationDegrees = rotateCam;
 			//CameraPivot.RotateY(Mathf.DegToRad(cam_rot_y));
 		}
-				//Rotation = (rotate.X);
+		//Rotation = (rotate.X);
 
 		//RotateObjectLocal(Vector3.Right, Mathf.DegToRad(-pitch));
+	}
+
+	public void AddAction(int action)
+	{
+		float remainder = 0;
+		if (Action < 100)
+		{
+			Action = Action + action;
+			remainder = Action - 100;
+			if (remainder > 0)
+			{
+				float multiplier = GameManager.Instance.StartingPoint.DistanceTo(GameManager.Instance.GetMainCharacterPosition());
+				multiplier = Mathf.Clamp(multiplier / 100, 1, 100);
+				multiplier = Mathf.FloorToInt(multiplier);
+				Mojo = Mojo + remainder * multiplier;
+			}
+		}
+		else if (Mojo < 100)
+		{
+			float multiplier = GameManager.Instance.StartingPoint.DistanceTo(GameManager.Instance.GetMainCharacterPosition());
+			multiplier = Mathf.Clamp(multiplier / 100, 1, 100);
+			multiplier = Mathf.FloorToInt(multiplier);
+			Mojo = Mojo + action * multiplier;
+		}
+		if (Mojo >= 100)
+		{
+			Points = Points + 1;
+			Mojo = 0;
+		}
 	}
 
 	public void UpdateHelpers(float deltaFloat)
@@ -592,9 +678,9 @@ public partial class MainCharacter : CharacterBody3D
 		}
 		if (PopupInfo != null)
 		{
-			text = text + "\n" + CurrentAction + " " + TerrainManager.Instance.GetTerrainHeightAtGlobalCoordinate(new Vector2(Position.X, Position.Z)).ToString();
-			//Mathf.RadToDeg(GetFloorAngle()) + " Pos: X: " + string.Format("{0:0. #}", Position.X) + " Y: " + string.Format("{0:0. #}", Position.Y) + " Z: " + string.Format("{0:0. #}", Position.Z) ;
-			//GD.Print(TerrainGenerator.Instance.CameraInChunk());
+			text = text;// + "\n" + CurrentAction + " " + TerrainManager.Instance.GetTerrainHeightAtGlobalCoordinate(new Vector2(Position.X, Position.Z)).ToString();
+						//Mathf.RadToDeg(GetFloorAngle()) + " Pos: X: " + string.Format("{0:0. #}", Position.X) + " Y: " + string.Format("{0:0. #}", Position.Y) + " Z: " + string.Format("{0:0. #}", Position.Z) ;
+						//GD.Print(TerrainGenerator.Instance.CameraInChunk());
 			PopupInfo.SetText(text);
 #if GODOT_ANDROID
 				PopupInfo.SetSize(50);
@@ -633,12 +719,16 @@ public partial class MainCharacter : CharacterBody3D
 		{
 			CurrentInput.SetFly();
 		}
+		
 		if (Input.IsActionPressed("sit"))
 		{
 			CurrentInput.SetSit();
 		}
 #if GODOT_WINDOWS
-
+		if (Input.IsActionJustPressed("torch"))
+		{
+			SpotLight.Visible = !SpotLight.Visible;
+		}
 		if (keyEvent is InputEventMouseButton _mouseButton)
 		{
 			switch (_mouseButton.ButtonIndex)
@@ -667,6 +757,10 @@ public partial class MainCharacter : CharacterBody3D
 		}
 #endif
 #if GODOT_ANDROID
+			if (Input.IsActionPressed("torch"))
+			{
+				SpotLight.Visible = !SpotLight.Visible;
+			}
 			if (Input.IsActionPressed("attack"))
 			{
 				CurrentInput.SetAttack();
@@ -681,6 +775,8 @@ public partial class MainCharacter : CharacterBody3D
 
 					Vector3 velocityDirection = (forwardDirection*2 + Vector3.Up).Normalized();
         			newCube.LinearVelocity = velocityDirection * 10;
+					
+    				LaunchAttack();
 			}
 #endif
 #if GODOT_WINDOWS

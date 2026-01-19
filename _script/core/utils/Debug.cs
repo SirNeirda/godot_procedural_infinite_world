@@ -146,7 +146,7 @@ namespace Bouncerock
 			wsui.Name = "MainCharLabel";
 			if (parent != null)
 			{
-				parent.AddChild(wsui);
+				parent.CallDeferred("add_child",wsui);
 			}
 			return wsui;
         }

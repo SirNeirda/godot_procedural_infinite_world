@@ -1,7 +1,18 @@
+////////////////////////////////////////////////////////////////////////////////////////////
+/// This script is part of the project "Infinite Runner", a procedural generation project
+/// By Adrien Pierret
+/// 
+/// TerrainManager: Determines which chunks need to be updated or destroyed. Every UpdateFrequency seconds,
+/// Evaluation is done depending on the parameters set in MapGenerator
+/// ///////////////////////////////////////////////////////////////////////////////////////
+
 using Godot;
 using Bouncerock.Events;
 using System.Collections.Generic;
 using System;
+using System.Threading.Tasks;
+using System.Runtime.Intrinsics.Arm;
+using Bouncerock.UI;
 
 namespace Bouncerock.Terrain
 {
@@ -70,7 +81,11 @@ namespace Bouncerock.Terrain
 
 		Vector2 currentHalfChunkPosition = Vector2.Zero;
 
-		public bool Initialized = false;
+		//public bool Armed = false;
+
+		public enum LoadStatuses {Unloaded, Armed, Initialized}
+
+		public LoadStatuses CurrentLoadStatus = LoadStatuses.Unloaded;
 
 		//bool set = false;
 
@@ -88,8 +103,8 @@ namespace Bouncerock.Terrain
 
 		public void LoadNewTerrain()
 		{
-			Initialized = false;
 			GD.Print("Initializing map");
+			GlobalUIManager.Instance.LoadingUI.SetLoadingText("Initializing map...");
 			CurrentMapSettings = new MapGenerationSettings();
 			CurrentMapSettings.DefaultValues();
 			Instance = this;
@@ -101,7 +116,8 @@ namespace Bouncerock.Terrain
 			//SetupMeshSettings();
 			DetailsManager = GetNode<TerrainDetailsManager>("TerrainDetailsManager");
 			meshWorldSize = TerrainMeshSettings.meshWorldSize;
-			Initialized = true;
+			CurrentLoadStatus = LoadStatuses.Armed;
+			
 		}
 
 		void SetupLOD()
@@ -117,7 +133,7 @@ namespace Bouncerock.Terrain
 
 			//Also the highest LOD level, the chunks adjacent to the part of the chunk the player is closest to
 			LODInfo inf1 = new LODInfo();
-			inf1.LodLevel = 0; 
+			inf1.LodLevel = 2; 
 			inf1.AdjacencyLevel = 1; 
 			inf1.HasCollider = true;
 			//inf1.lod = 4; inf1.visibleDstThreshold = 200;
@@ -125,13 +141,13 @@ namespace Bouncerock.Terrain
 			//First level of adjacency, 
 			LODInfo inf2 = new LODInfo();
 			//inf2.lod = 5; inf2.visibleDstThreshold = 400;
-			inf2.LodLevel = 2; 
+			inf2.LodLevel = 3; 
 			inf2.AdjacencyLevel = 2; 
-			inf2.HasCollider = false;
+			inf2.HasCollider = true;
 
 			//Second level of adjacency
 			LODInfo inf3 = new LODInfo();
-			inf3.LodLevel = 3; 
+			inf3.LodLevel = 4; 
 			inf3.AdjacencyLevel = 3; 
 			inf3.HasCollider = false;
 
@@ -141,17 +157,17 @@ namespace Bouncerock.Terrain
 			inf4.HasCollider = false;
 
 			LODInfo inf5 = new LODInfo();
-			inf4.LodLevel = 4; 
-			inf4.AdjacencyLevel = 5; 
-			inf4.HasCollider = false;
+			inf5.LodLevel = 4; 
+			inf5.AdjacencyLevel = 5; 
+			inf5.HasCollider = false;
 
 			detailLevels[0] = inf0;
 			detailLevels[1] = inf1;
 			detailLevels[2] = inf2;
 			detailLevels[3] = inf3;
 			detailLevels[4] = inf4;
-			//detailLevels[5] = inf5;
-			//detailLevels[4] = inf4;
+			detailLevels[5] = inf5;
+			///detailLevels[6] = inf6;
 		}
 		void SetupMeshSettings()
 		{
@@ -159,18 +175,40 @@ namespace Bouncerock.Terrain
 		}
 		public float[,] GetHeightmapForChunk(Vector2 chunkLoc)
 		{
-			if (chunksDictionary.ContainsKey(chunkLoc)) 
+			if (chunksDictionary.ContainsKey(chunkLoc))
 			{
 				return chunksDictionary[chunkLoc].GetHeightmap();
 			}
 			return null;
 		}
-
-		public List<List<WorldItemData>> GetItemsForChunk(Vector2 chunkLoc)
+		
+		public TerrainChunk GetChunk(Vector2 chunkLoc)
 		{
 			if (chunksDictionary.ContainsKey(chunkLoc)) 
 			{
-				return chunksDictionary[chunkLoc].GetItems();
+				return chunksDictionary[chunkLoc];
+			}
+			return null;
+		}
+
+		public List<TerrainChunk> GetChunks(int maxAdjacency, int minAdjacency = 0)
+		{
+			List<TerrainChunk> chunks = new List<TerrainChunk>();
+			foreach (KeyValuePair<Vector2, TerrainChunk>  chunk in chunksDictionary)
+			{
+				if (chunk.Value.currentLODIndex >= minAdjacency && chunk.Value.currentLODIndex<=maxAdjacency)
+				{
+					chunks.Add(chunk.Value);
+				}
+			}
+			return chunks;
+		}
+
+		public List<WorldItem> GetItemsForChunk(Vector2 chunkLoc)
+		{
+			if (chunksDictionary.ContainsKey(chunkLoc)) 
+			{
+				return chunksDictionary[chunkLoc]._map.GetTerrainElements();
 			}
 			return null;
 		}
@@ -259,7 +297,7 @@ namespace Bouncerock.Terrain
 		public override void _Process(double time) 
 		{
 			if (Viewer == null) {;return;}
-			if (Initialized == false) {;return;}
+			if (CurrentLoadStatus == LoadStatuses.Unloaded) {;return;}
 			viewerPosition = new Vector2 (Viewer.GlobalPosition.X, Viewer.GlobalPosition.Z);
 			
 			updateTimer = updateTimer + (float)time;
@@ -270,10 +308,14 @@ namespace Bouncerock.Terrain
 			}
 		}
 
-		void UpdateChunks()
+		async Task UpdateChunks()
 		{
 			// (set) {return;}
 			//GD.Print("Updating chunks");
+			if (CurrentLoadStatus == LoadStatuses.Armed)
+			{
+				GlobalUIManager.Instance.LoadingUI.SetLoadingText("Loading world chunks...");
+			}
 			Vector2 newChunkPosition = CameraInChunk();
 			if (currentChunk == null) 
 				{
@@ -282,7 +324,7 @@ namespace Bouncerock.Terrain
 					TerrainChunk newChunk = new TerrainChunk (newChunkPosition,heightMapSettings, detailLevels, 0, this);
 					chunksDictionary.Add (newChunkPosition, newChunk);
 					//newChunk.onVisibilityChanged += OnTerrainChunkVisibilityChanged;
-					newChunk.Load ();
+					await newChunk.Load ();
 					currentChunk = newChunk;
 					return;
 				}
@@ -321,6 +363,10 @@ namespace Bouncerock.Terrain
 				HashSet<Vector2> reviewedChunks = new HashSet<Vector2> ();
 				for (int i = 0; i < chunksLayered.Length; i++)
 					{
+						if (CurrentLoadStatus == LoadStatuses.Armed)
+						{
+							GlobalUIManager.Instance.LoadingUI.SetLoadingText($"Loading {i}/{chunksLayered.Length}");
+						}
 						//Loop through each lod coordinate in the fresh list to see if we need to change the chunk
 						foreach (Vector2 coord in chunksLayered[i])
 						{
@@ -337,7 +383,7 @@ namespace Bouncerock.Terrain
 								TerrainChunk newChunk = new TerrainChunk (coord,heightMapSettings, detailLevels, i, this);
 								chunksDictionary.Add (coord, newChunk);
 								//newChunk.onVisibilityChanged += OnTerrainChunkVisibilityChanged;
-								newChunk.Load ();
+								await newChunk.Load ();
 							}
 							
 							reviewedChunks.Add(coord);
@@ -350,6 +396,7 @@ namespace Bouncerock.Terrain
 					 if (!reviewedChunks.Contains(coord))
 						{
 							//Chunk isn't visible anymore, dispose
+							//Now this means every time we leave and reload, the chunk will be regenerated as is, so if there's any change, it'll be erased
 							chunksDictionary[coord].Destroy();
 							chunksDictionary.Remove(coord);
 						}
@@ -363,6 +410,11 @@ namespace Bouncerock.Terrain
 				//GD.Print("No mode detected for half chunk position");
 			}
 			currentHalfChunkPosition = newHalfChunk;
+			if (CurrentLoadStatus == LoadStatuses.Armed) 
+			{
+				CurrentLoadStatus = LoadStatuses.Initialized;
+				GlobalUIManager.Instance.LoadingUI.Visible = false;
+				}
 		}
 
 		
@@ -419,7 +471,6 @@ namespace Bouncerock.Terrain
 
 	}
 
-	[System.Serializable]
 	public struct LODInfo 
 	{
 		public int LodLevel;

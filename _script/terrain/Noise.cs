@@ -1,3 +1,11 @@
+////////////////////////////////////////////////////////////////////////////////////////////
+/// This script is part of the project "Infinite Runner", a procedural generation project
+/// By Adrien Pierret
+/// 
+/// Noise: This script generates the noises depending on player option. It was originally planned to include
+/// various Godot-independent generators, but Godot's defaults are more than enough for now. Voronoi will be useful for biomes maybe at some point.
+/// ///////////////////////////////////////////////////////////////////////////////////////
+
 using Godot;
 using System.Collections.Generic;
 using Bouncerock.Procedural;

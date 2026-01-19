@@ -20,6 +20,14 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
 
+////////////////////////////////////////////////////////////////////////////////////////////
+/// This script is part of the project "Infinite Runner", a procedural generation project
+/// By Adrien Pierret
+/// 
+/// GameManager: This script is originally supposed to centralize and take care of everything related to the software.
+/// It is the starting point for everything.
+/// ///////////////////////////////////////////////////////////////////////////////////////
+
 using Godot;
 using System;
 using Bouncerock.Events;
@@ -86,6 +94,14 @@ public partial class GameManager : Node
 	public float GetMainCharacterAction()
 	{
 		return mainCharacter.Action;
+	}
+	public float GetMainCharacterMojo()
+	{
+		return mainCharacter.Mojo;
+	}
+	public float GetMainCharacterScore()
+	{
+		return mainCharacter.Points;
 	}
 	public MainCharacter GetMainCharacter()
 	{

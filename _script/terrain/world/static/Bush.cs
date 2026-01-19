@@ -1,20 +1,22 @@
-using Godot;
+ using Godot;
 using System.Collections;
 using System.Collections.Generic;
 
-namespace Bouncerock
+namespace Bouncerock.Terrain
 {
-    public partial class Bush : WorldItem 
+    public partial class Bush : WorldItemModel 
 	{
         [Export]
 	public CollisionShape3D collider;
+
+
         public  void _on_area_3d_body_entered(Node3D area)
         {
             if (area is MainCharacter)
             {
                 MainCharacter chara = area as MainCharacter;
                 chara.SpeedMultiplier = 0.5f;
-                GD.Print("Entered");
+                //GD.Print("Entered");
             }
         }
 

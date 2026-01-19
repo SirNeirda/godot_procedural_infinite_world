@@ -1,10 +1,15 @@
+////////////////////////////////////////////////////////////////////////////////////////////
+/// This script is part of the project "Infinite Runner", a procedural generation project
+/// By Adrien Pierret
+/// 
+/// Shroom . Makes the character jump if walked on.
+/// ///////////////////////////////////////////////////////////////////////////////////////
 using Godot;
+using Bouncerock.Terrain;
 using System.Collections;
 using System.Collections.Generic;
 
-namespace Bouncerock
-{
-    public partial class Schroom : WorldItem 
+    public partial class Schroom : WorldItemModel 
 	{
         [Export]
 	public CollisionShape3D collider;
@@ -27,4 +32,3 @@ namespace Bouncerock
             }
         }
     }
-}

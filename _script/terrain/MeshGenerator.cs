@@ -1,3 +1,14 @@
+////////////////////////////////////////////////////////////////////////////////////////////
+/// This script is part of the project "Infinite Runner",
+/// a 3D procedural world generation project for Godot
+///
+/// By Adrien Pierret
+/// 
+/// MeshGenerator: This script creates mesh from the data given. Most of it comes directly from "Procedural Landmass"
+/// by Sebastian Lague, but adapted to Godot. One important addition is the generation of vertex colors, which we'll use 
+/// for texture blending.
+/// ///////////////////////////////////////////////////////////////////////////////////////
+
 using Godot;
 using Godot.Collections;
 using Bouncerock;
@@ -290,14 +301,7 @@ namespace Bouncerock.Terrain
 
 		public void ProcessMesh()
 		{
-			if (useFlatShading)
-			{
-				FlatShading();
-			}
-			else
-			{
-				BakeNormals();
-			}
+			BakeNormals();
 		}
 
 		void BakeNormals()
@@ -305,21 +309,6 @@ namespace Bouncerock.Terrain
 			(bakedNormals, vertexColors) = CalculateNormals();
 		}
 
-		void FlatShading()
-		{
-			Vector3[] flatShadedVertices = new Vector3[triangles.Length];
-			Vector2[] flatShadedUvs = new Vector2[triangles.Length];
-
-			for (int i = 0; i < triangles.Length; i++)
-			{
-				flatShadedVertices[i] = vertices[triangles[i]];
-				flatShadedUvs[i] = uvs[triangles[i]];
-				triangles[i] = i;
-			}
-
-			vertices = flatShadedVertices;
-			uvs = flatShadedUvs;
-		}
 
 		public async Task<ArrayMesh> CreateMesh()
 		{

@@ -1,9 +1,9 @@
 using Godot;
 using System;
-using Bouncerock;
+using Bouncerock.Terrain;
 using GodotPlugins.Game;
 
-public partial class Tower : WorldItem
+public partial class Tower : WorldItemModel
 {
     [Export]
     public CollisionShape3D collider;
@@ -35,10 +35,10 @@ public partial class Tower : WorldItem
             MobManager.Instance.SpawnsPerTime = 0;
             GD.Print("Entered tower area");
         }
-        else if (body.GetParent() is WorldItem)
+        else if (body.GetParent() is WorldItemModel)
         {
-            GD.Print("body is " + body.GetParent().Name);
-            body.GetParent().QueueFree();
+           // GD.Print("body is " + body.GetParent().Name);
+            body.Visible = false;
         }
     }
 

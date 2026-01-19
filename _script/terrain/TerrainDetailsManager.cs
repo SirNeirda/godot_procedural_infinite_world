@@ -1,110 +1,108 @@
-using Bouncerock.Terrain;
+////////////////////////////////////////////////////////////////////////////////////////////
+/// This script is part of the project "Infinite Runner", a procedural generation project
+/// By Adrien Pierret
+/// 
+/// TerrainDetailsManager: This script takes care of the actual spawning of terrain items on a given chunk, including the water.
+/// ///////////////////////////////////////////////////////////////////////////////////////
+
+//using Bouncerock.Terrain;
 using Godot;
 using System.Collections;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
 
-namespace Bouncerock
+namespace Bouncerock.Terrain
 {
-    public partial class TerrainDetailsManager : Node 
-	{
+    public partial class TerrainDetailsManager : Node
+    {
         public static TerrainDetailsManager Instance;
+
+        [Export]
+        public string SeaWaterScene;
+
+        public SeaWater Water;
+
+        //public Shader WaterShader;
+
+        //[Export] public ShaderMaterial ShaderMat;
+
+        //[Export] string ShaderAddress;
+
+       // [Export] string DebugShaderAddress;
+        //[Export] public bool UseDebug = true;
 
         public override void _Ready()
         {
             Instance = this;
+            PackedScene waterScene = ResourceLoader.Load<PackedScene>(SeaWaterScene);
+            /*if (UseDebug)
+            {
+                string path = UseDebug ? DebugShaderAddress : ShaderAddress;
+                WaterShader = ResourceLoader.Load<Shader>(path);
+            }*/
+            Water = waterScene.Instantiate() as SeaWater;
         }
 
         Dictionary<string, PackedScene> cachedScenes = new();
 
         public PackedScene GetCachedScene(string name)
         {
+            string path = $"res://_scenes/decor/{name}.tscn";
             if (!cachedScenes.ContainsKey(name))
-                cachedScenes[name] = ResourceLoader.Load<PackedScene>($"res://_scenes/decor/{name}.tscn");
+            {
+
+                 if (!ResourceLoader.Exists(path))
+                {
+                    GD.PushWarning($"Scene not found at path: {path}");
+                    return null;
+                }
+                cachedScenes[name] = ResourceLoader.Load<PackedScene>(path);
+            }
 
             return cachedScenes[name];
         }
 
-        public async Task <WorldItem>SpawnAndInitialize(SpawnedObject objectToSpawn)
+        public async Task<WorldItemModel> SpawnAndInitialize(WorldItem item)
         {
-
-            PackedScene Item = GetCachedScene(objectToSpawn.ObjectName);
-           // GD.Print("Instantiating : " + objectToSpawn.ObjectName);
-            WorldItem node = Item.Instantiate() as WorldItem;
-            if (objectToSpawn is NaturalObject)
+             if (item == null){return null;}
+            //GD.Print("[Item Action] Spawning Item " + item.ModelAddress);
+            if (string.IsNullOrWhiteSpace(item.ModelAddress)){return null;}
+            //PackedScene Item = GetCachedScene(objectToSpawn.ObjectName);
+            // GD.Print("Instantiating : " + objectToSpawn.ObjectName);
+            //Here we spawn the object
+                PackedScene Item = GetCachedScene(item.ModelAddress);
+                if (Item != null)
             {
-                NaturalObject objectSpawned = objectToSpawn as NaturalObject;
-                
-                    if (objectSpawned.RandomizeYRotation)
-                    {
-                        float rotation = TerrainManager.Instance.TerrainDetailsRandom.RandfRange(0,360);
-                        //GD.Print("rad " + rotation);
-                        rotation = Mathf.DegToRad(rotation);
-                        //GD.Print("deg " + rotation);
-                        //objectToSpawn.relevantItem.RotateY(rotation);
-                        node.RotateY(rotation);
-                    }
-                    if (objectSpawned.RandomizeTiltAngle !=0)
-                    {
-                        
-                        float rotation = TerrainManager.Instance.TerrainDetailsRandom.RandfRange(0,objectSpawned.RandomizeTiltAngle);
-                        rotation = Mathf.DegToRad(rotation);
-                        node.RotateZ(rotation);
-                        //objectToSpawn.relevantItem.RotateZ(rotation);
-                        //GD.Print(rotation);
-                        float rotation2 = TerrainManager.Instance.TerrainDetailsRandom.RandfRange(0,objectSpawned.RandomizeTiltAngle);
-                        rotation2 = Mathf.DegToRad(rotation2);
-                        node.RotateX(rotation2);
-                    // objectToSpawn.relevantItem.RotateX(rotation2);
-                    }
-                    node.Scale = Vector3.One*TerrainManager.Instance.TerrainDetailsRandom.RandfRange(objectSpawned.MinSize, objectSpawned.MaxSize);
-            // CallDeferred("add_sibling",node);
-            }
-            if (objectToSpawn is GameplayObject)
-            {
-
+                item.Model = Item.Instantiate() as WorldItemModel;
             }
             
-            return node;
+        
+
+            return item.Model;
         }
 
 
-        public SpawnedObject GetSpawnedObject(string name)
-		{
-            foreach (SpawnedObject obj in TerrainManager.Instance.CurrentMapSettings.NaturalObjects)
+        /*public WorldItemSettings GetSpawnedObject(string name)
+        {
+            foreach (WorldItemSettings obj in TerrainManager.Instance.CurrentMapSettings.NaturalObjects)
             {
-                if (obj.ObjectName == name)
+                if (obj.Name == name)
                 {
                     return obj;
                 }
             }
-            foreach (GameplayObject obj in TerrainManager.Instance.CurrentMapSettings.GameplayObjects)
+            foreach (WorldItemSettings obj in TerrainManager.Instance.CurrentMapSettings.GameplayObjects)
             {
-                if (obj.ObjectName == name)
+                if (obj.Name == name)
                 {
                     return obj;
                 }
             }
             return null;
-		}
-
-        /*public WorldItem SpawnObject_deprecated(string name, Node parent = null)
-        {
-            //GD.Print("Loading " + name);
-            PackedScene Item = ResourceLoader.Load<PackedScene>("res://_scenes/decor/" + name+".tscn");
-            WorldItem node = Item.Instantiate() as WorldItem;
-            
-            //CallDeferred("add_sibling",node);
-            if (parent != null)
-            {
-                parent.CallDeferred("add_child",node);
-                node.CallDeferred("Initialize");
-            }
-            
-            return node;
         }*/
 
-        
+
+
     }
 }

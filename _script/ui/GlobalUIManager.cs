@@ -1,3 +1,10 @@
+////////////////////////////////////////////////////////////////////////////////////////////
+/// This script is part of the project "Infinite Runner", a procedural generation project
+/// By Adrien Pierret
+/// 
+/// GlobalUIManager: THis is mostly unused, but designed to be a flexible UI manager.
+/// ///////////////////////////////////////////////////////////////////////////////////////
+/// 
 using System.Collections;
 using System.Collections.Generic;
 using Godot;
@@ -50,9 +57,12 @@ namespace Bouncerock.UI
 
         public bool MovementBlocked = false;
 
+         [Export] public LoadingScreen LoadingUI;
+
         public override void _Ready()
         {
             Instance = this;
+            LoadingUI.Visible  = true;
             MobileUI.Visible = false;
             #if GODOT_ANDROID
 			MobileUI.Visible = true;

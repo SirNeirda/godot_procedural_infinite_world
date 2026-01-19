@@ -1,13 +1,22 @@
-
+////////////////////////////////////////////////////////////////////////////////////////////
+/// This script is part of the project "Infinite Runner", a procedural generation project
+/// By Adrien Pierret
+/// 
+/// MapGenerator: This script is where various noises are blended and where the actual terrain is shaped.
+/// It would be cool to expose all these to the editor. But I lack the time. You'll notice all these references to .isl files. 
+/// These will eventually allow to save the terrain chunks on disk, making them reusable or allowing for persistent deformation.
+/// ///////////////////////////////////////////////////////////////////////////////////////
 using Godot;
 using System.IO;
 using Bouncerock;
 using System;
 using System.Collections.Generic;
 using System.Threading;
+using System.Security.Cryptography.X509Certificates;
 using System.Threading.Tasks;
 using Bouncerock.Procedural;
-
+using System.Linq;
+//using System.Numerics;
 namespace Bouncerock.Terrain
 {
 	public static class MapGenerator
@@ -17,224 +26,219 @@ namespace Bouncerock.Terrain
 
 		static string documentspath = System.Environment.GetFolderPath(System.Environment.SpecialFolder.MyDocuments)
 				+ "/Islands/";
-		//This is where new chunks are generated and assembled. For now we just use a basic simplex generator. This code should be updated later to include more complex generation.
+		//This is where new chunks are generated and assembled.
 
-public static async Task<Map> GenerateMapAsync(Vector2 sampleCentre)
-{
-    Vector2 offset = new Vector2(
-        -(TerrainMeshSettings.numVertsPerLine / 2) + sampleCentre.X,
-        (TerrainMeshSettings.numVertsPerLine / 2) - sampleCentre.Y);
-
-    Map map = new Map();
-
-    await Task.Run(async () =>
-    {
-        try
-        {
-            // --- Base heightmap ---
-            TerrainPass basePass = TerrainManager.Instance.CurrentMapSettings.Passes[0];
-            float[,] heightMap = GenerateHeightMapSimplex(
-                TerrainMeshSettings.numVertsPerLine,
-                TerrainMeshSettings.numVertsPerLine,
-                basePass,
-                offset);
-
-            ApplyContrast(heightMap, basePass.Contrast);
-
-            // --- Additive passes ---
-            for (int i = 1; i < TerrainManager.Instance.CurrentMapSettings.Passes.Count; i++)
-            {
-                TerrainPass pass = TerrainManager.Instance.CurrentMapSettings.Passes[i];
-                float[,] heightMapTemp = GenerateHeightMapSimplex(
-                    TerrainMeshSettings.numVertsPerLine,
-                    TerrainMeshSettings.numVertsPerLine,
-                    pass,
-                    offset);
-
-                ApplyContrast(heightMapTemp, pass.Contrast);
-
-                for (int y = 0; y < TerrainMeshSettings.numVertsPerLine; y++)
-                {
-                    for (int x = 0; x < TerrainMeshSettings.numVertsPerLine; x++)
-                    {
-                        heightMap[x, y] += heightMapTemp[x, y];
-                        heightMap[x, y] = Mathf.Clamp(heightMap[x, y], pass.MinHeight, pass.MaxHeight);
-                    }
-                }
-            }
-
-            // (Pathways, lakes, world items as before...)
-            // --- Finalize map ---
-            map = new Map(heightMap, Map.Origins.Generated);
-
-            List<List<WorldItemData>> _worldItems = new List<List<WorldItemData>>();
-            foreach (NaturalObject naturalObject in TerrainManager.Instance.CurrentMapSettings.NaturalObjects)
-            {
-                if (naturalObject.Concentration > 1)
-                {
-                    List<WorldItemData> items = await GenerateStaticElements(naturalObject);
-                    if (items.Count > 0) _worldItems.Add(items);
-                }
-                else
-                {
-                    WorldItemData item = await DetermineItemPresence(naturalObject);
-                    if (item.name != "") _worldItems.Add(new List<WorldItemData>() { item });
-                }
-            }
-
-            foreach (GameplayObject gameplayObject in TerrainManager.Instance.CurrentMapSettings.GameplayObjects)
-            {
-                if (gameplayObject.Concentration > 1)
-                {
-                    List<WorldItemData> items = await GenerateStaticElements(gameplayObject);
-                    if (items.Count > 0) _worldItems.Add(items);
-                }
-                else
-                {
-                    WorldItemData item = await DetermineItemPresence(gameplayObject);
-                    if (item.GridLocation != Vector2.Zero) _worldItems.Add(new List<WorldItemData>() { item });
-                }
-            }
-
-            foreach (List<WorldItemData> worldItem in _worldItems)
-            {
-                map.AddTerrainElements(worldItem);
-            }
-        }
-        catch (Exception ex)
-        {
-            GD.Print("Error in Map Generation: " + ex.StackTrace);
-        }
-    });
-
-    return map;
-}
-
-		/*public static async Task<Map> GenerateMapAsync_deprecated(Vector2 sampleCentre)
+		public static async Task<Map> GenerateMapAsync(Vector2 sampleCentre)
 		{
-			Vector2 offset = new Vector2(-(TerrainMeshSettings.numVertsPerLine / 2) + sampleCentre.X,
-										 (TerrainMeshSettings.numVertsPerLine / 2) - sampleCentre.Y);
+			Vector2 offset = new Vector2(
+				-(TerrainMeshSettings.numVertsPerLine / 2) + sampleCentre.X,
+				(TerrainMeshSettings.numVertsPerLine / 2) - sampleCentre.Y);
 
-			NoiseSettingsSimplexSmooth noiseSetting = new NoiseSettingsSimplexSmooth();
-			Map map = new Map();
+			Map map = new Map(Map.Origins.Generated);
 
-			await Task.Run(async () =>
+			try
 			{
-				try
+				// Base heightmap
+				TerrainPass basePass = TerrainManager.Instance.CurrentMapSettings.Passes[0];
+				float[,] heightMap = GenerateHeightMapSimplex(
+					TerrainMeshSettings.numVertsPerLine,
+					TerrainMeshSettings.numVertsPerLine,
+					basePass,
+					offset, 0);
+
+				heightMap = ApplyContrast(heightMap, basePass.Contrast);
+
+				// Additive passes
+				for (int i = 1; i < TerrainManager.Instance.CurrentMapSettings.Passes.Count; i++)
 				{
-					// Base heightmap
-					noiseSetting.scale = TerrainManager.Instance.CurrentMapSettings.Passes[0].VerticalScale;
-					noiseSetting.octaves = TerrainManager.Instance.CurrentMapSettings.Passes[0].Octaves;
-					noiseSetting.frequency = TerrainManager.Instance.CurrentMapSettings.Passes[0].Frequency;
+					TerrainPass pass = TerrainManager.Instance.CurrentMapSettings.Passes[i];
+					float[,] heightMapTemp = GenerateHeightMapSimplex(
+						TerrainMeshSettings.numVertsPerLine,
+						TerrainMeshSettings.numVertsPerLine,
+						pass,
+						offset, i);
 
-					noiseSetting.offset = offset;
+					heightMapTemp = ApplyContrast(heightMapTemp, pass.Contrast);
+					heightMap = ApplyBlend(heightMap, heightMapTemp, pass);
+				}
 
-					float[,] heightMap = GenerateHeightMapSimplex(
-						/*TerrainMeshSettings.numVertsPerLine, TerrainMeshSettings.numVertsPerLine,
-						noiseSetting, sampleCentre);
+				map.SetHeightmap(heightMap);
 
-					ApplyContrast(heightMap, TerrainManager.Instance.CurrentMapSettings.Passes[0].Contrast);
+				List<WorldItem> _worldItems = new List<WorldItem>();
 
-					// Apply all passes
-					for (int y = 0; y < TerrainMeshSettings.numVertsPerLine; y++)
+				foreach (WorldItemSettings naturalObject in TerrainManager.Instance.CurrentMapSettings.NaturalObjects)
+				{
+					if (naturalObject.Concentration > 1)
 					{
-						for (int x = 0; x < TerrainMeshSettings.numVertsPerLine; x++)
+						List<WorldItem> items = await GenerateStaticElements(heightMap, naturalObject);
+						if (items.Count > 0)
 						{
-							heightMap[x, y] += Mathf.Clamp(
-								heightMap[x, y] * TerrainManager.Instance.CurrentMapSettings.Passes[0].HorizontalScale,
-								TerrainManager.Instance.CurrentMapSettings.LowestPoint,
-								TerrainManager.Instance.CurrentMapSettings.HighestPoint);
+							_worldItems.AddRange(items);
 						}
 					}
-
-					for (int i = 1; i < TerrainManager.Instance.CurrentMapSettings.Passes.Count; i++)
+					else
 					{
-						noiseSetting.scale = TerrainManager.Instance.CurrentMapSettings.Passes[i].VerticalScale;
-						noiseSetting.octaves = TerrainManager.Instance.CurrentMapSettings.Passes[i].Octaves;
-						noiseSetting.frequency = TerrainManager.Instance.CurrentMapSettings.Passes[i].Frequency;
-						noiseSetting.offset = offset;
-
-						float[,] heightMapTemp = GenerateHeightMapSimplex(
-							TerrainMeshSettings.numVertsPerLine, TerrainMeshSettings.numVertsPerLine,
-							noiseSetting, sampleCentre);
-
-						ApplyContrast(heightMapTemp, TerrainManager.Instance.CurrentMapSettings.Passes[i].Contrast);
-
-						for (int y = 0; y < TerrainMeshSettings.numVertsPerLine; y++)
-						{
-							for (int x = 0; x < TerrainMeshSettings.numVertsPerLine; x++)
-							{
-								float value = heightMapTemp[x, y] * TerrainManager.Instance.CurrentMapSettings.Passes[i].HorizontalScale;
-
-								heightMap[x, y] += Mathf.Clamp(value,
-									TerrainManager.Instance.CurrentMapSettings.LowestPoint,
-									TerrainManager.Instance.CurrentMapSettings.HighestPoint);
-							}
-						}
-					}
-
-					// Pathways
-					PathwaySettings pathwaySettings = TerrainManager.Instance.CurrentMapSettings.Pathway;
-					float[,] pathwayMask = GeneratePathwayMaskSimplex(
-						TerrainMeshSettings.numVertsPerLine, TerrainMeshSettings.numVertsPerLine,
-						noiseSetting, sampleCentre, pathwaySettings);
-
-					ApplyPathwayFlattening(heightMap, pathwayMask, pathwaySettings);
-
-					// Lakes
-					ApplyLakes(heightMap, 0.25f);
-
-					// Place natural + gameplay objects
-					List<List<WorldItemData>> _worldItems = new List<List<WorldItemData>>();
-
-					foreach (NaturalObject naturalObject in TerrainManager.Instance.CurrentMapSettings.NaturalObjects)
-					{
-						if (naturalObject.Concentration > 1)
-						{
-							List<WorldItemData> items = await GenerateStaticElements(naturalObject);
-							if (items.Count > 0) _worldItems.Add(items);
-						}
-						else
-						{
-							WorldItemData item = await DetermineItemPresence(naturalObject);
-							if (item.name != "") _worldItems.Add(new List<WorldItemData>() { item });
-						}
-					}
-
-					foreach (GameplayObject gameplatObject in TerrainManager.Instance.CurrentMapSettings.GameplayObjects)
-					{
-						if (gameplatObject.Concentration > 1)
-						{
-							List<WorldItemData> items = await GenerateStaticElements(gameplatObject);
-							if (items.Count > 0) _worldItems.Add(items);
-						}
-						else
-						{
-							WorldItemData item = await DetermineItemPresence(gameplatObject);
-							if (item.GridLocation != Vector2.Zero) _worldItems.Add(new List<WorldItemData>() { item });
-						}
-					}
-
-					// Finalize map
-					map = new Map(heightMap, Map.Origins.Generated);
-					foreach (List<WorldItemData> worldItem in _worldItems)
-					{
-						map.AddTerrainElements(worldItem);
+						WorldItem item = await DetermineItemPresence(heightMap, naturalObject);
+						if (item != null && item.ModelAddress != ""){_worldItems.Add(item);}
+						
 					}
 				}
-				catch (Exception ex)
+
+				foreach (WorldItemSettings gameplayObject in TerrainManager.Instance.CurrentMapSettings.GameplayObjects)
 				{
-					GD.Print("Error in Map Generation: " + ex.StackTrace);
+					if (gameplayObject.Concentration > 1)
+					{
+						List<WorldItem> items = await GenerateStaticElements(heightMap, gameplayObject);
+						if (items.Count > 0)
+						{
+							_worldItems.AddRange(items);
+						}
+					}
+					else
+					{
+						WorldItem item = await DetermineItemPresence(heightMap, gameplayObject);
+						if (item != null && item.ModelAddress != ""){_worldItems.Add(item);}
+					}
 				}
-			});
+				map.AddTerrainElements(_worldItems);
+				//GD.Print("[Step 1] Chunk " + sampleCentre + " generated " + map.GetTerrainElements().Count + " elements");
 
-			return map;
-		}*/
+				return map;
+			}
+			catch (Exception ex)
+			{
+				GD.Print("Error in Map Generation: " + ex);
+				throw;
+			}
+		}
+
+
+		public class Pathway
+		{
+			public List<Vector2> Points = new List<Vector2>(); // local positions in the current heightmap
+			public PathwaySettings Settings;
+		}
+
+		private static Pathway CreatePathway(float[,] heightMap, PathwaySettings pathSettings, int seed = 0)
+		{
+			int size = heightMap.GetLength(0);
+			Random random = new Random(seed);
+
+			Pathway pathway = new Pathway();
+			pathway.Settings = pathSettings;
+
+			// Start on left edge
+			Vector2 pos = new Vector2(0, random.Next(0, size));
+			Vector2 direction = new Vector2(1, 0); // initially right
+			pathway.Points.Add(pos);
+
+			int maxSteps = size * 2; // prevent infinite loops
+			for (int i = 0; i < maxSteps; i++)
+			{
+				// Simple meander: small random angle change
+				float angleOffset = ((float)random.NextDouble() - 0.5f) * 0.5f;
+				direction = direction.Rotated(angleOffset).Normalized();
+
+				Vector2 nextPos = pos + direction;
+
+				// Clamp to map
+				nextPos.X = Mathf.Clamp(nextPos.X, 0, size - 1);
+				nextPos.Y = Mathf.Clamp(nextPos.Y, 0, size - 1);
+
+				float height = heightMap[(int)nextPos.X, (int)nextPos.Y];
+				if (height < pathSettings.MinElevation || height > pathSettings.MaxElevation)
+				{
+					// stop if too steep
+					break;
+				}
+
+				pos = nextPos;
+				pathway.Points.Add(pos);
+
+				// stop if reached right edge
+				if (pos.X >= size - 1) break;
+			}
+
+			return pathway;
+		}
+
+		private static float[,] ApplyBlend(float[,] heightMap1, float[,] heightMap2, TerrainPass pass)
+		{
+			const float TRANSPARENT = -201f;
+
+			int width = heightMap1.GetLength(0);
+			int height = heightMap1.GetLength(1);
+
+			float[,] result = new float[width, height];
+
+			bool hasMask = pass.Mask != null;
+
+			for (int x = 0; x < width; x++)
+			{
+				for (int y = 0; y < height; y++)
+				{
+					float a = heightMap1[x, y];
+					float b = heightMap2[x, y];
+
+					// --- Transparent handling ---
+					if (a == TRANSPARENT)
+					{
+						result[x, y] = b;
+						continue;
+					}
+					if (b == TRANSPARENT)
+					{
+						result[x, y] = a;
+						continue;
+					}
+
+					//  Height-based smooth constraint 
+					float heightMask = Mathf.SmoothStep(
+						pass.MinHeight,
+						pass.MaxHeight,
+						a
+					);
+
+					// Optional user mask
+					float mask = hasMask ? Mathf.Clamp(pass.Mask[x, y], 0f, 1f) : 1f;
+
+					// Final blend weight
+					float weight = pass.BlendValue * heightMask * mask;
+
+					float blended;
+
+					switch (pass.BlendType)
+					{
+						case TerrainPass.BlendTypes.Mix:
+							blended = MathExt.Lerp(a, b, weight);
+							break;
+
+						case TerrainPass.BlendTypes.Add:
+							blended = a + Math.Max(0f, b) * weight;
+							break;
+
+						case TerrainPass.BlendTypes.Substract:
+							blended = a - Math.Max(0f, b) * weight;
+							break;
+
+						case TerrainPass.BlendTypes.None:
+						default:
+							blended = a;
+							break;
+					}
+
+					result[x, y] = blended;
+				}
+			}
+
+			return result;
+		}
 
 
 
 
-		private static void ApplyContrast(float[,] heightMap, float contrast, float mid = 0)
+
+		private static float[,] ApplyContrast(float[,] heightMap, float contrast, float mid = 0)
 		{
 			int width = heightMap.GetLength(0);
 			int height = heightMap.GetLength(1);
@@ -247,73 +251,206 @@ public static async Task<Map> GenerateMapAsync(Vector2 sampleCentre)
 					heightMap[x, y] = mid + delta * contrast;
 				}
 			}
+			return heightMap;
 		}
 
-
-
-		private static void ApplyLakes(float[,] heightMap, float waterHeight = 0.25f)
+		/*static async Task<WorldItem> DetermineItemPresence(float[,] heightmap, WorldItemSettings settings)
 		{
-			for (int y = 0; y < heightMap.GetLength(1); y++)
-			{
-				for (int x = 0; x < heightMap.GetLength(0); x++)
-				{
-					if (heightMap[x, y] < waterHeight)
-						heightMap[x, y] = waterHeight;
-				}
-			}
-		}
-
-
-		static async Task<WorldItemData> DetermineItemPresence(SpawnedObject naturalObject)
-		{
-			WorldItemData item = new WorldItemData();
+			WorldItem item = new WorldItem();
+			item.settings = settings;
 			RandomNumberGenerator rnd = new RandomNumberGenerator();
 			rnd.Seed = (ulong)DateTime.Now.ToBinary();
 			float chance = rnd.RandfRange(0, 1);
 			//GD.Print("Item present " + naturalObject.ObjectName + " chance " + chance);
-			if (naturalObject.Concentration >= chance)
+			if (settings.Concentration >= chance)
 			{
 				Vector2 location = new Vector2();
 				location.X = rnd.RandfRange(0, TerrainMeshSettings.numVertsPerLine);
 				location.Y = rnd.RandfRange(0, TerrainMeshSettings.numVertsPerLine);
-				item.name = naturalObject.ObjectName;
+				item.ItemName = settings.Name;
 				item.GridLocation = location;
 				return item;
 			}
 			return item;
+		}*/
+
+		//This function is the one that determines the spread of objects in the terrain and all their properties. 
+		private static float GetHeightAtChunkMapLocation(float[,] heightMap, Vector2 location)
+		{
+			try
+			{
+				// Clamp the x and y indices to ensure they are within bounds.
+				int xClamped = Mathf.RoundToInt(location.X);
+				int yClamped = Mathf.RoundToInt(location.Y);
+
+				// Access the height map with clamped indices.
+				return heightMap[xClamped, yClamped];
+			}
+			catch (Exception)
+			{
+				//GD.Print("out of bounds" + location.X +"/"+location.Y);
+				// Return -201 if any exception occurs (e.g., out of bounds).
+				return -201;
+			}
 		}
 
-		static async Task<List<WorldItemData>> GenerateStaticElements(SpawnedObject naturalObject)
+		static async Task<WorldItem> DetermineItemPresence(float[,] heightmap, WorldItemSettings settings)
 		{
-			//List<Vector2> locations = await PoissonDiscSampling.Test(Vector2.One * (TerrainMeshSettings.numVertsPerLine-3), Vector2.Zero, 10);
-			int seed = (int)DateTime.Now.ToBinary();
-			//int minSpacing = Math.Clamp(70-(int)naturalObject.Concentration, 5,30);
-			List<Vector2> locations = await PoissonDiscSampling.GeneratePoints(Vector2.Zero, 10, Vector2.One * TerrainMeshSettings.numVertsPerLine, (int)naturalObject.Concentration, seed);
-			//GD.Print("Poisson disc loc: " + locations.Count + " elements ");
-
-			List<WorldItemData> generated = new List<WorldItemData>();
-
-			foreach (Vector2 location in locations)
+			WorldItem item = new WorldItem();
+			item.GridLocation = Vector2.Zero;
+			item.settings = settings;
+			item.ModelAddress = "";
+			RandomNumberGenerator rnd = new RandomNumberGenerator();
+			rnd.Seed = (ulong)DateTime.Now.ToBinary();
+			float chance = rnd.RandfRange(0, 1);
+			//GD.Print("Item present " + naturalObject.ObjectName + " chance " + chance);
+			if (settings.Concentration >= chance)
 			{
-				WorldItemData itm = new WorldItemData();
-				WorldItemSettings settings = new WorldItemSettings();
+				Vector2 location = new Vector2();
+				location.X = rnd.RandfRange(0, TerrainMeshSettings.numVertsPerLine);
+				location.Y = rnd.RandfRange(0, TerrainMeshSettings.numVertsPerLine);
+
+				/////////////////////////////////////////////
+				WorldItem itm = new WorldItem();
+				itm.settings = settings;
 
 				itm.GridLocation = location;
 				//GD.Print("INGRIDLOC " + itm.GridLocation);
-				itm.name = naturalObject.ObjectName;
+				itm.ItemName = settings.Name;
+				itm.ModelAddress = settings.Path;
 				if (settings.MinSize != settings.MaxSize)
 				{
-					RandomNumberGenerator rnd = new RandomNumberGenerator();
 					rnd.Seed = (ulong)location.X;
-					itm.Size = Vector3.One * rnd.RandfRange(settings.MinSize, settings.MaxSize);
+					itm.Scale = Vector3.One * rnd.RandfRange(settings.MinSize, settings.MaxSize);
 				}
 
+				//Excluding conditions
+				Vector2 inGridLocation = new Vector2(25 - itm.GridLocation.X, 25 - itm.GridLocation.Y);
 
-				//WorldItem = TerrainManager.Instance.DetailsManager.SpawnObject(settings.Path);
-				generated.Add(itm);
+				Vector3 worldLocation = new Vector3(-1 * inGridLocation.X, GetHeightAtChunkMapLocation(heightmap, itm.GridLocation), inGridLocation.Y);
 
+				if (worldLocation.Y < settings.MinimumSpawnAltitude || worldLocation.Y > settings.MaximumSpawnAltitude)
+				{
+					return null;//Discard this.
+				}
+				float rotZ = 0;
+				float rotX = 0;
+				float rotY = 0;
+				if (settings.RandomizeYRotation)
+				{
+					float rotation = TerrainManager.Instance.TerrainDetailsRandom.RandfRange(0, 360);
+					//GD.Print("rad " + rotation);
+					rotY = Mathf.DegToRad(rotation);
+					//GD.Print("deg " + rotation);
+					//objectToSpawn.relevantItem.RotateY(rotation);
+
+					// item.Model.RotateY(rotation);
+				}
+				if (settings.RandomizeTiltAngle != 0)
+				{
+
+					float rotation = TerrainManager.Instance.TerrainDetailsRandom.RandfRange(0, settings.RandomizeTiltAngle);
+					rotation = Mathf.DegToRad(rotation);
+					rotZ = rotation;
+					//item.Model.RotateZ(rotation);
+					//objectToSpawn.relevantItem.RotateZ(rotation);
+					//GD.Print(rotation);
+					float rotation2 = TerrainManager.Instance.TerrainDetailsRandom.RandfRange(0, settings.RandomizeTiltAngle);
+					rotation2 = Mathf.DegToRad(rotation2);
+					rotX = rotation2;//item.Model.RotateX(rotation2);
+									 // objectToSpawn.relevantItem.RotateX(rotation2);
+				}
+				itm.Rotation = new Vector3(rotX, rotY, rotZ);
+				itm.Scale = Vector3.One * TerrainManager.Instance.TerrainDetailsRandom.RandfRange(settings.MinSize, settings.MaxSize);
+				itm.Hash = "";
+				return itm;
+			}
+			return item;
+		}
+
+		static async Task<List<WorldItem>> GenerateStaticElements(float[,] heightmap, WorldItemSettings settings)
+		{
+
+			//List<Vector2> locations = await PoissonDiscSampling.Test(Vector2.One * (TerrainMeshSettings.numVertsPerLine-3), Vector2.Zero, 10);
+			int seed = (int)DateTime.Now.ToBinary();
+			//int minSpacing = Math.Clamp(70-(int)naturalObject.Concentration, 5,30);
+			List<Vector2> locations = await PoissonDiscSampling.GeneratePoints(Vector2.Zero, 10, Vector2.One * TerrainMeshSettings.numVertsPerLine, (int)settings.Concentration, seed);
+			//GD.Print("Poisson disc loc: " + locations.Count + " elements ");
+
+			List<WorldItem> generated = new List<WorldItem>();
+			int i = 0;
+			try
+			{
+				foreach (Vector2 location in locations)
+				{
+					WorldItem itm = new WorldItem();
+					itm.settings = settings;
+
+					itm.GridLocation = location;
+					
+					itm.ModelAddress = settings.Path;
+					if (settings.MinSize != settings.MaxSize)
+					{
+						RandomNumberGenerator rnd = new RandomNumberGenerator();
+						rnd.Seed = (ulong)location.X;
+						itm.Scale = Vector3.One * rnd.RandfRange(settings.MinSize, settings.MaxSize);
+					}
+
+					//Excluding conditions
+					Vector2 inGridLocation = new Vector2(25 - itm.GridLocation.X, 25 - itm.GridLocation.Y);
+
+					Vector3 worldLocation = new Vector3(-1 * inGridLocation.X, GetHeightAtChunkMapLocation(heightmap, itm.GridLocation), inGridLocation.Y);
+
+					if (worldLocation.Y < settings.MinimumSpawnAltitude || worldLocation.Y > settings.MaximumSpawnAltitude)
+					{
+						
+						continue;//Discard this.
+					}
+					float rotZ = 0;
+					float rotX = 0;
+					float rotY = 0;
+					if (settings.RandomizeYRotation)
+					{
+						float rotation = TerrainManager.Instance.TerrainDetailsRandom.RandfRange(0, 360);
+						//GD.Print("rad " + rotation);
+						rotY = Mathf.DegToRad(rotation);
+						//GD.Print("deg " + rotation);
+						//objectToSpawn.relevantItem.RotateY(rotation);
+
+						// item.Model.RotateY(rotation);
+					}
+					if (settings.RandomizeTiltAngle != 0)
+					{
+
+						float rotation = TerrainManager.Instance.TerrainDetailsRandom.RandfRange(0, settings.RandomizeTiltAngle);
+						rotation = Mathf.DegToRad(rotation);
+						rotZ = rotation;
+						//item.Model.RotateZ(rotation);
+						//objectToSpawn.relevantItem.RotateZ(rotation);
+						//GD.Print(rotation);
+						float rotation2 = TerrainManager.Instance.TerrainDetailsRandom.RandfRange(0, settings.RandomizeTiltAngle);
+						rotation2 = Mathf.DegToRad(rotation2);
+						rotX = rotation2;//item.Model.RotateX(rotation2);
+										 // objectToSpawn.relevantItem.RotateX(rotation2);
+					}
+					itm.Rotation = new Vector3(rotX, rotY, rotZ);
+					itm.Scale = Vector3.One * TerrainManager.Instance.TerrainDetailsRandom.RandfRange(settings.MinSize, settings.MaxSize);
+					itm.Hash = "";
+					itm.ItemName = "Decor-" + itm.ModelAddress + i;
+
+					//WorldItemSettings worldItem = TerrainDetailsManager.Instance.GetSpawnedObject(itm.ItemName);
+					//WorldItem = TerrainManager.Instance.DetailsManager.SpawnObject(settings.Path);
+					generated.Add(itm);
+					//THIS FUNCTION SHOULD NOT TRY TO RETURN WORLDITEMS OR WORLDITEMS SHOULD NOT DIRECTLY BE THE 3D OBJECTS
+
+				}
+			}
+			catch (Exception ex)
+			{
+				GD.Print(ex.StackTrace);
 			}
 
+			//GD.Print("[Item Action] Generating theoretical items " + generated.Count);
 			return generated;
 
 		}
@@ -346,11 +483,11 @@ public static async Task<Map> GenerateMapAsync(Vector2 sampleCentre)
 
 				byte[] details = FileWriter.ReadISLToByte(documentspath + path + "_D" + ".isl");
 
-				List<WorldItemData> list = (List<WorldItemData>)FileWriter.DeserializeFromBinary<List<WorldItemData>>(details);
-				List<List<WorldItemData>> worldItems = new List<List<WorldItemData>>();
-				worldItems.Add(list);
+				List<WorldItem> worldItems = (List<WorldItem>)FileWriter.DeserializeFromBinary<List<WorldItem>>(details);
+				//List<List<WorldItem>> worldItems = new List<List<WorldItemData>>();
+				//worldItems.Add(worldItems);
 
-				map.DecorElements = worldItems;
+				map.AddTerrainElements(worldItems);
 			});
 			return map;
 		}
@@ -389,57 +526,55 @@ public static async Task<Map> GenerateMapAsync(Vector2 sampleCentre)
 			return false;
 		}
 
-		public static float[,] GenerateHeightMapSimplex(int width, int height, TerrainPass settings, Vector2 sampleCentre)
+		public static float[,] GenerateHeightMapSimplex(int width, int height, TerrainPass settings, Vector2 sampleCentre, int passID = 1)
 		{
 			NoiseSettingsSimplexSmooth noiseSet = new NoiseSettingsSimplexSmooth();
 			noiseSet.octaves = settings.Octaves;
 			noiseSet.frequency = settings.Frequency;
 			noiseSet.offset = settings.HorizontalScale;
-			noiseSet.scale = Vector2.One*settings.VerticalScale;
-
+			noiseSet.scale = Vector2.One * settings.VerticalScale;
+			noiseSet.seed = TerrainManager.Instance.Seed + passID;
 			float[,] values = Noise.GenerateNoiseMapSimplex(width, height, noiseSet, sampleCentre);
+			/*for (int x = 0; x < width; x++)
+			{
+				for (int y = 0; y < height; y++)
+				{
+					float v = values[x, y];
+
+					if (v < settings.MinHeight || v > settings.MaxHeight)
+					{
+						values[x, y] = -201f; // sentinel = transparent
+					}
+				}
+			}*/
 
 			return values;
 		}
-
-		/*public static float[,] GeneratePathwayMaskSimplex(int mapWidth, int mapHeight, NoiseSettingsSimplexSmooth settings, Vector2 sampleCentre, PathwaySettings pathwaySettings)
-		{
-			float[,] pathwayMask = new float[mapWidth, mapHeight];
-
-			// Generate Simplex noise map for pathways
-			float[,] noiseMap = Noise.GenerateNoiseMapSimplex(mapWidth, mapHeight, settings, sampleCentre);
-
-			for (int y = 0; y < mapHeight; y++)
-			{
-				for (int x = 0; x < mapWidth; x++)
-				{
-					// Pathways are formed based on a noise threshold, creating narrow paths
-					if (Mathf.Abs(noiseMap[x, y] - 0.5f) < pathwaySettings.Threshold)
-					{
-						pathwayMask[x, y] = 1f; // Mark this area as part of the pathway
-					}
-					else
-					{
-						pathwayMask[x, y] = 0f; // No pathway
-					}
-				}
-			}
-
-			return pathwayMask;
-		}*/
 	}
 
 
 	//This is what composes a map. 
 	public struct Map
 	{
-		public readonly float[,] heightMap;
+		public float[,] heightMap;
 
 		public enum Origins { Generated, LoadedFromTexture, LoadedFromBinary }
 
-		public List<List<WorldItemData>> DecorElements = new List<List<WorldItemData>>();
+		List<WorldItem> DecorElements = new List<WorldItem>();
 
 		public Origins Origin;
+		/*public Map()
+		{
+			
+		}*/
+
+		public Map(Origins origin)
+		{
+
+
+
+			Origin = origin;
+		}
 
 		public Map(float[,] _heightMapCoordinates, Origins origin)
 		{
@@ -450,9 +585,28 @@ public static async Task<Map> GenerateMapAsync(Vector2 sampleCentre)
 			Origin = origin;
 		}
 
-		public void AddTerrainElements(List<WorldItemData> elements)
+		public void AddTerrainElement(WorldItem element)
 		{
-			DecorElements.Add(elements);
+			DecorElements.Add(element);
+		}
+		public void AddTerrainElements(List<WorldItem> elements)
+		{
+			DecorElements.AddRange(elements);
+		}
+
+		public void SetHeightmap(float[,] heightmap)
+		{
+			heightMap = heightmap;
+		}
+
+		public float[,] GetHeightmap()
+		{
+			return heightMap;
+		}
+
+		public List<WorldItem> GetTerrainElements()
+		{
+			return DecorElements;
 		}
 
 		public void SaveUnibyte(string name)

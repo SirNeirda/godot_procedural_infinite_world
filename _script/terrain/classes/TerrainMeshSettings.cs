@@ -1,3 +1,11 @@
+////////////////////////////////////////////////////////////////////////////////////////////
+/// This script is part of the project "Infinite Runner", a procedural generation project
+/// By Adrien Pierret
+/// 
+/// TerrainMeshSettings: This is mostly inherited from the original Unity project. These parameters allow
+/// the LOD to work. Do not change stuff here unless you know what you're doing.
+/// ///////////////////////////////////////////////////////////////////////////////////////
+
 using Godot;
 using System.Collections;
 
@@ -7,8 +15,8 @@ namespace Bouncerock.Terrain
 	public class TerrainMeshSettings
 	{
 		//public Color TestVariable;
-		public int numSupportedLODs = 5;
-		public int numSupportedChunkSizes = 9;
+		//public int numSupportedLODs = 5;
+		//public int numSupportedChunkSizes = 9;
 		//public int numSupportedFlatshadedChunkSizes = 3;
 		public static readonly int[] supportedChunkSizes = {48,72,96,120,144,168,192,216,240};
 		
