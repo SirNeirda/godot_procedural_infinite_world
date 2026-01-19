@@ -25,4 +25,5 @@ proximity_fade_distance = 0.01
 [node name="plant_12" instance=ExtResource("1_qxco8")]
 
 [node name="plant_1" parent="." index="0"]
+visibility_range_end = 60.0
 surface_material_override/0 = SubResource("StandardMaterial3D_mip3p")

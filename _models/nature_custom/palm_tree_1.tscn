@@ -1,0 +1,27 @@
+[gd_scene load_steps=5 format=3 uid="uid://yswl2mv1f7im"]
+
+[ext_resource type="PackedScene" uid="uid://bms3f0enx3wa4" path="res://_models/nature/palm_tree_1.glb" id="1_4611l"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_gg76s"]
+albedo_color = Color(0.44526, 0.23480797, 0.14049229, 1)
+backlight_enabled = true
+backlight = Color(0.2815048, 0.19740027, 0.2088641, 1)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_8lwmy"]
+albedo_color = Color(0.42939746, 0.7333156, 0.29476172, 1)
+backlight_enabled = true
+backlight = Color(0.11503755, 0.23089835, 0.0976985, 1)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_4611l"]
+albedo_color = Color(0.60848266, 0.414903, 0.34473538, 1)
+
+[node name="palm_tree_1" instance=ExtResource("1_4611l")]
+
+[node name="palm_tree_1_trunk" parent="." index="0"]
+surface_material_override/0 = SubResource("StandardMaterial3D_gg76s")
+
+[node name="palm_tree_1_leaves" parent="." index="1"]
+surface_material_override/0 = SubResource("StandardMaterial3D_8lwmy")
+
+[node name="palm_tree_1_coconuts" parent="." index="2"]
+surface_material_override/0 = SubResource("StandardMaterial3D_4611l")

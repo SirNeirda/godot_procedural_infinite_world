@@ -28,4 +28,6 @@ distance_fade_max_distance = 0.8
 [node name="bush_berries_12" instance=ExtResource("1_ae7jl")]
 
 [node name="bush_berries_1" parent="." index="0"]
+visibility_range_end = 50.0
+visibility_range_fade_mode = 1
 surface_material_override/0 = SubResource("StandardMaterial3D_mip3p")
