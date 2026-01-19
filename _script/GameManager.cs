@@ -115,6 +115,10 @@ public partial class GameManager : Node
 
 	public void LoadWorld()
 	{
-	
+	GD.Print("Loading world");
+		World = ResourceLoader.Load<PackedScene>("res://_scenes/world.tscn");
+		Node node = World.Instantiate();
+		CallDeferred("add_sibling",node);
+		//AddSibling(node);
 	}
 }
