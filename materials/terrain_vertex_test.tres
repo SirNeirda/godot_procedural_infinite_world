@@ -6,8 +6,8 @@
 [ext_resource type="Texture2D" uid="uid://cwpeyus2mt7bs" path="res://materials/textures/terrain/sandy/Export_Unity_standard_BasecolourOpacity.png" id="4_ivu2r"]
 [ext_resource type="Texture2D" uid="uid://dwy66aoct7ciw" path="res://materials/textures/terrain/muddy/Export_Godot_standard_Normal.png" id="4_ni7xb"]
 [ext_resource type="Texture2D" uid="uid://ygbtatcclgu8" path="res://materials/textures/textures/terrain/grassy/Grass_1__Normal.png" id="5_0nwbt"]
+[ext_resource type="Texture2D" uid="uid://lpshst420kaw" path="res://materials/textures/terrain/muddy/Export_Godot_standard_Rough.png" id="6_0nwbt"]
 [ext_resource type="Texture2D" uid="uid://dpjne4xjmm56r" path="res://materials/textures/terrain/sandy/Export_Unity_standard_MetallicSmoothness.png" id="7_0nwbt"]
-[ext_resource type="Texture2D" uid="uid://lpshst420kaw" path="res://materials/textures/terrain/muddy/Export_Godot_standard_Rough.png" id="8_ivu2r"]
 [ext_resource type="Texture2D" uid="uid://b3hdb2c8fdw5c" path="res://materials/textures/textures/terrain/grassy/Grass_1_MetallicSmoothness_r.png" id="8_udo8l"]
 [ext_resource type="Texture2D" uid="uid://b0ewnsednsi30" path="res://materials/textures/terrain/sandy/Export_Unity_standard_Normal.png" id="10_qclsw"]
 
@@ -16,7 +16,7 @@ render_priority = 0
 shader = ExtResource("1_ivu2r")
 shader_parameter/albedo0 = ExtResource("2_ahhlb")
 shader_parameter/normal0 = ExtResource("4_ni7xb")
-shader_parameter/rough0 = ExtResource("8_ivu2r")
+shader_parameter/rough0 = ExtResource("6_0nwbt")
 shader_parameter/albedo1 = ExtResource("2_ni7xb")
 shader_parameter/normal1 = ExtResource("5_0nwbt")
 shader_parameter/rough1 = ExtResource("8_udo8l")

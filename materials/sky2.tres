@@ -1,0 +1,12 @@
+[gd_resource type="ShaderMaterial" load_steps=2 format=3 uid="uid://c8rhjr1dn34c2"]
+
+[ext_resource type="Shader" uid="uid://bfq1j8c8106b7" path="res://materials/shaders/sky.gdshader" id="1_7087i"]
+
+[resource]
+shader = ExtResource("1_7087i")
+shader_parameter/cloud_scale = 1.0
+shader_parameter/cloud_speed = 0.03
+shader_parameter/cloud_cutoff = 0.5
+shader_parameter/cloud_color = Vector3(1, 1, 1)
+shader_parameter/sky_color = Vector3(0.4, 0.55, 0.9)
+shader_parameter/time = 0.0
