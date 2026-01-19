@@ -1,0 +1,777 @@
+[gd_scene load_steps=37 format=3 uid="uid://bf04of4xrt142"]
+
+[ext_resource type="Script" uid="uid://bg7jhdjqxgqbk" path="res://_script/GameManager.cs" id="1_jovvh"]
+[ext_resource type="Script" uid="uid://epcqve8dqtnd" path="res://_script/SoftwareManager.cs" id="2_gqgyk"]
+[ext_resource type="Script" uid="uid://ccilq7mlhnfyg" path="res://_script/ui/GlobalUIManager.cs" id="3_7t23k"]
+[ext_resource type="Script" uid="uid://bp76k8vnf3pn" path="res://_script/ScreenSpaceMainUI.cs" id="4_3e8h3"]
+[ext_resource type="PackedScene" uid="uid://bor1s8nxjn6gu" path="res://_scenes/gui/compass.tscn" id="5_hi6yo"]
+[ext_resource type="Shader" uid="uid://d2pmstab6nx1r" path="res://materials/shaders/blur_tint.gdshader" id="7_hi6yo"]
+[ext_resource type="Shader" uid="uid://b1x6scjuekwl4" path="res://materials/shaders/sharpen.gdshader" id="7_urak4"]
+[ext_resource type="Script" uid="uid://b5nx0gco7dnfh" path="res://_script/terrain/map/Minimap.cs" id="8_hi6yo"]
+[ext_resource type="Script" uid="uid://bkun3xnqpdwmh" path="res://_script/ui/LoadingScreen.cs" id="9_44f6i"]
+[ext_resource type="Texture2D" uid="uid://ctw7uwu7jh871" path="res://materials/textures/br/logo.png" id="10_7kglf"]
+[ext_resource type="Shader" uid="uid://cqnkjxmmne051" path="res://materials/shaders/canvas_tweakable_base.gdshader" id="10_g15ir"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_hi6yo"]
+shader = ExtResource("7_urak4")
+shader_parameter/blur_sharp = -5.0
+shader_parameter/pixel = 1.0
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_lavtb"]
+bg_color = Color(0.6, 0.6, 0.6, 0.0627451)
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_urak4"]
+shader = ExtResource("7_hi6yo")
+shader_parameter/blur_strength = 1.45999996736608
+shader_parameter/tint_color = Color(0.17808911, 0.43717077, 0.5264881, 1)
+shader_parameter/tint_strength = 0.3
+
+[sub_resource type="Gradient" id="Gradient_7kglf"]
+colors = PackedColorArray(1, 1, 1, 1, 1, 1, 1, 1)
+
+[sub_resource type="GradientTexture1D" id="GradientTexture1D_g15ir"]
+gradient = SubResource("Gradient_7kglf")
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_g15ir"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_hi6yo"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_owtmn"]
+content_margin_left = 8.0
+content_margin_top = 8.0
+content_margin_right = 8.0
+content_margin_bottom = 8.0
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_urak4"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_7kglf"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_owtmn"]
+bg_color = Color(0.15744668, 0.17346168, 0.40082106, 0.5411765)
+corner_radius_top_left = 5
+corner_radius_top_right = 30
+corner_radius_bottom_right = 5
+corner_radius_bottom_left = 5
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_7kglf"]
+bg_color = Color(0.42759886, 0.64924234, 0.92864466, 0.8117647)
+corner_radius_top_left = 5
+corner_radius_top_right = 30
+corner_radius_bottom_right = 5
+corner_radius_bottom_left = 5
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_44f6i"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_g15ir"]
+bg_color = Color(0.21370539, 0.349195, 0.27754217, 1)
+corner_radius_top_left = 5
+corner_radius_top_right = 30
+corner_radius_bottom_right = 5
+corner_radius_bottom_left = 5
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_44f6i"]
+bg_color = Color(0.63386214, 0.74876535, 0.58830166, 0.8745098)
+corner_radius_top_left = 5
+corner_radius_top_right = 30
+corner_radius_bottom_right = 5
+corner_radius_bottom_left = 5
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_hi6yo"]
+bg_color = Color(0.15407, 0.424114, 0.579969, 0.560784)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.256069, 0.483205, 0.670249, 1)
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+corner_radius_bottom_right = 3
+corner_radius_bottom_left = 3
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_urak4"]
+size = Vector2(500, 150)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_hi6yo"]
+size = Vector2(245, 150)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_urak4"]
+
+[sub_resource type="NoiseTexture2D" id="NoiseTexture2D_hi6yo"]
+width = 53
+height = 53
+
+[sub_resource type="Gradient" id="Gradient_g15ir"]
+colors = PackedColorArray(0.6003371, 0.5766559, 0.9210978, 1, 0.35532463, 0.2864779, 0.7082363, 1)
+
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_44f6i"]
+gradient = SubResource("Gradient_g15ir")
+fill_to = Vector2(1, 1)
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_eulei"]
+texture = SubResource("GradientTexture2D_44f6i")
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_eulei"]
+bg_color = Color(0.04755766, 0.047557645, 0.047557645, 0.07058824)
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_44f6i"]
+shader = ExtResource("10_g15ir")
+shader_parameter/saturation = 1.1200000532
+shader_parameter/opacity = 0.1130000053675
+
+[node name="Main" type="Node"]
+
+[node name="GameManager" type="Node" parent="."]
+script = ExtResource("1_jovvh")
+
+[node name="SoftwareManager" type="Node" parent="."]
+script = ExtResource("2_gqgyk")
+
+[node name="CanvasLayer" type="CanvasLayer" parent="."]
+visible = false
+
+[node name="SharpenShader" type="ColorRect" parent="CanvasLayer"]
+visible = false
+material = SubResource("ShaderMaterial_hi6yo")
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="UI" type="Node" parent="." node_paths=PackedStringArray("MobileUI", "LoadingUI")]
+script = ExtResource("3_7t23k")
+MobileUI = NodePath("Control2")
+LoadingUI = NodePath("LoadingScreen")
+
+[node name="ScreenSpaceUI" type="Control" parent="UI" node_paths=PackedStringArray("Distance", "ActionBar", "MojoBar", "Score", "Multiplier", "Record", "TimeOfDay")]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+script = ExtResource("4_3e8h3")
+Distance = NodePath("PanelContainer/HBoxContainer/Label2")
+ActionBar = NodePath("PanelContainer4/PanelContainer2/VBoxContainer/ProgressBar")
+MojoBar = NodePath("PanelContainer4/PanelContainer2/VBoxContainer/PanelContainer/PanelContainer4/ProgressBar")
+Score = NodePath("PanelContainer4/PanelContainer2/VBoxContainer/PanelContainer/PanelContainer4/Score")
+Multiplier = NodePath("PanelContainer4/PanelContainer2/VBoxContainer/PanelContainer/PanelContainer4/Multiplier")
+Record = NodePath("PanelContainer3/HBoxContainer/Label2")
+TimeOfDay = NodePath("PanelContainer5/HBoxContainer/Label2")
+
+[node name="Compass" parent="UI/ScreenSpaceUI" instance=ExtResource("5_hi6yo")]
+layout_mode = 1
+
+[node name="PanelContainer3" type="PanelContainer" parent="UI/ScreenSpaceUI"]
+layout_mode = 0
+offset_left = 20.0
+offset_top = 591.0
+offset_right = 204.365
+offset_bottom = 631.0
+grow_horizontal = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_lavtb")
+
+[node name="BlurPass" type="TextureRect" parent="UI/ScreenSpaceUI/PanelContainer3"]
+material = SubResource("ShaderMaterial_urak4")
+layout_mode = 2
+texture = SubResource("GradientTexture1D_g15ir")
+expand_mode = 2
+
+[node name="HBoxContainer" type="HBoxContainer" parent="UI/ScreenSpaceUI/PanelContainer3"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="UI/ScreenSpaceUI/PanelContainer3/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 10
+text = "Record:"
+horizontal_alignment = 1
+
+[node name="Label2" type="Label" parent="UI/ScreenSpaceUI/PanelContainer3/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "0"
+
+[node name="PanelContainer5" type="PanelContainer" parent="UI/ScreenSpaceUI"]
+layout_mode = 0
+offset_left = 211.0
+offset_top = 591.0
+offset_right = 395.365
+offset_bottom = 631.0
+grow_horizontal = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_lavtb")
+
+[node name="HBoxContainer" type="HBoxContainer" parent="UI/ScreenSpaceUI/PanelContainer5"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="UI/ScreenSpaceUI/PanelContainer5/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 10
+text = "Time:"
+horizontal_alignment = 1
+
+[node name="Label2" type="Label" parent="UI/ScreenSpaceUI/PanelContainer5/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "0"
+
+[node name="PanelContainer" type="PanelContainer" parent="UI/ScreenSpaceUI"]
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -250.0
+offset_top = 50.0
+offset_right = 73.195
+offset_bottom = 90.0
+grow_horizontal = 2
+theme_override_styles/panel = SubResource("StyleBoxEmpty_g15ir")
+
+[node name="BlurPass" type="TextureRect" parent="UI/ScreenSpaceUI/PanelContainer"]
+material = SubResource("ShaderMaterial_urak4")
+layout_mode = 2
+texture = SubResource("GradientTexture1D_g15ir")
+
+[node name="HBoxContainer" type="HBoxContainer" parent="UI/ScreenSpaceUI/PanelContainer"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="UI/ScreenSpaceUI/PanelContainer/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 10
+text = "Distance from start:"
+horizontal_alignment = 1
+
+[node name="Label2" type="Label" parent="UI/ScreenSpaceUI/PanelContainer/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "0"
+
+[node name="PanelContainer4" type="PanelContainer" parent="UI/ScreenSpaceUI"]
+layout_mode = 1
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -411.0
+offset_top = 16.0
+offset_right = -11.0
+offset_bottom = 168.0
+grow_horizontal = 0
+theme_override_styles/panel = SubResource("StyleBoxEmpty_hi6yo")
+
+[node name="BlurPass" type="TextureRect" parent="UI/ScreenSpaceUI/PanelContainer4"]
+material = SubResource("ShaderMaterial_urak4")
+layout_mode = 2
+texture = SubResource("GradientTexture1D_g15ir")
+
+[node name="PanelContainer2" type="PanelContainer" parent="UI/ScreenSpaceUI/PanelContainer4"]
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxEmpty_owtmn")
+
+[node name="VBoxContainer" type="VBoxContainer" parent="UI/ScreenSpaceUI/PanelContainer4/PanelContainer2"]
+layout_mode = 2
+theme_override_constants/separation = 0
+
+[node name="PanelContainer" type="PanelContainer" parent="UI/ScreenSpaceUI/PanelContainer4/PanelContainer2/VBoxContainer"]
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxEmpty_urak4")
+
+[node name="PanelContainer4" type="PanelContainer" parent="UI/ScreenSpaceUI/PanelContainer4/PanelContainer2/VBoxContainer/PanelContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 0
+theme_override_styles/panel = SubResource("StyleBoxEmpty_7kglf")
+
+[node name="ProgressBar" type="ProgressBar" parent="UI/ScreenSpaceUI/PanelContainer4/PanelContainer2/VBoxContainer/PanelContainer/PanelContainer4"]
+custom_minimum_size = Vector2(0, 50)
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 1
+theme_override_styles/background = SubResource("StyleBoxFlat_owtmn")
+theme_override_styles/fill = SubResource("StyleBoxFlat_7kglf")
+value = 26.68
+show_percentage = false
+
+[node name="Multiplier" type="Label" parent="UI/ScreenSpaceUI/PanelContainer4/PanelContainer2/VBoxContainer/PanelContainer/PanelContainer4"]
+layout_mode = 2
+size_flags_horizontal = 0
+theme_override_colors/font_color = Color(1, 1, 1, 0.5529412)
+theme_override_colors/font_shadow_color = Color(0.16470589, 0.19607843, 0.18431373, 0.4)
+theme_override_constants/shadow_offset_x = 0
+theme_override_constants/shadow_offset_y = 1
+theme_override_constants/shadow_outline_size = 2
+theme_override_font_sizes/font_size = 16
+text = "x2"
+horizontal_alignment = 2
+
+[node name="Score" type="Label" parent="UI/ScreenSpaceUI/PanelContainer4/PanelContainer2/VBoxContainer/PanelContainer/PanelContainer4"]
+custom_minimum_size = Vector2(100, 0)
+layout_mode = 2
+size_flags_horizontal = 8
+theme_override_colors/font_color = Color(0.89269733, 0.9561507, 0.9800078, 1)
+theme_override_colors/font_shadow_color = Color(0.078431375, 0.078431375, 0.078431375, 0.7176471)
+theme_override_colors/font_outline_color = Color(0.290085, 0.371938, 0.713049, 1)
+theme_override_constants/shadow_offset_x = 3
+theme_override_constants/outline_size = 9
+theme_override_font_sizes/font_size = 36
+theme_override_styles/normal = SubResource("StyleBoxEmpty_44f6i")
+text = "00000"
+horizontal_alignment = 1
+vertical_alignment = 1
+clip_text = true
+
+[node name="Label" type="Label" parent="UI/ScreenSpaceUI/PanelContainer4/PanelContainer2/VBoxContainer"]
+layout_mode = 2
+text = "MOJO"
+
+[node name="ProgressBar" type="ProgressBar" parent="UI/ScreenSpaceUI/PanelContainer4/PanelContainer2/VBoxContainer"]
+custom_minimum_size = Vector2(160, 50)
+layout_mode = 2
+size_flags_vertical = 4
+theme_override_styles/background = SubResource("StyleBoxFlat_g15ir")
+theme_override_styles/fill = SubResource("StyleBoxFlat_44f6i")
+value = 50.0
+show_percentage = false
+
+[node name="Label3" type="Label" parent="UI"]
+visible = false
+custom_minimum_size = Vector2(80, 0)
+offset_left = 997.0
+offset_top = 622.0
+offset_right = 1147.0
+offset_bottom = 645.0
+size_flags_horizontal = 3
+text = "Version 1.0a"
+
+[node name="Control2" type="Control" parent="UI"]
+visible = false
+layout_mode = 3
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -40.0
+offset_top = -40.0
+grow_horizontal = 0
+grow_vertical = 0
+
+[node name="VBoxContainer" type="VBoxContainer" parent="UI/Control2"]
+layout_mode = 0
+offset_left = -515.0
+offset_top = -479.0
+offset_right = -15.0
+offset_bottom = -9.0
+theme_override_constants/separation = 10
+
+[node name="PanelContainer" type="PanelContainer" parent="UI/Control2/VBoxContainer"]
+custom_minimum_size = Vector2(500, 150)
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_hi6yo")
+
+[node name="JumpButton" type="TouchScreenButton" parent="UI/Control2/VBoxContainer/PanelContainer"]
+position = Vector2(253, 76)
+shape = SubResource("RectangleShape2D_urak4")
+action = "jump"
+visibility_mode = 1
+
+[node name="Label" type="Label" parent="UI/Control2/VBoxContainer/PanelContainer/JumpButton"]
+offset_left = -68.0
+offset_top = -32.0
+offset_right = 61.0
+offset_bottom = 37.0
+theme_override_colors/font_shadow_color = Color(0, 0, 0, 1)
+theme_override_font_sizes/font_size = 50
+text = "JUMP"
+
+[node name="HBoxContainer" type="HBoxContainer" parent="UI/Control2/VBoxContainer"]
+layout_mode = 2
+
+[node name="PanelContainer2" type="PanelContainer" parent="UI/Control2/VBoxContainer/HBoxContainer"]
+custom_minimum_size = Vector2(245, 150)
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_hi6yo")
+
+[node name="JumpButton" type="TouchScreenButton" parent="UI/Control2/VBoxContainer/HBoxContainer/PanelContainer2"]
+position = Vector2(124, 75)
+shape = SubResource("RectangleShape2D_hi6yo")
+action = "attack"
+visibility_mode = 1
+
+[node name="Label" type="Label" parent="UI/Control2/VBoxContainer/HBoxContainer/PanelContainer2/JumpButton"]
+offset_left = -132.0
+offset_top = -33.0
+offset_right = 150.0
+offset_bottom = 36.0
+theme_override_colors/font_shadow_color = Color(0, 0, 0, 1)
+theme_override_font_sizes/font_size = 50
+text = "CRATES"
+horizontal_alignment = 1
+
+[node name="PanelContainer3" type="PanelContainer" parent="UI/Control2/VBoxContainer/HBoxContainer"]
+custom_minimum_size = Vector2(245, 150)
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_hi6yo")
+
+[node name="JumpButton" type="TouchScreenButton" parent="UI/Control2/VBoxContainer/HBoxContainer/PanelContainer3"]
+position = Vector2(124, 75)
+shape = SubResource("RectangleShape2D_hi6yo")
+action = "torch"
+visibility_mode = 1
+
+[node name="Label" type="Label" parent="UI/Control2/VBoxContainer/HBoxContainer/PanelContainer3/JumpButton"]
+offset_left = -132.0
+offset_top = -33.0
+offset_right = 150.0
+offset_bottom = 36.0
+theme_override_colors/font_shadow_color = Color(0, 0, 0, 1)
+theme_override_font_sizes/font_size = 50
+text = "LIGHT"
+horizontal_alignment = 1
+
+[node name="PanelContainer3" type="PanelContainer" parent="UI/Control2/VBoxContainer"]
+custom_minimum_size = Vector2(500, 150)
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_hi6yo")
+
+[node name="JumpButton" type="TouchScreenButton" parent="UI/Control2/VBoxContainer/PanelContainer3"]
+position = Vector2(250, 71)
+shape = SubResource("RectangleShape2D_urak4")
+action = "fly"
+visibility_mode = 1
+
+[node name="Label" type="Label" parent="UI/Control2/VBoxContainer/PanelContainer3/JumpButton"]
+offset_left = -50.0
+offset_top = -35.0
+offset_right = 79.0
+offset_bottom = 34.0
+theme_override_colors/font_shadow_color = Color(0, 0, 0, 1)
+theme_override_font_sizes/font_size = 50
+text = "FLY"
+
+[node name="Control3" type="Control" parent="UI" node_paths=PackedStringArray("MinimapTexture", "ImagesContainer")]
+visible = false
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("8_hi6yo")
+MinimapTexture = NodePath("PanelContainer/GridContainer/TextureRect")
+ImagesContainer = NodePath("PanelContainer/GridContainer")
+
+[node name="PanelContainer" type="ScrollContainer" parent="UI/Control3"]
+layout_mode = 0
+offset_left = 41.0
+offset_top = 383.0
+offset_right = 211.0
+offset_bottom = 553.0
+theme_override_styles/panel = SubResource("StyleBoxFlat_urak4")
+
+[node name="GridContainer" type="GridContainer" parent="UI/Control3/PanelContainer"]
+layout_mode = 2
+size_flags_horizontal = 6
+size_flags_vertical = 6
+theme_override_constants/h_separation = 0
+theme_override_constants/v_separation = 0
+columns = 3
+
+[node name="TextureRect" type="TextureRect" parent="UI/Control3/PanelContainer/GridContainer"]
+layout_mode = 2
+texture = SubResource("NoiseTexture2D_hi6yo")
+
+[node name="TextureRect2" type="TextureRect" parent="UI/Control3/PanelContainer/GridContainer"]
+layout_mode = 2
+texture = SubResource("NoiseTexture2D_hi6yo")
+
+[node name="TextureRect3" type="TextureRect" parent="UI/Control3/PanelContainer/GridContainer"]
+layout_mode = 2
+texture = SubResource("NoiseTexture2D_hi6yo")
+
+[node name="TextureRect4" type="TextureRect" parent="UI/Control3/PanelContainer/GridContainer"]
+layout_mode = 2
+texture = SubResource("NoiseTexture2D_hi6yo")
+
+[node name="TextureRect5" type="TextureRect" parent="UI/Control3/PanelContainer/GridContainer"]
+layout_mode = 2
+texture = SubResource("NoiseTexture2D_hi6yo")
+
+[node name="TextureRect6" type="TextureRect" parent="UI/Control3/PanelContainer/GridContainer"]
+layout_mode = 2
+texture = SubResource("NoiseTexture2D_hi6yo")
+
+[node name="TextureRect7" type="TextureRect" parent="UI/Control3/PanelContainer/GridContainer"]
+layout_mode = 2
+texture = SubResource("NoiseTexture2D_hi6yo")
+
+[node name="TextureRect8" type="TextureRect" parent="UI/Control3/PanelContainer/GridContainer"]
+layout_mode = 2
+texture = SubResource("NoiseTexture2D_hi6yo")
+
+[node name="TextureRect9" type="TextureRect" parent="UI/Control3/PanelContainer/GridContainer"]
+layout_mode = 2
+texture = SubResource("NoiseTexture2D_hi6yo")
+
+[node name="LoadingScreen" type="Control" parent="UI" node_paths=PackedStringArray("LoadingText", "LoadingContainer")]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("9_44f6i")
+LoadingText = NodePath("PanelContainer/VBoxContainer/Label2")
+LoadingContainer = NodePath("PanelContainer")
+
+[node name="PanelContainer" type="PanelContainer" parent="UI/LoadingScreen"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = SubResource("StyleBoxTexture_eulei")
+
+[node name="VBoxContainer" type="VBoxContainer" parent="UI/LoadingScreen/PanelContainer"]
+layout_mode = 2
+size_flags_vertical = 4
+
+[node name="Label" type="Label" parent="UI/LoadingScreen/PanelContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_colors/font_shadow_color = Color(0.48306954, 0.43368292, 0.636524, 0)
+theme_override_colors/font_outline_color = Color(0.8100825, 0.5146052, 0.81152123, 1)
+theme_override_constants/outline_size = 1
+theme_override_constants/shadow_outline_size = 1
+theme_override_font_sizes/font_size = 25
+text = "Loading..."
+horizontal_alignment = 1
+
+[node name="Label2" type="Label" parent="UI/LoadingScreen/PanelContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_colors/font_shadow_color = Color(0.48306954, 0.43368292, 0.636524, 0)
+theme_override_colors/font_outline_color = Color(0.8100825, 0.5146052, 0.81152123, 1)
+theme_override_constants/outline_size = 1
+theme_override_constants/shadow_outline_size = 1
+theme_override_font_sizes/font_size = 22
+text = "Loading..."
+horizontal_alignment = 1
+
+[node name="Label" type="Label" parent="UI/LoadingScreen/PanelContainer"]
+visible = false
+layout_mode = 2
+size_flags_horizontal = 8
+size_flags_vertical = 8
+theme_override_colors/font_shadow_color = Color(0.48306954, 0.43368292, 0.636524, 0)
+theme_override_colors/font_outline_color = Color(0.8100825, 0.5146052, 0.81152123, 1)
+theme_override_constants/outline_size = 1
+theme_override_constants/shadow_outline_size = 1
+theme_override_font_sizes/font_size = 16
+text = "World Procedural Generation Project, brought by Adrien Pierret for Bouncerock Co.
+Full source code available under MIT Licence: https://github.com/SirNeirda/godot_procedural_infinite_world"
+horizontal_alignment = 2
+
+[node name="RichTextLabel" type="RichTextLabel" parent="UI/LoadingScreen/PanelContainer"]
+layout_mode = 2
+theme_override_colors/font_shadow_color = Color(0, 0, 0, 0.3529412)
+theme_override_constants/shadow_outline_size = 1
+bbcode_enabled = true
+text = "World Procedural Generation Project, brought by Adrien Pierret for Bouncerock Co.
+Full source code available under MIT Licence: https://github.com/SirNeirda/godot_procedural_infinite_world"
+fit_content = true
+
+[node name="RichTextLabel2" type="RichTextLabel" parent="UI/LoadingScreen/PanelContainer"]
+layout_mode = 2
+size_flags_vertical = 8
+theme_override_colors/font_shadow_color = Color(0, 0, 0, 0.3529412)
+theme_override_constants/shadow_outline_size = 1
+bbcode_enabled = true
+text = "Version 0.99_a"
+fit_content = true
+
+[node name="PanelContainer2" type="PanelContainer" parent="UI/LoadingScreen"]
+layout_mode = 0
+offset_left = 47.0
+offset_top = 225.0
+offset_right = 403.0
+offset_bottom = 442.0
+scale = Vector2(0.7, 0.7)
+theme_override_styles/panel = SubResource("StyleBoxFlat_eulei")
+
+[node name="VBoxContainer" type="VBoxContainer" parent="UI/LoadingScreen/PanelContainer2"]
+layout_mode = 2
+size_flags_vertical = 4
+theme_override_constants/separation = 0
+
+[node name="HBoxContainer" type="HBoxContainer" parent="UI/LoadingScreen/PanelContainer2/VBoxContainer"]
+layout_mode = 2
+
+[node name="Label3" type="Label" parent="UI/LoadingScreen/PanelContainer2/VBoxContainer/HBoxContainer"]
+custom_minimum_size = Vector2(100, 0)
+layout_mode = 2
+theme_override_colors/font_shadow_color = Color(0.48306954, 0.43368292, 0.636524, 0)
+theme_override_colors/font_outline_color = Color(0.8100825, 0.5146052, 0.81152123, 1)
+theme_override_constants/outline_size = 1
+theme_override_constants/shadow_outline_size = 1
+theme_override_font_sizes/font_size = 22
+text = "WASD"
+
+[node name="Label2" type="Label" parent="UI/LoadingScreen/PanelContainer2/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+theme_override_colors/font_shadow_color = Color(0.48306954, 0.43368292, 0.636524, 0)
+theme_override_colors/font_outline_color = Color(0.8100825, 0.5146052, 0.81152123, 1)
+theme_override_constants/outline_size = 1
+theme_override_constants/shadow_outline_size = 1
+theme_override_font_sizes/font_size = 22
+text = "Move"
+
+[node name="HBoxContainer2" type="HBoxContainer" parent="UI/LoadingScreen/PanelContainer2/VBoxContainer"]
+layout_mode = 2
+
+[node name="Label3" type="Label" parent="UI/LoadingScreen/PanelContainer2/VBoxContainer/HBoxContainer2"]
+custom_minimum_size = Vector2(100, 0)
+layout_mode = 2
+theme_override_colors/font_shadow_color = Color(0.48306954, 0.43368292, 0.636524, 0)
+theme_override_colors/font_outline_color = Color(0.8100825, 0.5146052, 0.81152123, 1)
+theme_override_constants/outline_size = 1
+theme_override_constants/shadow_outline_size = 1
+theme_override_font_sizes/font_size = 22
+text = "V"
+
+[node name="Label2" type="Label" parent="UI/LoadingScreen/PanelContainer2/VBoxContainer/HBoxContainer2"]
+layout_mode = 2
+theme_override_colors/font_shadow_color = Color(0.48306954, 0.43368292, 0.636524, 0)
+theme_override_colors/font_outline_color = Color(0.8100825, 0.5146052, 0.81152123, 1)
+theme_override_constants/outline_size = 1
+theme_override_constants/shadow_outline_size = 1
+theme_override_font_sizes/font_size = 22
+text = "Flashlight"
+
+[node name="HBoxContainer3" type="HBoxContainer" parent="UI/LoadingScreen/PanelContainer2/VBoxContainer"]
+layout_mode = 2
+
+[node name="Label3" type="Label" parent="UI/LoadingScreen/PanelContainer2/VBoxContainer/HBoxContainer3"]
+custom_minimum_size = Vector2(100, 0)
+layout_mode = 2
+theme_override_colors/font_shadow_color = Color(0.48306954, 0.43368292, 0.636524, 0)
+theme_override_colors/font_outline_color = Color(0.8100825, 0.5146052, 0.81152123, 1)
+theme_override_constants/outline_size = 1
+theme_override_constants/shadow_outline_size = 1
+theme_override_font_sizes/font_size = 22
+text = "Space"
+
+[node name="Label2" type="Label" parent="UI/LoadingScreen/PanelContainer2/VBoxContainer/HBoxContainer3"]
+layout_mode = 2
+theme_override_colors/font_shadow_color = Color(0.48306954, 0.43368292, 0.636524, 0)
+theme_override_colors/font_outline_color = Color(0.8100825, 0.5146052, 0.81152123, 1)
+theme_override_constants/outline_size = 1
+theme_override_constants/shadow_outline_size = 1
+theme_override_font_sizes/font_size = 22
+text = "Jump"
+
+[node name="HBoxContainer4" type="HBoxContainer" parent="UI/LoadingScreen/PanelContainer2/VBoxContainer"]
+layout_mode = 2
+
+[node name="Label3" type="Label" parent="UI/LoadingScreen/PanelContainer2/VBoxContainer/HBoxContainer4"]
+custom_minimum_size = Vector2(100, 0)
+layout_mode = 2
+theme_override_colors/font_shadow_color = Color(0.48306954, 0.43368292, 0.636524, 0)
+theme_override_colors/font_outline_color = Color(0.8100825, 0.5146052, 0.81152123, 1)
+theme_override_constants/outline_size = 1
+theme_override_constants/shadow_outline_size = 1
+theme_override_font_sizes/font_size = 22
+text = "X"
+
+[node name="Label2" type="Label" parent="UI/LoadingScreen/PanelContainer2/VBoxContainer/HBoxContainer4"]
+layout_mode = 2
+theme_override_colors/font_shadow_color = Color(0.48306954, 0.43368292, 0.636524, 0)
+theme_override_colors/font_outline_color = Color(0.8100825, 0.5146052, 0.81152123, 1)
+theme_override_constants/outline_size = 1
+theme_override_constants/shadow_outline_size = 1
+theme_override_font_sizes/font_size = 22
+text = "Sit"
+
+[node name="HBoxContainer5" type="HBoxContainer" parent="UI/LoadingScreen/PanelContainer2/VBoxContainer"]
+layout_mode = 2
+
+[node name="Label3" type="Label" parent="UI/LoadingScreen/PanelContainer2/VBoxContainer/HBoxContainer5"]
+custom_minimum_size = Vector2(100, 0)
+layout_mode = 2
+theme_override_colors/font_shadow_color = Color(0.48306954, 0.43368292, 0.636524, 0)
+theme_override_colors/font_outline_color = Color(0.8100825, 0.5146052, 0.81152123, 1)
+theme_override_constants/outline_size = 1
+theme_override_constants/shadow_outline_size = 1
+theme_override_font_sizes/font_size = 22
+text = "F"
+
+[node name="Label2" type="Label" parent="UI/LoadingScreen/PanelContainer2/VBoxContainer/HBoxContainer5"]
+layout_mode = 2
+theme_override_colors/font_shadow_color = Color(0.48306954, 0.43368292, 0.636524, 0)
+theme_override_colors/font_outline_color = Color(0.8100825, 0.5146052, 0.81152123, 1)
+theme_override_constants/outline_size = 1
+theme_override_constants/shadow_outline_size = 1
+theme_override_font_sizes/font_size = 22
+text = "Jetpack (while airborne)"
+
+[node name="HBoxContainer6" type="HBoxContainer" parent="UI/LoadingScreen/PanelContainer2/VBoxContainer"]
+layout_mode = 2
+
+[node name="Label3" type="Label" parent="UI/LoadingScreen/PanelContainer2/VBoxContainer/HBoxContainer6"]
+custom_minimum_size = Vector2(100, 0)
+layout_mode = 2
+theme_override_colors/font_shadow_color = Color(0.48306954, 0.43368292, 0.636524, 0)
+theme_override_colors/font_outline_color = Color(0.8100825, 0.5146052, 0.81152123, 1)
+theme_override_constants/outline_size = 1
+theme_override_constants/shadow_outline_size = 1
+theme_override_font_sizes/font_size = 22
+text = "SHIFT"
+
+[node name="Label2" type="Label" parent="UI/LoadingScreen/PanelContainer2/VBoxContainer/HBoxContainer6"]
+layout_mode = 2
+theme_override_colors/font_shadow_color = Color(0.48306954, 0.43368292, 0.636524, 0)
+theme_override_colors/font_outline_color = Color(0.8100825, 0.5146052, 0.81152123, 1)
+theme_override_constants/outline_size = 1
+theme_override_constants/shadow_outline_size = 1
+theme_override_font_sizes/font_size = 22
+text = "Run/Glide (airborne)"
+
+[node name="HBoxContainer7" type="HBoxContainer" parent="UI/LoadingScreen/PanelContainer2/VBoxContainer"]
+layout_mode = 2
+
+[node name="Label3" type="Label" parent="UI/LoadingScreen/PanelContainer2/VBoxContainer/HBoxContainer7"]
+custom_minimum_size = Vector2(100, 0)
+layout_mode = 2
+theme_override_colors/font_shadow_color = Color(0.48306954, 0.43368292, 0.636524, 0)
+theme_override_colors/font_outline_color = Color(0.8100825, 0.5146052, 0.81152123, 1)
+theme_override_constants/outline_size = 1
+theme_override_constants/shadow_outline_size = 1
+theme_override_font_sizes/font_size = 22
+text = "R-CLICK"
+
+[node name="Label2" type="Label" parent="UI/LoadingScreen/PanelContainer2/VBoxContainer/HBoxContainer7"]
+layout_mode = 2
+theme_override_colors/font_shadow_color = Color(0.48306954, 0.43368292, 0.636524, 0)
+theme_override_colors/font_outline_color = Color(0.8100825, 0.5146052, 0.81152123, 1)
+theme_override_constants/outline_size = 1
+theme_override_constants/shadow_outline_size = 1
+theme_override_font_sizes/font_size = 22
+text = "Create a crate"
+
+[node name="TextureRect" type="TextureRect" parent="UI/LoadingScreen"]
+material = SubResource("ShaderMaterial_44f6i")
+layout_mode = 1
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -359.0
+offset_top = -386.0
+offset_right = 793.0
+offset_bottom = 262.0
+grow_horizontal = 0
+grow_vertical = 0
+texture = ExtResource("10_7kglf")
+stretch_mode = 2

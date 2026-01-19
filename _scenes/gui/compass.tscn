@@ -1,0 +1,47 @@
+[gd_scene load_steps=5 format=3 uid="uid://bor1s8nxjn6gu"]
+
+[ext_resource type="Script" uid="uid://b03uwmw2r6cde" path="res://_script/ui/Compass.cs" id="1_3dt1q"]
+[ext_resource type="Texture2D" uid="uid://byck3s5w3scvh" path="res://materials/ui/compass.png" id="2_oltl2"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_g15ir"]
+bg_color = Color(0.137255, 0.145098, 0.219608, 0.160784)
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_3dt1q"]
+
+[node name="Compass" type="Control" node_paths=PackedStringArray("Angle", "CompassContainer")]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_3dt1q")
+Angle = NodePath("Label")
+CompassContainer = NodePath("Compass")
+
+[node name="Label" type="Label" parent="."]
+layout_mode = 0
+offset_left = 75.0
+offset_top = 57.0
+offset_right = 115.0
+offset_bottom = 80.0
+theme_override_styles/normal = SubResource("StyleBoxFlat_g15ir")
+text = "000"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Compass" type="PanelContainer" parent="."]
+layout_mode = 0
+offset_left = 40.0
+offset_top = 85.0
+offset_right = 140.0
+offset_bottom = 185.0
+rotation = -0.0558505
+pivot_offset = Vector2(50, 50)
+theme_override_styles/panel = SubResource("StyleBoxEmpty_3dt1q")
+
+[node name="TextureRect" type="TextureRect" parent="Compass"]
+custom_minimum_size = Vector2(100, 100)
+layout_mode = 2
+texture = ExtResource("2_oltl2")
+expand_mode = 2

@@ -1,0 +1,7 @@
+[gd_scene load_steps=2 format=3 uid="uid://buclkj60s8lvp"]
+
+[ext_resource type="Script" uid="uid://wdwj5vvy80vh" path="res://_script/ui/worldspace/WorldSpaceUI.cs" id="1_qo57g"]
+
+[node name="HelperLabel" type="Node3D"]
+script = ExtResource("1_qo57g")
+MaxViewDistance = 300.0

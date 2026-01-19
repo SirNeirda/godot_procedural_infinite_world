@@ -1,0 +1,20 @@
+[gd_scene load_steps=4 format=3 uid="uid://2yqjq3uvqxyt"]
+
+[ext_resource type="Script" uid="uid://d5h3hc38qpa7" path="res://_script/terrain/world/static/Tree.cs" id="1_vpsgw"]
+[ext_resource type="PackedScene" uid="uid://yswl2mv1f7im" path="res://_models/nature_custom/palm_tree_1.tscn" id="2_vpsgw"]
+
+[sub_resource type="CylinderShape3D" id="CylinderShape3D_ieu8c"]
+height = 5.0018787
+radius = 0.55566406
+
+[node name="Tree2" type="Node3D"]
+script = ExtResource("1_vpsgw")
+
+[node name="RigidBody3D" type="RigidBody3D" parent="."]
+freeze = true
+
+[node name="palm_tree_2" parent="RigidBody3D" instance=ExtResource("2_vpsgw")]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="RigidBody3D"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.7084599, 0)
+shape = SubResource("CylinderShape3D_ieu8c")

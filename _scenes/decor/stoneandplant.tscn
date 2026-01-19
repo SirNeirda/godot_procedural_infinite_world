@@ -1,0 +1,31 @@
+[gd_scene load_steps=5 format=3 uid="uid://sd3cwd73ehx7"]
+
+[ext_resource type="Script" uid="uid://d5h3hc38qpa7" path="res://_script/terrain/world/static/Tree.cs" id="1_bkt7e"]
+[ext_resource type="PackedScene" uid="uid://c07g4bj2mbrj5" path="res://_models/nature/stone_4.glb" id="3_g0cfe"]
+[ext_resource type="PackedScene" uid="uid://qx0nqqkjtead" path="res://_models/nature_custom/plant_12.tscn" id="4_bkt7e"]
+
+[sub_resource type="CylinderShape3D" id="CylinderShape3D_m66f8"]
+height = 0.292877
+radius = 0.290039
+
+[node name="StoneAndPlant" type="Node3D"]
+script = ExtResource("1_bkt7e")
+
+[node name="RigidBody3D" type="RigidBody3D" parent="."]
+freeze = true
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="RigidBody3D"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.0707414, 0.166165, -0.0418458)
+shape = SubResource("CylinderShape3D_m66f8")
+
+[node name="Node3D" type="Node3D" parent="RigidBody3D"]
+transform = Transform3D(2, 0, 0, 0, 2, 0, 0, 0, 2, 0, -0.189569, 0)
+
+[node name="plant_12" parent="RigidBody3D/Node3D" instance=ExtResource("4_bkt7e")]
+transform = Transform3D(1.5, 0, 0, 0, 1.5, 0, 0, 0, 1.5, -1.13523, -0.130626, -0.0269244)
+
+[node name="plant_13" parent="RigidBody3D/Node3D" instance=ExtResource("4_bkt7e")]
+transform = Transform3D(-1.01366, 0, -1.10567, 0, 1.5, 0, 1.10567, 0, -1.01366, 0.71123, -0.130626, -0.0269244)
+
+[node name="stone_42" parent="RigidBody3D/Node3D" instance=ExtResource("3_g0cfe")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.282932, 0, 0)

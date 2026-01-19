@@ -1,0 +1,100 @@
+[gd_scene load_steps=15 format=3 uid="uid://g0byxtaew82"]
+
+[ext_resource type="Script" uid="uid://v0qb14g4bte7" path="res://_script/terrain/world/SeaWater.cs" id="1_mr076"]
+[ext_resource type="Shader" uid="uid://dlgjo0kou1xj0" path="res://materials/shaders/water_sea.gdshader" id="2_mr076"]
+[ext_resource type="Shader" uid="uid://sdeukjcib4ag" path="res://materials/shaders/water_debug.gdshader" id="2_voa36"]
+[ext_resource type="Script" uid="uid://bg38v6efrv4ib" path="res://_script/terrain/Water.cs" id="3_p8e0m"]
+
+[sub_resource type="Gradient" id="Gradient_p8e0m"]
+
+[sub_resource type="GradientTexture1D" id="GradientTexture1D_out0b"]
+gradient = SubResource("Gradient_p8e0m")
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_p8e0m"]
+render_priority = 0
+shader = ExtResource("2_voa36")
+shader_parameter/heightmap_tex = SubResource("GradientTexture1D_out0b")
+shader_parameter/uv_scale = Vector2(1, -1)
+
+[sub_resource type="PlaneMesh" id="PlaneMesh_dnkau"]
+lightmap_size_hint = Vector2i(7, 7)
+size = Vector2(1, 1)
+
+[sub_resource type="Gradient" id="Gradient_voa36"]
+
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_p8e0m"]
+gradient = SubResource("Gradient_voa36")
+fill_from = Vector2(1, 0)
+fill_to = Vector2(1, 1)
+
+[sub_resource type="FastNoiseLite" id="FastNoiseLite_p8e0m"]
+frequency = 0.0191
+
+[sub_resource type="NoiseTexture2D" id="NoiseTexture2D_out0b"]
+noise = SubResource("FastNoiseLite_p8e0m")
+seamless = true
+as_normal_map = true
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_hvdyj"]
+render_priority = 0
+shader = ExtResource("2_mr076")
+shader_parameter/heightmap_tex = SubResource("GradientTexture2D_p8e0m")
+shader_parameter/normal_map = SubResource("NoiseTexture2D_out0b")
+shader_parameter/uv_scale = Vector2(1, 1)
+shader_parameter/uv_offset = Vector2(0, 0)
+shader_parameter/heightmap_tex_crop_by_pixels = Vector2(2, 2)
+shader_parameter/shallow_color = Color(0.07863375, 0.4867136, 0.50131965, 1)
+shader_parameter/deep_color = Color(0.020375287, 0.3772495, 0.7347055, 1)
+shader_parameter/shallow_alpha = 0.87
+shader_parameter/deep_alpha = 1.0
+shader_parameter/shallow_grad_min = 1.115
+shader_parameter/shallow_grad_max = 0.91
+shader_parameter/wave_strength = 0.18
+shader_parameter/wave_height = 0.01
+shader_parameter/wave_scale = 1.0
+shader_parameter/wave_frequency = 2.0
+shader_parameter/wave_speed = 0.15
+shader_parameter/noise_scale = 0.285
+shader_parameter/noise_strength = 0.24
+shader_parameter/noise_flow_direction = Vector2(0.3, 0.2)
+shader_parameter/noise_flow_speed = 0.065
+shader_parameter/shallow_noise_attenuation = 0.1
+shader_parameter/use_normal_map = true
+shader_parameter/normal_strength = 0.215
+shader_parameter/normal_flow_direction = Vector2(0.625, 0.1)
+shader_parameter/normal_flow_speed = 0.05
+shader_parameter/rim_strength = 0.1
+shader_parameter/rim_power = 0.1
+shader_parameter/rim_color = Color(0.124412306, 0.41350448, 0.3948428, 1)
+shader_parameter/use_screen_reflection_rim = false
+shader_parameter/screen_reflection_strength = 1.0
+shader_parameter/screen_reflection_normal_influence = 1.0
+shader_parameter/specular_strength = 1.095
+shader_parameter/roughness = 0.15
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_iwksa"]
+margin = 0.0
+size = Vector3(1, 54.710785, 1)
+
+[node name="SeaWater" type="Node3D" node_paths=PackedStringArray("WaterMesh")]
+script = ExtResource("1_mr076")
+SeaLevelY = -0.7
+WaterMesh = NodePath("SeaWaterMesh")
+DebugShader = SubResource("ShaderMaterial_p8e0m")
+
+[node name="SeaWaterMesh" type="MeshInstance3D" parent="."]
+ignore_occlusion_culling = true
+mesh = SubResource("PlaneMesh_dnkau")
+skeleton = NodePath("../..")
+surface_material_override/0 = SubResource("ShaderMaterial_hvdyj")
+
+[node name="Area3D" type="Area3D" parent="SeaWaterMesh"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.014527243, 0)
+script = ExtResource("3_p8e0m")
+Drag = 1.0
+Offset = 0.3
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="SeaWaterMesh/Area3D"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -27.370865, 0)
+shape = SubResource("BoxShape3D_iwksa")
+debug_color = Color(0.69411767, 0.29411766, 0.4392157, 0.79607844)
