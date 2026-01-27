@@ -64,6 +64,7 @@ namespace Bouncerock.Terrain
         }
     }
 
+    //This class is intended to set basic setting for procedural generation
     public class WorldItemSettings
     {
 

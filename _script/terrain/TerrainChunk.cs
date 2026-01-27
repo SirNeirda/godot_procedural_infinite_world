@@ -1,6 +1,7 @@
+
+
 ////////////////////////////////////////////////////////////////////////////////////////////
 /// This script is part of the project "Infinite Runner", a procedural generation project
-/// By Adrien Pierret
 /// 
 /// TerrainChunk: This script contains all the information relevant to each terrain chunk.
 /// This includes heightmap, LODs, and all objects contains in the given chunk
@@ -47,7 +48,9 @@ namespace Bouncerock.Terrain
 		bool hasSetWater = false;
 		bool hasSetDecor = false;
 
-		bool loading = false;
+		bool isHidden = false;
+
+		public bool loading = false;
 		//float maxViewDst;
 
 		//HeightMapSettings heightMapSettings;
@@ -55,6 +58,8 @@ namespace Bouncerock.Terrain
 
 		StaticBody3D staticBody;
 		CollisionShape3D collisionShape;
+
+		public float timer = 0;
 
 		//public List<MeshInstance3D> DecorHelpers = new List<MeshInstance3D>();
 
@@ -98,7 +103,20 @@ namespace Bouncerock.Terrain
 				lodMeshes[i].updateCallback += SetMaterial;
 				lodMeshes[i].updateCallback += UpdateHelpers;
 			}
+			//DebugUI.Instance.AddChunkData(GridPosition.ToString(), GridPosition + $"[{GridPosition}] - New chunk. ");
 
+		}
+
+		void UpdateDebugData()
+		{
+			return;
+			string loadingTxt = loading?"":"(loading...)";
+			string itemsLoad = "";
+			if (itemsLoaded)
+			{
+				itemsLoad = $"Items: {_map.GetTerrainElements().Count}";
+			}
+			DebugUI.Instance.AddChunkData(GridPosition.ToString(), $"{GridPosition} {loadingTxt} LOD: {currentLODIndex}. Material: {hasSetMaterial}. Water: {hasSetWater}. {itemsLoad}");
 		}
 
 		/*void CreateBoundGizmo()
@@ -122,23 +140,28 @@ namespace Bouncerock.Terrain
 		public async Task Load()
 		{
 			//Do I have a local save?
+			UpdateDebugData();
 			loading = true;
 			if (TerrainManager.Instance.SaveTerrainToLocalDisk)
 			{
 				if (MapGenerator.MapExists("Chunk[x" + GridPosition.X + ",y" + GridPosition.Y + "].isl"))
 				{
 					Map savedMap = await MapGenerator.LoadMapFromUnibyteAsync("Chunk[x" + GridPosition.X + ",y" + GridPosition.Y + "]");
-					OnHeightMapReceived(savedMap);
+					await OnHeightMapReceived(savedMap);
+					UpdateDebugData();
 					//ThreadedDataRequester.RequestData(() => MapGenerator.LoadMapFromUnibyte("Chunk[x" + GridPosition.X + ",y" + GridPosition.Y+"]"), OnHeightMapReceived);
+					loading = false;
 					return;
 				}
 			}
 			Map generatedMap = await MapGenerator.GenerateMapAsync(sampleCentre);
 			if (loading)
 			{
-				await OnHeightMapReceived(generatedMap);
+				_=OnHeightMapReceived(generatedMap);//calling the function 
 			}
 			loading = false;
+			//GD.Print("Done loading " + GridPosition);
+			UpdateDebugData();
 			//GD.Print("Map " +GridPosition+ "generated, with " + generatedMap.GetTerrainElements().Count + " map elements");
 			//GD.Print("has heightmap " + generatedMap.heightMap==null);
 			//ThreadedDataRequester.RequestData(() => MapGenerator.GenerateMap (sampleCentre), OnHeightMapReceived);
@@ -208,25 +231,50 @@ namespace Bouncerock.Terrain
 				_map.SaveUnibyte("Chunk[x" + GridPosition.X + ",y" + GridPosition.Y + "]");
 				_map.SaveMapDetails("Chunk[x" + GridPosition.X + ",y" + GridPosition.Y + "]");
 			}
-
+			
 			heightMapReceived = true;
-			if (loading)
+			try
 			{
-				await OnLODChanged();
+				if (loading)
+				{
+					await OnLODChanged();
+					UpdateDebugData();
+				}
 			}
-			if (loading)
+			catch(Exception ex)
 			{
-				await LoadTerrainElements();
+				GD.Print("LOD Change failed: " +ex.StackTrace);
 			}
-			if (loading)
+			await Task.Yield(); 
+			try
 			{
-				await LoadWater(_map.heightMap);
+				if (!itemsLoaded)
+				{
+					LoadTerrainElements();
+					//UpdateDebugData();
+				}
+			}
+			catch(Exception ex)
+			{
+				GD.Print("Terrain elements load failed: " +ex.StackTrace);
+			}
+			try
+			{
+				if (!hasSetWater)
+				{
+					LoadWater(_map.heightMap);
+					//UpdateDebugData();
+				}
+			}
+			catch(Exception ex)
+			{
+				GD.Print("Water load failed: " +ex.StackTrace);
 			}
 		}
 
 		async Task LoadWater(float[,] heightMap)
 		{
-			if (AllAboveThreshold(heightMap, 0)) { return; }
+			if (AllAboveThreshold(heightMap, 0)) {hasSetWater = true; return; }
 			Node3D parentNode = new Node3D();
 			parentNode.Name = "Water";
 			meshObject.CallDeferred("add_child", parentNode);
@@ -234,6 +282,7 @@ namespace Bouncerock.Terrain
 			parentNode.CallDeferred("add_child", water);
 			water.Scale = Vector3.One * (TerrainMeshSettings.chunkMeshSize + 2f);
 			await water.SetTerrainElevation("Chunk[x" + GridPosition.X + ",y" + GridPosition.Y + "]", heightMap);
+			hasSetWater = true;
 			//water.Position = 
 		}
 
@@ -267,6 +316,7 @@ namespace Bouncerock.Terrain
 			
 			if (itemsLoaded) { return; }if (meshObject==null) { return; }
 			itemsLoaded = true;
+			//await Task.Yield(); 
 			//GD.Print("Loading terrain elements, with " + heightMap.DecorElements.Count + " elements");
 			Node3D parentNode = new Node3D();
 			parentNode.Name = "DecorObjects";
@@ -348,10 +398,11 @@ namespace Bouncerock.Terrain
 			if (lodMesh.hasMesh)
 			{
 				previousLODIndex = currentLODIndex;
-				if (!meshObject.IsInsideTree() || lodMesh.mesh == null) {GD.Print("Issue: LOD nonexistent");return;}
+				if (meshObject == null || !meshObject.IsInsideTree() || lodMesh.mesh == null) {GD.Print("Issue: LOD nonexistent");return;}
 
 				meshObject.Mesh = lodMesh.mesh;
 			}
+			UpdateDebugData();
 		}
 
 		//The index of our LOD has changed, we need to change the terrain mesh and do other stuff if need is
@@ -359,7 +410,7 @@ namespace Bouncerock.Terrain
 		{
 			if (!heightMapReceived)
 			{
-				//GD.Print("LOD Changed, but did not receive heightmap");
+				GD.Print("LOD Changed, but did not receive heightmap");
 			}
 			if (heightMapReceived)
 			{
@@ -385,6 +436,7 @@ namespace Bouncerock.Terrain
 			{
 				itm.OnChangedLOD(currentLODIndex);
 			}
+			UpdateDebugData();
 			//if (currentLODIndex == 0){GD.Print("Current LOD 0 is " + GridPosition);}
 		}
 
@@ -405,8 +457,27 @@ namespace Bouncerock.Terrain
 
 		public void Destroy()
 		{
-			loading = false;
-			meshObject.QueueFree();
+			
+			DebugUI.Instance.RemoveChunkData(GridPosition.ToString());
+
+			if (meshObject != null && meshObject.IsInsideTree())
+				meshObject.QueueFree();
+		}
+
+		public void SetChunkPendingDestruction()
+		{
+			isHidden = true;
+			meshObject.Visible = false;
+
+		}
+
+		public void ReinstateChunk()
+		{
+			isHidden = false;
+			//state = ChunkState.MeshReady;
+			OnLODChanged ();
+			meshObject.Visible = true;
+
 		}
 
 		public void UpdateCollisionMesh()

@@ -162,6 +162,7 @@ namespace Bouncerock.Terrain
 			tower.RandomizeYRotation = false;
 			tower.RandomizeTiltAngle = 0;
 			tower.ItemType = WorldItemSettings.ItemTypes.Static;
+			tower.Levitation = 1;
 
 			NaturalObjects.Add(newObj);
 			NaturalObjects.Add(newObj2);

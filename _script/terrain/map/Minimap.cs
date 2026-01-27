@@ -28,12 +28,12 @@ public partial class Minimap : Control
 
     public override void _Process(double delta)
     {
-       // Update();
+        //Update();
     }
 
     public void Update()
     {
-        // UpdateMap();
+        //UpdateMap();
         //CallDeferred("updateMap");
     }
 
@@ -64,9 +64,9 @@ public partial class Minimap : Control
 
         ImagesMosaic.Clear();
 
-        for (int y = -1; y <= 1; y++)        // top → bottom
+        for (int y = -1; y <= 1; y++)      
         {
-            for (int x = -1; x <= 1; x++)    // left → right
+            for (int x = -1; x <= 1; x++)    
             {
                 Vector2 chunkLoc = currentChunkLoc + new Vector2(x, y);
                 TerrainChunk chunk = TerrainManager.Instance.GetChunk(chunkLoc);
