@@ -1,10 +1,9 @@
-[gd_scene load_steps=38 format=3 uid="uid://dorvgphrel13u"]
+[gd_scene format=3 uid="uid://dorvgphrel13u"]
 
 [ext_resource type="PackedScene" uid="uid://bw42mox3u02yq" path="res://_scenes/main_character.tscn" id="1_ciup7"]
 [ext_resource type="Material" uid="uid://wq3811s3nwm7" path="res://materials/sky.tres" id="1_f50i4"]
 [ext_resource type="Script" uid="uid://dav7mfvtja61m" path="res://_script/terrain/TerrainManager.cs" id="2_hui18"]
 [ext_resource type="Script" uid="uid://cau6dgr4td5dk" path="res://_script/EnvironmentManager.cs" id="2_luoph"]
-[ext_resource type="Texture2D" uid="uid://dvprrws80mh2u" path="res://materials/start.png" id="3_ike5v"]
 [ext_resource type="Script" uid="uid://tk8lkgbaluti" path="res://_script/terrain/TerrainDetailsManager.cs" id="3_x21qi"]
 [ext_resource type="Script" uid="uid://h5w4bya8uxkc" path="res://_script/MobManager.cs" id="6_5h46a"]
 [ext_resource type="Material" uid="uid://knjtxqt2cr3q" path="res://materials/terrain_vertex_test.tres" id="6_hvdyj"]
@@ -29,7 +28,7 @@ radiance_size = 2
 background_mode = 2
 sky = SubResource("Sky_hvdyj")
 ambient_light_source = 3
-ambient_light_color = Color(0.811046, 0.567566, 0.672959, 1)
+ambient_light_color = Color(0.71584797, 0.6217142, 0.662856, 1)
 reflected_light_source = 2
 tonemap_mode = 2
 sdfgi_use_occlusion = true
@@ -40,7 +39,6 @@ glow_normalized = true
 glow_intensity = 1.26
 glow_strength = 1.22
 glow_bloom = 0.03
-glow_blend_mode = 1
 glow_map_strength = 1.0
 glow_map = SubResource("NoiseTexture2D_ike5v")
 fog_enabled = true
@@ -51,6 +49,7 @@ fog_density = 0.005
 fog_aerial_perspective = 0.779
 volumetric_fog_density = 0.0119
 adjustment_enabled = true
+adjustment_saturation = 0.94
 
 [sub_resource type="Gradient" id="Gradient_t248a"]
 offsets = PackedFloat32Array(0.21132898, 0.48737863)
@@ -66,17 +65,6 @@ colors = PackedColorArray(0.6872149, 0.68721503, 0.6872149, 1, 0.427493, 0.42749
 
 [sub_resource type="Gradient" id="Gradient_iwksa"]
 colors = PackedColorArray(1, 1, 1, 1, 1, 1, 1, 1)
-
-[sub_resource type="PhysicsMaterial" id="PhysicsMaterial_23t8k"]
-
-[sub_resource type="BoxShape3D" id="BoxShape3D_8idyo"]
-size = Vector3(2, 0.1, 2)
-
-[sub_resource type="PlaneMesh" id="PlaneMesh_virbw"]
-
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_hvdyj"]
-albedo_texture = ExtResource("3_ike5v")
-roughness_texture = ExtResource("3_ike5v")
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_lq8db"]
 render_priority = 0
@@ -135,7 +123,7 @@ rim_tint = 0.56
 
 [sub_resource type="Gradient" id="Gradient_ike5v"]
 interpolation_mode = 2
-offsets = PackedFloat32Array(0, 0.15240084, 0.6388309, 1)
+offsets = PackedFloat32Array(0, 0.04329897, 0.8, 0.8412371)
 colors = PackedColorArray(0.17254902, 0.48235294, 0.9019608, 0, 0.17704809, 0.49492985, 0.92547864, 1.0260742, 0.17254902, 0.48235294, 0.9019608, 1, 0, 0, 0, 0)
 
 [sub_resource type="GradientTexture2D" id="GradientTexture2D_hvdyj"]
@@ -144,21 +132,20 @@ gradient = SubResource("Gradient_ike5v")
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_osuqp"]
 transparency = 1
 albedo_texture = SubResource("GradientTexture2D_hvdyj")
+emission = Color(0.69135684, 0.6913568, 0.69135684, 1)
+emission_energy_multiplier = 2.98
 
 [sub_resource type="QuadMesh" id="QuadMesh_lq8db"]
 material = SubResource("StandardMaterial3D_osuqp")
-size = Vector2(300, 4000)
+size = Vector2(2000, 4000)
 
-[sub_resource type="CylinderMesh" id="CylinderMesh_ike5v"]
-cap_top = false
-cap_bottom = false
+[node name="World" type="Node3D" unique_id=1178046818]
 
-[node name="World" type="Node3D"]
-
-[node name="WorldEnvironment" type="WorldEnvironment" parent="." node_paths=PackedStringArray("SunLight")]
+[node name="WorldEnvironment" type="WorldEnvironment" parent="." unique_id=1206896856 node_paths=PackedStringArray("SunLight")]
 environment = SubResource("Environment_673ij")
 script = ExtResource("2_luoph")
 SunLight = NodePath("../DirectionalLight3D")
+StartAtHour = 11.0
 SpottyGradient = SubResource("Gradient_t248a")
 CloudyGradient = SubResource("Gradient_osuqp")
 CoveredGradient = SubResource("Gradient_lq8db")
@@ -174,19 +161,19 @@ NOON_DaytimeSunTop = Color(0.4240942, 0.7723892, 0.9697487, 1)
 NOON_DaytimeSunGround = Color(0.55160356, 0.8566488, 0.9999996, 1)
 NOON_DaytimeLightColor = Color(0.84851354, 0.736708, 0.58976215, 1)
 NOON_CloudColor = Color(0.88767403, 0.80533785, 0.7916861, 1)
-NOON_FogColor = Color(0.80875844, 0.4456138, 0.2049295, 1)
+NOON_FogColor = Color(0.7074641, 0.6235063, 0.40814248, 1)
 NOON_DaytimeLightEnergy = 1.2
 NOON_TimeStart = 9.0
 PM_DaytimeSunTop = Color(0.10378859, 0.5938163, 0.8829619, 1)
 PM_DaytimeSunGround = Color(0.95321757, 0.68088466, 0.52256775, 1)
 PM_DaytimeLightColor = Color(0.91562915, 0.7471837, 0.52453005, 1)
 PM_CloudColor = Color(0.9035783, 0.61493015, 0.44281328, 1)
-PM_FogColor = Color(0.90039825, 0.38819066, 0.38475606, 1)
-PM_DaytimeLightEnergy = 1.5
+PM_FogColor = Color(0.8598158, 0.5944027, 0.58921784, 1)
+PM_DaytimeLightEnergy = 3.0
 AM_TransitionTimeToDusk = 1.5
 EV_DaytimeSunTop = Color(0.40622988, 0.26584163, 0.61221397, 1)
 EV_CloudColor = Color(0.46713996, 0.2688164, 0.2146742, 1)
-EV_FogColor = Color(0.5196789, 0.44289675, 0.7717213, 1)
+EV_FogColor = Color(0.6442221, 0.58629197, 0.8633136, 1)
 EV_DaytimeLightEnergy = 1.1
 Night_Ground = Color(0.06360622, 0.07483224, 0.1428298, 1)
 Night_LightColor = Color(0.18991342, 0.22371992, 0.26031756, 1)
@@ -196,37 +183,22 @@ Night_LightEnergy = 0.05
 CycleSpeed = 10.0
 CloudsSpeed = 3.0
 
-[node name="PlayingCharacter" parent="." node_paths=PackedStringArray("Faraway") instance=ExtResource("1_ciup7")]
+[node name="PlayingCharacter" parent="." unique_id=1748511459 node_paths=PackedStringArray("Faraway") instance=ExtResource("1_ciup7")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0)
 Faraway = NodePath("../Faraway")
 
-[node name="StaticBody3D" type="StaticBody3D" parent="."]
-transform = Transform3D(2.095, 0, 0, 0, 2.095, 0, 0, 0, 2.095, 0, 13.4573, 37.1025)
-visible = false
-physics_material_override = SubResource("PhysicsMaterial_23t8k")
-
-[node name="CollisionShape3D" type="CollisionShape3D" parent="StaticBody3D"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.0523541, 0)
-shape = SubResource("BoxShape3D_8idyo")
-
-[node name="MeshInstance3D" type="MeshInstance3D" parent="StaticBody3D/CollisionShape3D"]
-transform = Transform3D(-0.999848, 0, 0.0174174, 0, 1, 0, -0.0174174, 0, -0.999848, 0, 0.0523543, 0)
-mesh = SubResource("PlaneMesh_virbw")
-skeleton = NodePath("../../..")
-surface_material_override/0 = SubResource("StandardMaterial3D_hvdyj")
-
-[node name="TerrainManager" type="Node" parent="."]
+[node name="TerrainManager" type="Node" parent="." unique_id=2089846001]
 script = ExtResource("2_hui18")
 SaveTerrainToLocalDisk = false
 UseDebugMaterial = false
 TerrainMaterial = ExtResource("6_hvdyj")
 DebugTerrainMaterial = SubResource("ShaderMaterial_lq8db")
 
-[node name="TerrainDetailsManager" type="Node" parent="TerrainManager"]
+[node name="TerrainDetailsManager" type="Node" parent="TerrainManager" unique_id=1238620707]
 script = ExtResource("3_x21qi")
 SeaWaterScene = "res://_scenes/sea_water.tscn"
 
-[node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="." unique_id=919458266]
 transform = Transform3D(1, 0, 0, 0, 0.88759, 0.460634, 0, -0.460634, 0.88759, 0, 4.00946, 4.97494)
 light_color = Color(0.932094, 0.710711, 0.539878, 1)
 light_energy = 2.964
@@ -243,13 +215,13 @@ shadow_blur = 2.107
 directional_shadow_blend_splits = true
 directional_shadow_fade_start = 0.73
 
-[node name="MobsManager" type="Node3D" parent="." node_paths=PackedStringArray("SafetyBubble")]
+[node name="MobsManager" type="Node3D" parent="." unique_id=1025076362 node_paths=PackedStringArray("SafetyBubble")]
 script = ExtResource("6_5h46a")
 DelayBetweenSpawns = 2.0
 SpawnsPerTime = 1
 SafetyBubble = NodePath("SafetyBubble")
 
-[node name="SafetyBubble" type="MeshInstance3D" parent="MobsManager"]
+[node name="SafetyBubble" type="MeshInstance3D" parent="MobsManager" unique_id=1905258690]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.63792, -0.291809)
 layers = 524288
 cast_shadow = 0
@@ -258,32 +230,27 @@ mesh = SubResource("CapsuleMesh_luoph")
 skeleton = NodePath("../..")
 surface_material_override/0 = SubResource("ShaderMaterial_ike5v")
 
-[node name="Node3D" type="Node3D" parent="."]
+[node name="Node3D" type="Node3D" parent="." unique_id=1908679321]
 transform = Transform3D(10, 0, 0, 0, 10, 0, 0, 0, 10, -18.8404, 0.0218635, 0)
 
-[node name="Faraway" type="MeshInstance3D" parent="."]
+[node name="Faraway" type="MeshInstance3D" parent="." unique_id=1877492176]
 transform = Transform3D(1, 0, 0, 0, -4.371139e-08, 1, 0, -1, -4.371139e-08, 0, 0, 0)
 cast_shadow = 0
 mesh = SubResource("QuadMesh_ike5v")
 surface_material_override/0 = SubResource("StandardMaterial3D_11ryp")
 
-[node name="MeshInstance3D" type="MeshInstance3D" parent="Faraway"]
-transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, 2000, 0, 0)
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Faraway" unique_id=1874006580]
+transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, 2000, 0, -543.3003)
 mesh = SubResource("QuadMesh_lq8db")
 
-[node name="MeshInstance3D5" type="MeshInstance3D" parent="Faraway"]
-transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, 2000, 0, 45.954)
-visible = false
-mesh = SubResource("CylinderMesh_ike5v")
-
-[node name="MeshInstance3D3" type="MeshInstance3D" parent="Faraway"]
-transform = Transform3D(-4.371139e-08, -1, 4.371139e-08, 0, -4.371139e-08, -1, 1, -4.371139e-08, 1.9106855e-15, 0, 2000, 0)
+[node name="MeshInstance3D3" type="MeshInstance3D" parent="Faraway" unique_id=593249783]
+transform = Transform3D(-4.371139e-08, -1, 4.371139e-08, 0, -4.371139e-08, -1, 1, -4.371139e-08, 3.5527137e-15, 2.3748411e-05, 2000, -543.3003)
 mesh = SubResource("QuadMesh_lq8db")
 
-[node name="MeshInstance3D4" type="MeshInstance3D" parent="Faraway"]
-transform = Transform3D(1.3113416e-07, 1, -4.371139e-08, 3.821371e-15, 4.371139e-08, 1, 1, -1.3113416e-07, 1.9106855e-15, 0, -2000, 0)
+[node name="MeshInstance3D4" type="MeshInstance3D" parent="Faraway" unique_id=1582986181]
+transform = Transform3D(1.3113416e-07, 1, -4.371139e-08, 3.5527137e-15, 4.371139e-08, 1, 1, -1.3113416e-07, 3.5527137e-15, -7.1245224e-05, -2000, -543.3003)
 mesh = SubResource("QuadMesh_lq8db")
 
-[node name="MeshInstance3D2" type="MeshInstance3D" parent="Faraway"]
-transform = Transform3D(4.371139e-08, -3.821371e-15, 1, -8.742278e-08, -1, 0, 1, -8.742278e-08, -4.371139e-08, -2000, 0, 0)
+[node name="MeshInstance3D2" type="MeshInstance3D" parent="Faraway" unique_id=1283542008]
+transform = Transform3D(4.371139e-08, -3.821371e-15, 1, -8.742278e-08, -1, 0, 1, -8.742278e-08, -4.371139e-08, -2000, 4.7496822e-05, -543.3003)
 mesh = SubResource("QuadMesh_lq8db")

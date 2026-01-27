@@ -1,4 +1,4 @@
-[gd_scene load_steps=5 format=3 uid="uid://ci76qxgotcwqo"]
+[gd_scene format=3 uid="uid://ci76qxgotcwqo"]
 
 [ext_resource type="PackedScene" uid="uid://1nej3nf5un6x" path="res://_models/obstacles/tower/tower.glb" id="1_e2fqs"]
 [ext_resource type="Script" uid="uid://b1nrapc5y0ooy" path="res://_script/gameplay/Tower.cs" id="2_dcva2"]
@@ -8,47 +8,56 @@
 height = 21.586761
 radius = 7.4907227
 
-[node name="tower" node_paths=PackedStringArray("collider") instance=ExtResource("1_e2fqs")]
+[node name="tower" unique_id=1722908266 node_paths=PackedStringArray("collider", "ReflectProbe") instance=ExtResource("1_e2fqs")]
 transform = Transform3D(0.7, 0, 0, 0, 0.7, 0, 0, 0, 0.7, 0, 0, 0)
 script = ExtResource("2_dcva2")
 collider = NodePath("Area3D/CollisionShape3D")
+ReflectProbe = NodePath("ReflectionProbe")
 
-[node name="Tower_New" parent="." index="0"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.351828, -0.29349136, -0.22752178)
+[node name="Tower_New" parent="." index="0" unique_id=2114115907]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0)
+visible = false
 gi_lightmap_texel_scale = 3.5953
 surface_material_override/0 = ExtResource("3_sy1iy")
 
-[node name="Area3D" type="Area3D" parent="." index="1"]
+[node name="Area3D" type="Area3D" parent="." index="1" unique_id=1718422737]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 8.087425, 0)
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="Area3D" index="0"]
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Area3D" index="0" unique_id=1474753851]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.907192, 3.2689342, 0)
 shape = SubResource("CylinderShape3D_g5ffg")
 
-[node name="Tower_New-col" parent="." index="2"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.351828, -0.29349136, -0.22752178)
+[node name="Tower_Interior" parent="." index="2" unique_id=1147391283]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0)
+layers = 524288
+surface_material_override/0 = ExtResource("3_sy1iy")
+
+[node name="OmniLight3D3" type="OmniLight3D" parent="." index="3" unique_id=1103705320]
+transform = Transform3D(1.4285715, 0, 0, 0, 1.4285715, 0, 0, 0, 1.4285715, -1.1110497, 4.931072, 0.41353276)
 visible = false
-
-[node name="OmniLight3D2" type="OmniLight3D" parent="." index="3"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.5135527, 22.828321, -3.031602)
 light_color = Color(0.33047116, 0.616816, 0.691105, 1)
 light_energy = 0.815
 light_indirect_energy = 1.465
 light_volumetric_fog_energy = 3.153
-light_negative = true
+light_bake_mode = 1
 shadow_enabled = true
 shadow_opacity = 0.0
 omni_range = 9.437
 omni_attenuation = 0.564
 
-[node name="OmniLight3D3" type="OmniLight3D" parent="." index="4"]
-transform = Transform3D(1.4285715, 0, 0, 0, 1.4285715, 0, 0, 0, 1.4285715, 0.13142416, 3.9640155, 0.41353276)
-light_color = Color(0.33047116, 0.616816, 0.691105, 1)
-light_energy = 0.815
-light_indirect_energy = 1.465
-light_volumetric_fog_energy = 3.153
-light_negative = true
-shadow_enabled = true
-shadow_opacity = 0.0
-omni_range = 9.437
-omni_attenuation = 0.564
+[node name="ReflectionProbe" type="ReflectionProbe" parent="." index="4" unique_id=832685479]
+transform = Transform3D(1.4285715, 0, 0, 0, 1.4285715, 0, 0, 0, 1.4285715, 1.9896209, 10.698718, 0.9770448)
+layers = 3
+blend_distance = 1.29
+max_distance = 7.9
+size = Vector3(15.320229, 26.363464, 14.335114)
+origin_offset = Vector3(-1.17, -5.155, -1.795)
+interior = true
+enable_shadows = true
+reflection_mask = 524290
+ambient_mode = 2
+ambient_color = Color(0.15520173, 0.15843084, 0.16731751, 1)
+
+[node name="Tower_Exterior" parent="." index="5" unique_id=1934949132]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0)
+surface_material_override/0 = ExtResource("3_sy1iy")
