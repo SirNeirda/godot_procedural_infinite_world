@@ -8,6 +8,13 @@ public partial class Tower : WorldItemModel
     [Export]
     public CollisionShape3D collider;
 
+   /* [Export] Color AmbientLightColorSky;
+     [Export] Color AmbientGroundHorizon;
+      [Export] Color AmbientLightColorGround;
+    [Export] float GroundWeight;*/
+
+    [Export] ReflectionProbe ReflectProbe;
+
     private Area3D colliderArea;
 
     public override void _Ready()
@@ -30,14 +37,22 @@ public partial class Tower : WorldItemModel
         if (body is MainCharacter)
         {
             MainCharacter charbody = body as MainCharacter;
-            charbody.FloorMaxAngle = 80;
-            MobManager.Instance.DespawnAllMobs();
-            MobManager.Instance.SpawnsPerTime = 0;
+            charbody.FloorMaxAngle = 70;
+            //MobManager.Instance.DespawnAllMobs();
+           // MobManager.Instance.SpawnsPerTime = 0;
+            //EnvironmentManager.Instance.OverrideAmbientColor(1, AmbientLightColorSky, GroundWeight, AmbientGroundHorizon, 0, AmbientLightColorGround, 0);
+           // ReflectProbe.UpdateGizmos(); //This doesn't work, only for the editor dixit the API docs
             GD.Print("Entered tower area");
         }
-        else if (body.GetParent() is WorldItemModel)
+        
+       else if (body.GetParent() is WorldItemModel)
         {
-           // GD.Print("body is " + body.GetParent().Name);
+           GD.Print("body is " + body.GetParent().Name);
+            body.Visible = false;
+        }
+        else if (body.GetParent().GetParent() is WorldItemModel)
+        {
+           GD.Print("body is " + body.GetParent().GetParent().Name);
             body.Visible = false;
         }
     }
@@ -46,9 +61,10 @@ public partial class Tower : WorldItemModel
     {
         if (body is MainCharacter)
         {
+            EnvironmentManager.Instance.EndOverride();
             MainCharacter charbody = body as MainCharacter;
             charbody.FloorMaxAngle = 60;
-            MobManager.Instance.SpawnsPerTime = 4;
+            //MobManager.Instance.SpawnsPerTime = 4;
             GD.Print("Exited tower area");
         }
     }
