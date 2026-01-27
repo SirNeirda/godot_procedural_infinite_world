@@ -134,8 +134,23 @@ public partial class EnvironmentManager : WorldEnvironment
 
     public Color CurrentCloudColor;
 
+    private float OverrideFade = 0.0f;
+    private float OverrideFadeSpeed = 1.5f;
+
     public Color CurrentFogColor;
     private ProceduralSkyMaterial skyMaterial;
+
+    public Color AmbientColorOverrideGround;
+
+    public float OverrideBlendGround = 0;
+    public Color AmbientColorOverrideHorizon;
+
+    public float OverrideBlendHoziron = 0;
+    public Color AmbientColorOverrideSky;
+
+    public float OverrideBlendSky = 0;
+
+    public bool UseOverride;
 
     //private readonly TransitionPhase dawn = new TransitionPhase { StartHour = 4.5f, EndHour = 7.0f };
     //private readonly TransitionPhase dusk = new TransitionPhase { StartHour = 18.5f, EndHour = 20.5f };
@@ -177,6 +192,22 @@ public partial class EnvironmentManager : WorldEnvironment
         return (float)GD.RandRange(0.0, 24.0);
     }
 
+    public void OverrideAmbientColor(float overrideFadeSpeed, Color overrideColSky, float skyBlend, Color overrideColHorizon, float horizonBlend, Color overrideColGround, float groundBlend)
+    {
+        OverrideFadeSpeed = overrideFadeSpeed;
+        OverrideBlendSky = skyBlend;
+        OverrideBlendHoziron = horizonBlend;
+        OverrideBlendGround = groundBlend;
+        AmbientColorOverrideGround = overrideColGround;
+        AmbientColorOverrideHorizon = overrideColHorizon;
+        AmbientColorOverrideSky = overrideColSky;
+        UseOverride = true;
+    }
+    public void EndOverride()
+    {
+        UseOverride = false;
+    }
+
     public string GetTime()
     {
         return currentTime.ToString();
@@ -191,97 +222,102 @@ public partial class EnvironmentManager : WorldEnvironment
             DetermineWeather();
         }
 
+        OverrideFade = Mathf.MoveToward(
+        OverrideFade,
+        UseOverride ? 1.0f : 0.0f,
+        (float)delta * OverrideFadeSpeed);
+
         UpdateLighting();
         UpdateClouds(delta);
     }
-private void ResetGradient(Gradient g)
-{
-    // Replace default two points by 1 dummy point
-    // (minimum allowed by Godot)
-    g.SetOffset(0, 0f); 
-    g.SetColor(0, Colors.White);
-
-    // If gradient had more than 1 point, trim extra from end
-    for (int i = g.GetPointCount() - 1; i > 0; i--)
+    private void ResetGradient(Gradient g)
     {
-        g.RemovePoint(i);
-    }
-}
-   private Gradient InterpolateGradients(Gradient grad1, Gradient grad2, float t)
-{
-    if (grad1 == null || grad2 == null)
-    {
-        return new Gradient();
-    }
+        // Replace default two points by 1 dummy point
+        // (minimum allowed by Godot)
+        g.SetOffset(0, 0f);
+        g.SetColor(0, Colors.White);
 
-    t = Mathf.Clamp(t, 0f, 1f);
-
-    Gradient output = new Gradient();
-    //ResetGradient(output); // Safe clear
-
-    // Collect all unique offsets
-    List<float> offsets = new List<float>();
-
-    for (int i = 0; i < grad1.GetPointCount(); i++)
-    {
-        offsets.Add(grad1.GetOffset(i));
-    }
-
-    for (int i = 0; i < grad2.GetPointCount(); i++)
-    {
-        float o = grad2.GetOffset(i);
-        if (!offsets.Contains(o))
+        // If gradient had more than 1 point, trim extra from end
+        for (int i = g.GetPointCount() - 1; i > 0; i--)
         {
-            offsets.Add(o);
+            g.RemovePoint(i);
         }
     }
-
-    offsets.Sort();
-
-
-    foreach (float pos in offsets)
+    private Gradient InterpolateGradients(Gradient grad1, Gradient grad2, float t)
     {
-        Color c1 = grad1.Sample(pos);
-        Color c2 = grad2.Sample(pos);
-        Color blended = c1.Lerp(c2, t);
+        if (grad1 == null || grad2 == null)
+        {
+            return new Gradient();
+        }
 
-        output.AddPoint(pos, blended);
+        t = Mathf.Clamp(t, 0f, 1f);
+
+        Gradient output = new Gradient();
+        //ResetGradient(output); // Safe clear
+
+        // Collect all unique offsets
+        List<float> offsets = new List<float>();
+
+        for (int i = 0; i < grad1.GetPointCount(); i++)
+        {
+            offsets.Add(grad1.GetOffset(i));
+        }
+
+        for (int i = 0; i < grad2.GetPointCount(); i++)
+        {
+            float o = grad2.GetOffset(i);
+            if (!offsets.Contains(o))
+            {
+                offsets.Add(o);
+            }
+        }
+
+        offsets.Sort();
+
+
+        foreach (float pos in offsets)
+        {
+            Color c1 = grad1.Sample(pos);
+            Color c2 = grad2.Sample(pos);
+            Color blended = c1.Lerp(c2, t);
+
+            output.AddPoint(pos, blended);
+        }
+
+        return output;
     }
-
-    return output;
-}
 
     private void DetermineWeather()
     {
-       Array values = Enum.GetValues(typeof(CloudSettings));
-    CloudSettings newWeather = (CloudSettings)values.GetValue(GD.Randi() % values.Length);
+        Array values = Enum.GetValues(typeof(CloudSettings));
+        CloudSettings newWeather = (CloudSettings)values.GetValue(GD.Randi() % values.Length);
 
-    if (CurrentCloud == newWeather)
-        return;
+        if (CurrentCloud == newWeather)
+            return;
 
-    // Store previous
-    previousGradient = CurrentGradient;
+        // Store previous
+        previousGradient = CurrentGradient;
 
-    // Set new cloud type + target gradient
-    CurrentCloud = newWeather;
+        // Set new cloud type + target gradient
+        CurrentCloud = newWeather;
 
-    switch (CurrentCloud)
-    {
-        case CloudSettings.Clear:   CurrentGradient = SunnyGradient; break;
-        case CloudSettings.Spotty:  CurrentGradient = SpottyGradient; break;
-        case CloudSettings.Cloudy:  CurrentGradient = CloudyGradient; break;
-        case CloudSettings.Covered: CurrentGradient = CoveredGradient; break;
-    }
+        switch (CurrentCloud)
+        {
+            case CloudSettings.Clear: CurrentGradient = SunnyGradient; break;
+            case CloudSettings.Spotty: CurrentGradient = SpottyGradient; break;
+            case CloudSettings.Cloudy: CurrentGradient = CloudyGradient; break;
+            case CloudSettings.Covered: CurrentGradient = CoveredGradient; break;
+        }
 
-    // Start blending from 0 → 1
-    gradientLerpValue = 0f;
+        // Start blending from 0 → 1
+        gradientLerpValue = 0f;
 
-    GD.Print("New clouds: " + CurrentCloud);
+        GD.Print("New clouds: " + CurrentCloud);
     }
 
     private void UpdateClouds(double delta)
     {
-        
+
         if (skyMaterial != null)
         {
             NoiseTexture2D noiseTexture = skyMaterial.SkyCover as NoiseTexture2D;
@@ -292,18 +328,18 @@ private void ResetGradient(Gradient g)
             Vector3 offset = new Vector3(timeOfDay, 0, 0);
             noiseLite.Offset = offset;
             // Blending
-    if (previousGradient != null && CurrentGradient != null && gradientLerpValue < 1f)
-    {
-        gradientLerpValue += (float)delta / GradientBlendDuration;
+            if (previousGradient != null && CurrentGradient != null && gradientLerpValue < 1f)
+            {
+                gradientLerpValue += (float)delta / GradientBlendDuration;
 
-        float t = Mathf.Clamp(gradientLerpValue, 0f, 1f);
+                float t = Mathf.Clamp(gradientLerpValue, 0f, 1f);
 
-        Gradient grad = InterpolateGradients(previousGradient, CurrentGradient, t);
+                Gradient grad = InterpolateGradients(previousGradient, CurrentGradient, t);
 
-        noiseTexture.ColorRamp = grad;
+                noiseTexture.ColorRamp = grad;
 
-       // GD.Print($"Blending: {t}");
-    }
+                // GD.Print($"Blending: {t}");
+            }
         }
     }
 
@@ -322,6 +358,7 @@ private void ResetGradient(Gradient g)
 
             float visibility = GetSunVisibilityFactor(hour);
             float lightEnergy = Mathf.Lerp(GetTimeLightEnergy(hour), Night_LightEnergy, 1f - visibility);
+            // float fogEnergy = lightEnergy/1.5f;
             CurrentLightColor = GetTimeLightColor(hour).Lerp(Night_LightColor, 1f - visibility);
             CurrentCloudColor = GetCloudColor(hour).Lerp(Night_LightColor, 1f - visibility);
             CurrentFogColor = GetFogColor(hour).Lerp(Night_LightColor, 1f - visibility);
@@ -339,12 +376,26 @@ private void ResetGradient(Gradient g)
         // Set sky colors based on time
         if (skyMaterial != null)
         {
+
+            Environment.FogLightEnergy = SunLight.LightEnergy;
             skyMaterial.SkyCoverModulate = CurrentCloudColor;
             Environment.FogLightColor = CurrentFogColor;
-            skyMaterial.SkyTopColor = GetTimeSkyTopColor(hour);
-            Color GroundColor = GetTimeSkyGroundColor(hour);
-            skyMaterial.SkyHorizonColor = GroundColor;
-            skyMaterial.GroundHorizonColor = GroundColor;
+
+            Color baseSky = GetTimeSkyTopColor(hour);
+            Color baseGround = GetTimeSkyGroundColor(hour);
+
+            float skyWeight = OverrideBlendSky * OverrideFade;
+            float horizonWeight = OverrideBlendHoziron * OverrideFade;
+            float groundWeight = OverrideBlendGround * OverrideFade;
+
+            skyMaterial.SkyTopColor =
+                baseSky.Lerp(AmbientColorOverrideSky, skyWeight);
+
+            skyMaterial.SkyHorizonColor =
+                baseGround.Lerp(AmbientColorOverrideHorizon, horizonWeight);
+
+            skyMaterial.GroundHorizonColor =
+                baseGround.Lerp(AmbientColorOverrideGround, groundWeight);
         }
     }
 

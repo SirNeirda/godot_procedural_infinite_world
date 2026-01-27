@@ -670,7 +670,7 @@ public partial class MainCharacter : CharacterBody3D
 
 	public void UpdateHelpers(float deltaFloat)
 	{
-		string text = CharacterName;
+		string text = CharacterName+ "\n" + TerrainManager.Instance.CameraInChunk();
 		if (PopupInfo == null)
 		{
 			PopupInfo = Debug.SetTextHelper(text, CameraPivot.Position, CameraPivot);

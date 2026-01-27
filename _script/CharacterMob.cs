@@ -54,7 +54,7 @@ public partial class CharacterMob : CharacterBody3D
 	[Export] public float DirectionUpdateInterval = 2f;
 	[Export] public float RotationSmoothness = 4f;
 
-	private float _directionTimer = 0f;
+	private float _directionTimer = 5f;
 	private Vector3 _cachedDirection;
 
 
@@ -75,6 +75,9 @@ public partial class CharacterMob : CharacterBody3D
 	protected virtual void Initialization()
 	{
 		Velocity = Vector3.Zero;
+		RandomNumberGenerator rng = new RandomNumberGenerator();
+		int multiplier = rng.RandiRange(-5, 5);
+		_cachedDirection = _cachedDirection*multiplier;
 		//Input.MouseMode = Input.MouseModeEnum.Captured;
 		FloorMaxAngle = Mathf.DegToRad(50);
 
