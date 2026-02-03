@@ -52,6 +52,5 @@ If any mob gets too close, the distance counter resets, the safe zone resets aro
 ![Alt Text](./images/v99_9.jpg)
 
 ## Discord
-https://github.com/SirNeirda/godot_procedural_infinite_world/blob/main/images/v99_7.jpg
 
 So if you would like to help or receive help, ask a question or simply chill, welcome to join our [Discord](https://discord.gg/JhnQwUpFBm)! 
